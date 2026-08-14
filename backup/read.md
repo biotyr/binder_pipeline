@@ -1,0 +1,1 @@
+# 本文件夹是单链target的binder设计核心代码，不支持多链复合物target
