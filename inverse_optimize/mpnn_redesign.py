@@ -289,22 +289,39 @@ def mpnn_redesign_binder(
     )
 
     # ---- 5. 结构化输出 ----
-    binder_len = len(raw["seq"][0]) if raw.get("seq") else 0
-    # MPNN 返回的 seq 可能包含 target + binder; 取前 binder_len 个残基
+    ##### claude 2026/9/9 fix #####
+    # colabdesign sample() 的两个适配问题:
+    # 1. raw["seq"]/["score"]/["seqid"] 是 numpy 数组 (seq: ndarray of
+    #    np.str_), 对 >1 元素数组做真值判断会触发
+    #    "truth value of an array is ambiguous" — 改为显式 None/长度检查。
+    # 2. 多链时 raw["seq"] 是各链序列用 "/" 拼接的字符串
+    #    (如 "BINDER/TARGET", S 张量不含 "/"), 旧代码用
+    #    len(raw["seq"][0]) (总长) 当 binder 长度做前缀切片, 恒等无切片,
+    #    导致 binder 序列混入 target — 改为按 "/" 分段取第一段
+    #    (binder 在 design_chains 中恒排第一位)。
+    if raw.get("seq") is None or not len(raw["seq"]):
+        print("[MPNN Redesign] sample() returned no sequences")
+        return []
 
     results: list[RedesignResult] = []
-    for n in range(len(raw.get("seq", []))):
-        full_seq = raw["seq"][n]
-        ##### claude 2026/8/13 start #####
-        # binder 在 design_chains 的第一位 (binder-first 设计),
-        # 因此输出序列的前段即 binder (若返回全链拼接序列)。
-        seq = full_seq[:binder_len] if binder_len and len(full_seq) > binder_len else full_seq
-        ##### claude 2026/8/13 end #####
+    for n in range(len(raw["seq"])):
+        full_seq = str(raw["seq"][n])
+        segments = full_seq.split("/")
+        seq = segments[0] if len(segments) > 1 else full_seq
+        ##### claude 2026/9/9 fix end #####
 
         results.append({
             "sequence": seq,
-            "score": round(raw["score"][n], 4) if raw.get("score") else float("nan"),
-            "seqid": round(raw["seqid"][n], 4) if raw.get("seqid") else float("nan"),
+            "score": (
+                round(float(raw["score"][n]), 4)
+                if raw.get("score") is not None and len(raw["score"])
+                else float("nan")
+            ),
+            "seqid": (
+                round(float(raw["seqid"][n]), 4)
+                if raw.get("seqid") is not None and len(raw["seqid"])
+                else float("nan")
+            ),
             "length": len(seq),
             "mpnn_n": n + 1,
         })

@@ -94,8 +94,20 @@ def score_interface(
     ##### claude 2026/8/13 start #####
     # 多链 target: 接口定义为 target 组对 binder (如 "AB_C")。
     # Rosetta 原生支持下划线两侧连写多链; A-B 自身接触不计入界面。
-    iam.set_interface(f"{''.join(target_labels)}_{binder_chain}")
     ##### claude 2026/8/13 end #####
+    partners = f"{''.join(target_labels)}_{binder_chain}"
+    ##### claude 2026/9/9 fix #####
+    # PyRosetta 2026.29+ 移除了 set_interface(str) 重载, 只收
+    # core.pose.DockingPartners (字符串解析挪进其工厂方法
+    # docking_partners_from_string, 界面定义语法不变)。旧版走原
+    # 字符串路径, 新版走工厂方法。
+    try:
+        iam.set_interface(partners)
+    except TypeError:
+        from pyrosetta.rosetta.core.pose import DockingPartners
+
+        iam.set_interface(DockingPartners.docking_partners_from_string(partners))
+    ##### claude 2026/9/9 fix end #####
     scorefxn = pr.get_fa_scorefxn()
     iam.set_scorefunction(scorefxn)
     iam.set_compute_packstat(True)

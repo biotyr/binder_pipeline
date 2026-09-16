@@ -1,0 +1,32 @@
+{
+  "task": "4ZQK_multi",
+  "hotspot": "no",
+  "seed": 0,
+  "batch_size": 1,
+  "hotspot_ids": null,
+  "target_chain_lengths": {
+    "A": 115,
+    "B": 118
+  },
+  "config": {
+    "enable_mpnn": true,
+    "enable_rosetta": true,
+    "mpnn_num_seqs": 20,
+    "hero_critic_names": [
+      "ESMFold2-Experimental-Cutoff2025"
+    ],
+    "use_stage1_scaling": false,
+    "batch_size": 1,
+    "dtype": "trunk bf16 (native) + heads fp32"
+  },
+  "elapsed_s": 8296.6,
+  "n_stage1_candidates": 1,
+  "n_selected": 13,
+  "n_quality_passed": 1,
+  "n_quality_failed": 0,
+  "n_refold_results": 19,
+  "best_sequences": [
+    "AFTVTVPKDLYVVEYGSNMTIECKFPVEKQLDLAALIVYWEMEDKNIIQFVHGEEDLKVQHSSYRQRARLLKDQLSLGNAALQITDVKLQDAGVYRCMISYGGADYKRITVKVNA|NPPTFSPALLVVTEGDNATFTCSFSNTSESFVLNWYRMSPSNQTDKLAAFPEDRSQPGQDSRFRVTQLPNGRDFHMSVVRARRNDSGTYLCGAISLAPKAQIKESLRAELRVTERRAE|DEDDDDDDDEDDDEDDDFKLESLLNRIAFNIFIMFELFKQFRKADDIDLEELNEHVANARQQVMIFLNRLADRLFRAKRNGDDDDLIEFLKELLEALDELKKALKKLADLLDDDDADEDDIKKALKDVIDALKKVLEVLADYDGDDDGVVKKLLKLIN"
+  ],
+  "peak_vram_gib": 20.856032371520996
+}

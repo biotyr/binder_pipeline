@@ -551,7 +551,13 @@ def compute_structure_losses(
         losses["epitope_loss"] = compute_epitope_loss(
             distogram_logits=distogram_logits,
             epitope_mask=epitope_mask,
-            target_length=target_length,
+            ##### claude 2026/9/9 fix #####
+            # 重构残留: 本函数作用域内从未定义 target_length (NameError,
+            # 仅热点分支触发)。total_target (上方 assert 已验证其等于
+            # 各 target 链长度之和) 即 compute_epitope_loss 所需的
+            # target token 跨度。
+            target_length=total_target,
+            ##### claude 2026/9/9 fix end #####
             binder_length=binder_length,
             bin_distance=bin_distance,
             epitope_contact_distance=epitope_contact_distance,

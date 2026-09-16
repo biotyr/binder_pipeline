@@ -8,6 +8,9 @@
 pipeline/
 ├── README.md                              ← 本文件
 │
+├── environment.yml                        ← conda 环境配置 (esmbind, python 3.12,
+│                                            含版本裁决依据与手动安装步骤)
+│
 ├── core.py                                ← 核心模块 (纯 Python, 零 Modal 依赖)
 │   ├── PipelineConfig / PipelineResult
 │   ├── compute_selection_score / apply_filters / select_top_n
@@ -21,10 +24,12 @@ pipeline/
 │   └── argparse → IntegratedPipeline(config).run(...)
 │
 ├── esmcp/                                 ← ESMFold2 设计引擎
-│   └── binder_design.py                   ← 核心: 150步 SGD + Inversion/Critic 评分
-│                                             - pdb_with_quality_remarks() 将 iPTM/pTM
-│                                               嵌入 PDB REMARK 250 记录
-│                                             - critic_results["annotated_pdb"] 直接可用
+│   ├── binder_design.py                   ← 核心: 150步 SGD + Inversion/Critic 评分
+│   │                                        - pdb_with_quality_remarks() 将 iPTM/pTM
+│   │                                          嵌入 PDB REMARK 250 记录
+│   │                                        - critic_results["annotated_pdb"] 直接可用
+│   └── binder_design.ipynb                ← 上游 Modal 教程 notebook (sweep → 收集
+│                                            → 选序参考实现)
 │
 ├── inverse_optimize/                      ← 逆折叠序列优化
 │   ├── __init__.py
@@ -44,6 +49,8 @@ pipeline/
     ├── default_filters.json               ← 默认过滤阈值配置
     └── integration.py                     ← ESMFold2 ↔ BindCraft 桥接
 ```
+
+另: `backup/` 为多链 target 改造 (2026/8/13) 前的单链版本快照, 见 `backup/read.md`。
 
 ### 代码拆分设计
 
@@ -206,9 +213,20 @@ Hotspot ID 必须带链前缀: `"<chain>:<residue><idx>"`，如 `"A:L150"` = 链
 
 esmcp 输出的 `annotated_pdb` 中 B-factor = pLDDT × 100, REMARK 250 记录 iPTM/pTM/distogram_binding_confidence。
 
+### 输入链名与 hotspot 的同步 (链名重置)
+
+Pipeline 本体不解析 FASTA: `run()` 接受 `|` 拼接的序列串, 原始链名**不保留** —— 复合物内一律按 asym_id 位置重置 (见上表)。因此 hotspot 的链前缀指向的是**传入序列中该链的排列位置**, 而非 FASTA/PDB 原始链字母:
+
+- 单链 target `"SEQ1"` → 重置为 `A`; hotspot 写 `A:<res><idx>`
+- 多链 target `"SEQ1|SEQ2"` → 依次重置为 `A`、`B` (binder 为 `C`); hotspot `B:P98` 指**第二段** (SEQ2) 链内第 98 位 (1-indexed)
+
+对齐由调用方保证: 原始链名 → 重置链名的映射 = 传入时链的排列顺序。`test/e2e/run_e2e.py` 按 FASTA header 的 Chain 字母经 `chain_order` **显式排序**后拼接, 因此两个测试靶 (3RRQ 单链 A; 4ZQK 双链 A=PD-L1, B=PD-1) 重置前后链名一致, 4/4 热点残基字母核对通过。注意 4ZQK FASTA 中 B 链记录排在 A 链之前 —— 若按文件顺序拼接会使 B→A 错位, `chain_order` 显式排序即为规避。
+
+两个校验护栏: ① hotspot 残基字母必须与该位置序列字母一致, 错位时立即暴露; ② 残基编号是去 X 后序列的链内 1-indexed 位置。
+
 ## 快速使用
 
-### 本地运行 (推荐, 无需 Modal)
+### 本地运行 (推荐, 无需 Modal 远程服务; 仍需安装 modal 包, 见外部依赖)
 
 ```bash
 # 基础: ESMFold2 设计 + 质量过滤
@@ -288,8 +306,10 @@ from refold import RefoldScreen, RefoldScreenConfig
 # 质量检查
 qc = filter_pdb_by_quality("design.pdb", min_iptm=0.7, binder_chain="B")
 
-# MPNN
-designs = mpnn_redesign_binder("design.pdb", num_seqs=20)
+# MPNN (binder_chain / target_chains 必填, 无默认链假设)
+designs = mpnn_redesign_binder(
+    "design.pdb", binder_chain="B", target_chains="A", num_seqs=20,
+)
 
 # 重折叠
 screen = RefoldScreen(target_seq, scaling_models, hero_models)
@@ -298,21 +318,26 @@ hero_results, _ = screen.run([d["sequence"] for d in designs])
 
 ## 外部依赖
 
-### 核心依赖 (core.py / run_local.py)
+完整环境规格以 `environment.yml` 为准 (conda env `esmbind`, python 3.12,
+含版本裁决依据与手动安装步骤)。核心依赖:
 
 ```
-  - torch ≥ 2.8.0 + triton + flash-attn
-  - transformers (HuggingFace, ESMFold2 fork)
-  - esm (Biohub GitHub @main)
-  - biotite, abnumber (抗体时)
+  - torch==2.8.0 + triton==3.4.0 + flash-attn==2.8.3 (cu128 预编译 wheel)
+  - transformers — Biohub fork (github.com/Biohub/transformers), 提供
+    mainline 没有的 transformers.models.esmfold2_* 模块
+  - esm 3.3.0 — Biohub fork 本地快照 (/home/taoyr/projects/biohub-esm/
+    esm-main; 上游 git@main 已漂移到 3.4.1, 要求 torch>=2.11,
+    与 torch==2.8.0 冲突, 故钉本地克隆)
+  - biotite, abnumber (抗体时; 依赖 conda 渠道的 anarci + hmmer)
   - biopython, scipy, numpy, pandas, pyarrow
-  - colabdesign (ProteinMPNN)
+  - colabdesign (ProteinMPNN; 依赖 conda 渠道 JAX 栈 jax/jaxlib/flax/
+    dm-haiku 等, 安装须 --no-deps, 见 environment.yml 尾部说明)
+  - modal — esmcp/binder_design.py 模块级 import, 本地运行同样需要安装
 ```
 
 ### Modal 专用 (run_modal.py)
 
 ```
-  - modal (远程 GPU 编排)
   - CUDA 12.8 + transformer-engine + xformers (由 Modal 镜像提供)
 ```
 

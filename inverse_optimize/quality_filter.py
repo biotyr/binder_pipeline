@@ -55,7 +55,8 @@ class QualityFilterConfig:
     ca_clash_cutoff : float
         CA 冲突距离阈值 (Å), 默认 2.5。
     binder_chain : str
-        PDB 中 binder 的链 ID, 默认 "B"。
+        PDB 中 binder 的链 ID, 默认 "" (必填 — 无默认链假设;
+        设置 min_binder_plddt 时若为空会触发 assert)。
     """
 
     min_iptm: float = 0.50

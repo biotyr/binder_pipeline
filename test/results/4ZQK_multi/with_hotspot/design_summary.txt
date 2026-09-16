@@ -1,0 +1,9 @@
+# e2e 设计结果  task=4ZQK_multi  hotspot=with  seed=0  batch_size=1  epitope_weight=0.5
+# 生成时间 2026-09-15 16:36:44  |  精度: 主干bf16(原生)+头fp32  hero=1(Cutoff2025)  Stage1-scaling=off
+
+# [stage1_only] Stage-1 hero 原始设计 (未经 MPNN/重折叠/Rosetta, dG=NA)
+rank  hero_model                              iptm        dG  binder_sequence
+   1  ESMFold2-Experimental-Cutoff2025      0.4660        NA  TTPPPPPPPPPPPPPPPTPTPPPSTPPPPPPPSPPPPPPPDPPPPPPPPPSSSSSSSSSNSKSQWRKLILLLQQQLQNRRNNNNNNNSLSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSLPPPPPPPPPPPPPPPPPPTPPSSSSLLLVP
+
+# [full_pipeline] 最终 selected (MPNN 重设计 → 重折叠 → Rosetta)
+rank  stage         iptm        dG     score  binder_sequence

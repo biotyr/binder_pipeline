@@ -1,0 +1,114 @@
+{
+  "T1a": {
+    "pass": [
+      "edge_iptm_exact",
+      "high",
+      "high_pI7_notminibinder"
+    ],
+    "fail": [
+      "high_but_pI7",
+      "low"
+    ],
+    "order": [
+      "high_but_pI7",
+      "high_pI7_notminibinder",
+      "high",
+      "edge_iptm_exact",
+      "low"
+    ],
+    "scores": {
+      "high_but_pI7": 1.0,
+      "high_pI7_notminibinder": 1.0,
+      "high": 0.8786,
+      "edge_iptm_exact": 0.5214,
+      "low": 0.0
+    },
+    "unmet": {
+      "high_but_pI7": [
+        "pI=7.0>=6.0"
+      ],
+      "high_pI7_notminibinder": [],
+      "high": [],
+      "edge_iptm_exact": [],
+      "low": [
+        "Average_pLDDT",
+        "Average_i_pTM"
+      ]
+    }
+  },
+  "T1b": {
+    "scores_w0": {
+      "conf_hi_phys_bad": 0.5,
+      "conf_lo_phys_good": 0.5,
+      "conf_mid_phys_good": 0.4785714285714285
+    },
+    "scores_w03": {
+      "conf_lo_phys_good": 0.6199999999999999,
+      "conf_mid_phys_good": 0.6049999999999999,
+      "conf_hi_phys_bad": 0.35
+    },
+    "passed": [
+      "conf_lo_phys_good",
+      "conf_mid_phys_good"
+    ],
+    "failed": [
+      "conf_hi_phys_bad"
+    ],
+    "unmet_bad": [
+      "Average_ShapeComplementarity",
+      "Average_dG",
+      "Average_n_InterfaceHbonds",
+      "Average_n_InterfaceUnsatHbonds"
+    ]
+  },
+  "checks": [
+    {
+      "check": "T1a passed \u96c6\u5408",
+      "ok": true
+    },
+    {
+      "check": "T1a low \u88ab\u62d2\u4e14\u8bb0\u5f55 unmet",
+      "ok": true
+    },
+    {
+      "check": "T1a \u8fb9\u754c 0.50 \u6070\u597d\u901a\u8fc7",
+      "ok": true
+    },
+    {
+      "check": "T1a pI \u7279\u4f8b\u6807\u6ce8",
+      "ok": true
+    },
+    {
+      "check": "T1a \u6392\u5e8f\u5355\u8c03",
+      "ok": true
+    },
+    {
+      "check": "T1a top-N \u5206\u7ec4\u6bcf\u7ec4 1 \u6761",
+      "ok": true
+    },
+    {
+      "check": "T1b conf_hi_phys_bad \u6743\u91cd\u6052\u7b49\u533a\u95f4",
+      "ok": true
+    },
+    {
+      "check": "T1b conf_lo_phys_good \u6743\u91cd\u6052\u7b49\u533a\u95f4",
+      "ok": true
+    },
+    {
+      "check": "T1b conf_mid_phys_good \u6743\u91cd\u6052\u7b49\u533a\u95f4",
+      "ok": true
+    },
+    {
+      "check": "T1b \u7269\u7406\u5206\u6539\u53d8\u6392\u5e8f",
+      "ok": true
+    },
+    {
+      "check": "T1b ros_bad \u88ab Rosetta \u9608\u503c\u62d2",
+      "ok": true
+    },
+    {
+      "check": "T1b ros_good \u901a\u8fc7\u5168\u90e8 Rosetta \u9608\u503c",
+      "ok": true
+    }
+  ]
+}

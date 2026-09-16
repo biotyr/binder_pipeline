@@ -18,7 +18,7 @@ import torch
 # ---- 从 esmcp 复用核心函数 ----
 # 这些导入假设 esmcp/binder_design.py 在 PYTHONPATH 中。
 # 如果直接运行, 确保 pipeline/ 目录可被导入:
-#   import sys; sys.path.insert(0, "/home/biotyr/esmbind/pipeline")
+#   import sys; sys.path.insert(0, "/home/taoyr/projects/pipeline")
 from esmcp.binder_design import (
     PROTEIN_1TO3,
     TOKENS,
@@ -179,7 +179,17 @@ def refold_full(
 
     # Global pLDDT
     plddt_tensor = fold.get("plddt")
-    plddt = plddt_tensor.item() if plddt_tensor is not None else None
+    ##### claude 2026/9/11 fix #####
+    # 模型输出的 plddt 是逐 token 张量 ([L] 或 [B, L]), 不是标量 —
+    # .item() 会抛 "a Tensor with N elements cannot be converted to
+    # Scalar" (仅 Stage 4 refold_full 触发; Stage 1 score_critic 不提取
+    # plddt 故被掩盖)。全局平均 pLDDT = 对所有 token 取均值。
+    plddt = (
+        plddt_tensor.mean().item()
+        if plddt_tensor is not None
+        else None
+    )
+    ##### claude 2026/9/11 fix end #####
 
     # Distogram-based binding confidence
     iptm_proxy = compute_distogram_iptm_proxy(

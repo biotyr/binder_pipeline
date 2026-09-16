@@ -1,0 +1,89 @@
+[
+  {
+    "file": "single_pass.pdb",
+    "passed": true,
+    "expected_pass": true,
+    "iptm": 0.62,
+    "binder_plddt": 0.85,
+    "distogram_binding_confidence": 0.58,
+    "ca_clashes": 0,
+    "reasons": [],
+    "case_ok": true
+  },
+  {
+    "file": "single_fail_iptm.pdb",
+    "passed": false,
+    "expected_pass": false,
+    "iptm": 0.49,
+    "binder_plddt": 0.85,
+    "distogram_binding_confidence": 0.58,
+    "ca_clashes": 0,
+    "reasons": [
+      "iPTM=0.4900 < 0.50"
+    ],
+    "case_ok": true
+  },
+  {
+    "file": "single_fail_plddt.pdb",
+    "passed": false,
+    "expected_pass": false,
+    "iptm": 0.62,
+    "binder_plddt": 0.6,
+    "distogram_binding_confidence": 0.58,
+    "ca_clashes": 0,
+    "reasons": [
+      "Binder pLDDT=0.6000 < 0.70"
+    ],
+    "case_ok": true
+  },
+  {
+    "file": "single_fail_proxy.pdb",
+    "passed": false,
+    "expected_pass": false,
+    "iptm": 0.62,
+    "binder_plddt": 0.85,
+    "distogram_binding_confidence": 0.45,
+    "ca_clashes": 0,
+    "reasons": [
+      "dist_binding_confidence=0.4500 < 0.50"
+    ],
+    "case_ok": true
+  },
+  {
+    "file": "multi_pass.pdb",
+    "passed": true,
+    "expected_pass": true,
+    "iptm": 0.75,
+    "binder_plddt": 0.85,
+    "distogram_binding_confidence": 0.58,
+    "ca_clashes": 0,
+    "reasons": [],
+    "case_ok": true
+  },
+  {
+    "file": "multi_fail_iptm.pdb",
+    "passed": false,
+    "expected_pass": false,
+    "iptm": 0.69,
+    "binder_plddt": 0.85,
+    "distogram_binding_confidence": 0.58,
+    "ca_clashes": 0,
+    "reasons": [
+      "iPTM=0.6900 < 0.70"
+    ],
+    "case_ok": true
+  },
+  {
+    "file": "multi_clash.pdb",
+    "passed": false,
+    "expected_pass": false,
+    "iptm": 0.75,
+    "binder_plddt": 0.85,
+    "distogram_binding_confidence": 0.58,
+    "ca_clashes": 103,
+    "reasons": [
+      "CA clashes=103 > 0"
+    ],
+    "case_ok": true
+  }
+]

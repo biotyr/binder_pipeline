@@ -1,0 +1,84 @@
+[rescore] 共 21 个候选, 6 进程并行 Rosetta (含 relax)...
+  [1/21] mpnn#1: dG=-72.87 sc=0.71
+  [2/21] mpnn#4: dG=-72.56 sc=0.69
+  [3/21] mpnn#3: dG=-73.87 sc=0.70
+  [4/21] mpnn#5: dG=-70.11 sc=0.70
+  [5/21] mpnn#6: dG=-70.27 sc=0.66
+  [6/21] mpnn#7: dG=-65.55 sc=0.71
+  [7/21] mpnn#2: dG=-74.91 sc=0.67
+  [8/21] mpnn#11: dG=-71.50 sc=0.68
+  [9/21] mpnn#8: dG=-71.87 sc=0.68
+  [10/21] mpnn#12: dG=-70.59 sc=0.68
+  [11/21] mpnn#9: dG=-72.01 sc=0.72
+  [12/21] mpnn#10: dG=-76.63 sc=0.71
+  [13/21] mpnn#13: dG=-76.77 sc=0.74
+  [14/21] mpnn#16: dG=-76.46 sc=0.68
+  [15/21] mpnn#15: dG=-63.99 sc=0.74
+  [16/21] mpnn#14: dG=-71.94 sc=0.70
+  [17/21] mpnn#17: dG=-68.86 sc=0.69
+  [18/21] mpnn#18: dG=-70.37 sc=0.72
+  [19/21] mpnn#19: dG=-67.15 sc=0.69
+  [20/21] stage1#1: dG=-69.68 sc=0.69
+  [21/21] mpnn#20: dG=-69.97 sc=0.70
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+[rescore] Rosetta 完成, 803s
+
+[rescore] 完成: 21 候选打分排序, filter 通过 19, selected 19 (含 stage1: False)
+[rescore] Top-3:
+  1. [mpnn] iPTM=  0.8630 dG=   -72.87 score=  0.8348
+  2. [mpnn] iPTM=  0.8639 dG=   -73.87 score=  0.8180
+  3. [mpnn] iPTM=  0.8640 dG=   -74.91 score=  0.8073
+[rescore] 产物: design_summary.txt / selection_with_rosetta.parquet / PDB REMARK

@@ -1,0 +1,106 @@
+{
+  "T5": {
+    "critic": "ESMFold2-Experimental-Fast-base300M-step1500k",
+    "n_seqs": 8,
+    "threshold": 0.5,
+    "n_passed": 8,
+    "scores": [
+      0.8971732439925454,
+      0.8936960106976073,
+      0.891709020243357,
+      0.8892252821755441,
+      0.885748048880606,
+      0.8852513012670434,
+      0.8822708155856679,
+      0.8787935822907299
+    ],
+    "passed": [
+      {
+        "sequence": "MFRVSVPQDTYYVKEGSDMSITALFPVGDSLDVDKLIIYWEKDGKVIIQWIKGEEKKEYIDPEYLDRASLDKSKLAKGEATLVIKNVTKEDAGTYRVMISHGGADYKRINVVVEA",
+        "distogram_iptm_proxy": 0.8971732439925454
+      },
+      {
+        "sequence": "MFTVSVPKDTYVVKEGSDMSISGLFPVGDSLDVSKLIIYWEQDGKTIIQLIKGEEKKEYVDPRYLDRASLVLSSLPSGIAELRITNVTKEDAGTYRLMISHGGADYKRIEVIVES",
+        "distogram_iptm_proxy": 0.8936960106976073
+      },
+      {
+        "sequence": "MFTVSVPQDVYKVKEGSDMSISSLFPVGSSLDVSKLIIYWEKDGKTIIQLINGKLDTSLVDPRYHDRASLDLSSLANGIAKLVIKNVTKEDAGTYRDMISYGGADYKRIEVVVES",
+        "distogram_iptm_proxy": 0.891709020243357
+      },
+      {
+        "sequence": "MFVVSVPQDTYVVKEGSDVSISGYFPVGESLDVDKLIVYWEKEGKVLIQLIKGKLDLENVDPRYHDRVSLDLSSLPQGKATLVIKNVTKEDAGTYRLMISHGGADYKRITLIVES",
+        "distogram_iptm_proxy": 0.8892252821755441
+      },
+      {
+        "sequence": "MFTVSVPKDTYFVKKGSDMSISALFPVGDSLDVDKLIIYWEKDGKTIIQWIKGKEVKELIDPRYHDRASLDKSSLAKGIATLVIKNVEEEDAGTYRLMISHGGADYKRIEVVVIS",
+        "distogram_iptm_proxy": 0.885748048880606
+      },
+      {
+        "sequence": "MFVVSVPKDVYYVKLGSDMKITGLFPVGDKLDIDKLIVYWEKDGEVLIQYIKGKLVKELVDPRYLDRVSLDESSLPKGEATLVIKNVKEEDAGTYRLMISHGGADYKRIEVIVVS",
+        "distogram_iptm_proxy": 0.8852513012670434
+      },
+      {
+        "sequence": "MFTVSVPKDTYEVKEGSDMSISALFPVGESLDVDKLIIYWEKDGKVLIQLIKGKVRYEYVDPEYLDRVSLDESSLPKGIAKLVIKNVEKEDAGVYRVMVSHGGADYKRIEVKVVS",
+        "distogram_iptm_proxy": 0.8822708155856679
+      },
+      {
+        "sequence": "MFKVSVEKDTYYVKEGSDMSISAYFPVGDSLDVSKLIIYWEQDGKVIIQLINGKVKWEYVDPRYLDRASLDTSSLAQGKATLVIKNVTKEDAGTYRVMVSYGGADYKRIKVVVED",
+        "distogram_iptm_proxy": 0.8787935822907299
+      }
+    ]
+  },
+  "T6": {
+    "3RRQ_single_with_hs": {
+      "target_len": 129,
+      "binder_len": 115,
+      "hotspots": [
+        "A:N85",
+        "A:R83"
+      ],
+      "losses": {
+        "intra_contact_loss": 0.9778774976730347,
+        "inter_contact_loss": 3.0104336738586426,
+        "glob_loss": -0.17084673047065735,
+        "epitope_loss": 8.850000381469727,
+        "total_loss": 6.384986400604248
+      }
+    },
+    "3RRQ_single_no_hs": {
+      "target_len": 129,
+      "binder_len": 115,
+      "hotspots": null,
+      "losses": {
+        "intra_contact_loss": 0.9798863530158997,
+        "inter_contact_loss": 3.013758420944214,
+        "glob_loss": -0.17042595148086548,
+        "total_loss": 1.9627372026443481
+      }
+    },
+    "4ZQK_multi_with_hs": {
+      "target_len": 233,
+      "binder_len": 115,
+      "hotspots": [
+        "B:P98",
+        "A:K58"
+      ],
+      "losses": {
+        "intra_contact_loss": 1.1543253660202026,
+        "inter_contact_loss": 4.40247106552124,
+        "glob_loss": -0.1558346450328827,
+        "epitope_loss": 2.3375000953674316,
+        "total_loss": 3.9159812927246094
+      }
+    },
+    "4ZQK_multi_no_hs": {
+      "target_len": 233,
+      "binder_len": 115,
+      "hotspots": null,
+      "losses": {
+        "intra_contact_loss": 1.1557903289794922,
+        "inter_contact_loss": 4.408867359161377,
+        "glob_loss": -0.15579035878181458,
+        "total_loss": 2.7511708736419678
+      }
+    }
+  }
+}

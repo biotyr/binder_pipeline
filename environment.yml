@@ -1,0 +1,172 @@
+# ##### claude 2026/9/7 start #####
+# ======================================================================
+# ESMFold2 × ProteinMPNN × BindCraft 集成 pipeline 环境配置
+#
+# 依赖来源 (按上游工作流逐一核对):
+#   1. BindCraft 工作流:   BindCraft-main/install_bindcraft.sh
+#   2. biohub-esm 工作流:  biohub-esm/esm-main/pyproject.toml (esm 3.3.0)
+#   3. 版本钉扎权威来源:    pipeline/run_modal.py 镜像定义
+#
+# 版本裁决 (两工作流冲突项):
+#   - python 3.12:  esm 3.3.0 硬性要求 (>=3.12,<3.13),
+#                   BindCraft 原生 3.10 被覆盖 (pipeline 只移植了其过滤
+#                   函数, 不需要其 AF2 全栈)
+#   - transformers: Biohub fork (github.com/Biohub/transformers),
+#                   提供 mainline 没有的 transformers.models.esmfold2_*
+#                   模块 (esmcp/binder_design.py 直接 import);
+#                   本地克隆: /home/taoyr/projects/biohub-transformers
+#   - numpy:        不显式钉扎。BindCraft 原生要求 <2.0.0 仅为适配其
+#                   AF2 部分; pipeline 移植部分 (biopython/scipy/pandas)
+#                   与 esm 3.3.0 均兼容 numpy2
+#   - jaxlib:       环境内含 cuda-version=12.8 时, conda-forge 求解器
+#                   会自动选 CUDA 构建本 (实测 jax.devices() 可见全部
+#                   GPU), 无需再手动换 GPU 变体
+#
+# 使用:
+#   conda env create -f environment.yml
+#   conda activate esmbind
+#   # 再执行文件尾"手动安装步骤"(colabdesign 等)
+# ======================================================================
+# ##### claude 2026/9/7 end #####
+
+name: esmbind
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - python=3.12
+  - pip
+
+  # ---- CUDA 12.8 工具链 (与 run_modal.py Modal 镜像一致) ----
+  # ---- 全部 GPU 库均走 pip 预编译 wheel, 仅源码编译时需要 nvcc ----
+  - cuda-version=12.8
+  - cuda-libraries-dev=12.8
+  - cuda-nvcc=12.8
+  - cmake
+  - ninja
+  - git
+
+  # ---- abnumber 抗体编号依赖 (esmcp/binder_design.py) ----
+  # ---- anarci/hmmer 仅 conda 渠道提供, 故放此处 ----
+  - anarci>=2020.04.03
+  - hmmer=3.4
+
+  # ---- ProteinMPNN (colabdesign) 的 JAX 栈 ----
+  # ---- 照抄 BindCraft install_bindcraft.sh 配方; ----
+  # ---- jaxlib 默认为 CPU 版, GPU 变体见文件头注释命令 ----
+  - jax>=0.4,<=0.6.0
+  - jaxlib>=0.4,<=0.6.0
+  - flax<0.10.0
+  - dm-haiku
+  - dm-tree
+  - ml-collections
+  - immutabledict
+  - optax
+  - chex
+  - joblib
+
+  # ---- 通用科学计算 (BindCraft 配方 + pipeline 直接 import) ----
+  - biopython
+  - scipy
+  - pandas
+  - tqdm
+
+  # ---- pip 区: torch 生态 + biohub-esm 工作流 ----
+  - pip:
+      # cu128 官方索引优先: torch==2.8.0 解析为 2.8.0+cu128 (PEP440
+      # 本地版本高于 PyPI 同名 wheel, 不会误装其他 CUDA 变体);
+      # 其余包回落 PyPI
+      - --index-url https://download.pytorch.org/whl/cu128
+      - --extra-index-url https://pypi.org/simple
+      - torch==2.8.0
+      - triton==3.4.0
+      # flash-attn: PyPI 仅有 sdist, 其 setup.py 在构建期 import torch,
+      # 在 pip 隔离构建环境内必报 ModuleNotFoundError; 改用官方预编译
+      # wheel (cu12 + torch2.8 + cxx11abiTRUE, 与 torch==2.8.0+cu128 匹配)
+      - https://github.com/Dao-AILab/flash-attention/releases/download/v2.8.3/flash_attn-2.8.3+cu12torch2.8cxx11abiTRUE-cp312-cp312-linux_x86_64.whl
+      - transformer-engine[core-cu12,pytorch]==2.13.0
+      - xformers==0.0.32.post1
+      # biohub-esm 工作流 (esm 3.3.0); 其 pyproject 自动带入
+      # biotite/rdkit/einops/py3dmol/pydssp/accelerate 及 DockQ 等
+      # 次要依赖
+      # 注意: 上游 git@main 已漂移到 3.4.1 (要求 torch>=2.11, 与上方
+      # torch==2.8.0 冲突), 且仓库无 v3.3.0 tag 可钉, 故钉本地克隆快照
+      - /home/taoyr/projects/biohub-esm/esm-main
+      # esm 3.3.0 pyproject 声明的 DockQ fork (numpy2 兼容版), 显式列出
+      - 'dockq @ git+https://github.com/nrontsis/DockQ.git@ba4df5adaad7c77fd60851d0b7b05f2b77061ba2'
+      # Biohub transformers fork (esm 3.3.0 的依赖, 此处显式声明;
+      # 本地克隆: /home/taoyr/projects/biohub-transformers/transformers-main)
+      - 'transformers @ git+https://github.com/Biohub/transformers.git@main'
+      # pipeline 直接依赖
+      - abnumber
+      - modal
+      - pyarrow
+
+# ======================================================================
+# ##### claude 2026/9/7 start #####
+# ---- 手动安装步骤 (environment.yml 无法表达 per-package pip 选项) ----
+# [2026-09-07 esmbind 环境重建时已全部完成, 下面记录实际生效的命令]
+#
+# 1. ColabDesign (Stage 3 ProteinMPNN) — 必须 --no-deps:    [已完成]
+#      pip install git+https://github.com/sokrypton/ColabDesign.git --no-deps
+#    (--no-deps 防止 pip 版 CPU jaxlib 覆盖 conda 装的 jaxlib;
+#     BindCraft 官方 install_bindcraft.sh 同款做法)
+#    实测装得 colabdesign 1.1.3, conda 的 CUDA 版 jaxlib 未被覆盖
+#
+# 2. jaxlib GPU 变体:                                        [无需手动]
+#    环境内含 cuda-version=12.8 时 conda-forge 求解器自动选 CUDA
+#    构建本; 实测 jax.devices() 列出全部 4 张 GPU
+#
+# 3. PyRosetta (可选, Stage 5 Rosetta 评分; 需商业许可):     [已完成]
+#    注意: PyPI 上无 pyrosetta 发行版, 直接 pip install pyrosetta
+#    会报 "No matching distribution found"; 必须带 --find-links:
+#      pip install pyrosetta --find-links \
+#          https://west.rosettacommons.org/pyrosetta/quarterly/release.cxx11thread.serialization
+#
+# 4. DSSP 可执行文件 (Stage 5 二级结构分析需要):             [已完成]
+#      chmod +x ~/projects/BindCraft-main/functions/dssp
+#      ln -sf ~/projects/BindCraft-main/functions/dssp \
+#             $CONDA_PREFIX/bin/dssp
+#    (mkdssp 2.0.4, 静态链接可执行文件)
+#
+# 5. DAlphaBall.gcc (Stage 5 Rosetta UnsatHbonds 检测需要):  [已完成]
+#      chmod +x ~/projects/BindCraft-main/functions/DAlphaBall.gcc
+#      ln -sf ~/projects/BindCraft-main/functions/DAlphaBall.gcc \
+#             $CONDA_PREFIX/bin/DAlphaBall.gcc
+#
+# 6. transformer_engine torch-binding 重编译:                [已完成]
+#    PyPI 的 transformer_engine_torch 只有 sdist, pip 隔离构建会拉
+#    "最新" torch 编译, 运行时对 torch==2.8.0 报 undefined symbol
+#    (_ZN3c104cuda19CUDAErrorLogCaptureC1Ev)。修复命令:
+#      conda activate esmbind
+#      export CUDA_HOME=$CONDA_PREFIX MAX_JOBS=32 NVTE_FRAMEWORK=pytorch
+#      export NVTE_PYTORCH_FORCE_BUILD=TRUE
+#      export CPATH=$CONDA_PREFIX/lib/python3.12/site-packages/nvidia/nvtx/include:$CPATH
+#      pip install --no-build-isolation --no-deps --force-reinstall \
+#          --no-cache-dir transformer_engine_torch==2.13.0
+#    注: NVTE_PYTORCH_FORCE_BUILD=TRUE 跳过其 setup.py 从 GitHub 抓
+#    预编译 wheel 的步骤 (github 网络不稳时必卡死); CPATH 补 nvtx3
+#    头文件 (来自 torch 依赖 nvidia-nvtx-cu12)。验证: ESMC 加载不再
+#    出 "transformer_engine is not installed" 警告。
+#
+# 7. 模型权重 (HF hub, 本机已全部就位, 共 ~150GB):           [已完成]
+#    缓存位置: ~/.cache/huggingface/hub (HF_HOME 未设, 与 Modal 的
+#    /models 挂载不同)。清单:
+#      - biohub/ESMC-6B + 4x biohub/ESMFold2-Experimental-*   (hero)
+#      - 15x ESMFold2-Experimental-Fast-base{300M,600M,6B}-step{250..1500}k
+#        (scaling critics, design 阶段按需逐个加载, core.py 硬编码
+#         use_scaling_critics=True, 不可省)
+#      - 14x biohub/ESMC-{300M,600M,6B}-stepXXX (scaling critics
+#        各自的 LM 主干, 经 config.esmc_id 引用) + biohub/ESMFold2
+#        (ccd.pkl, conformers.py 输入准备用)
+#    下载: HF_ENDPOINT=https://hf-mirror.com (huggingface.co 直连
+#    不通), ProteinMPNN 权重随 colabdesign 包自带, 无需下载。
+#
+# 8. 无需安装项:
+#      - AlphaFold2 权重 (alphafold_params_2022-12-06.tar):
+#        pipeline 用 ESMFold2 替代 AF2, 不下载
+#      - BindCraft 原生全功能额外依赖 (pdbfixer, matplotlib, seaborn,
+#        ffmpeg, fsspec, jupyter, libgfortran5): pipeline 未使用,
+#        需要原版 BindCraft 完整流程时再按 install_bindcraft.sh 补装
+# ======================================================================
+# ##### claude 2026/9/7 end #####

@@ -1,0 +1,572 @@
+2026-09-15 09:31:47 [chain] 启动: 3RRQ_single/with → 4ZQK_multi/no → 4ZQK_multi/with
+2026-09-15 09:31:47 [chain] ===== 任务开始: 3RRQ_single / with (阈值 22500MiB) =====
+2026-09-15 09:31:47 [3RRQ_single/with] 检测到 GPU 1 空闲达标 (>=22500MiB), 开始 300s 跟踪
+2026-09-15 09:36:48 [3RRQ_single/with] GPU 1 连续 300s 保持充足 (当前 24115MiB), 提交 e2e 任务 (CUDA_VISIBLE_DEVICES=GPU-49430b92-9084-dec3-450c-43516cada260)
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[e2e] task=3RRQ_single hotspot=with seed=0 batch_size=1
+[e2e] target chains: [('A', 129)]
+[e2e] hotspots: ['A:N85', 'A:R83']
+[e2e] GPU: NVIDIA GeForce RTX 4090, free=23.2GiB
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=3RRQ_single  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards:  33%|███▎      | 2/6 [00:00<00:00, 17.77it/s]Loading checkpoint shards:  67%|██████▋   | 4/6 [00:00<00:00, 17.49it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 19.00it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 79.26it/s]
+2026-09-15 09:37:48,300 INFO:   step   0  |  intra_contact_loss=4.2517  inter_contact_loss=5.1093  glob_loss=0.3716  epitope_loss=4.2000  total_loss=9.9173  plm_loss=3.0625  time=34.8111  peak_allocated_gib=17.9092  peak_reserved_gib=18.5391  T=0.9999
+2026-09-15 09:37:57,271 INFO:   step   5  |  intra_contact_loss=3.6748  inter_contact_loss=4.2424  glob_loss=0.1813  epitope_loss=4.0875  total_loss=9.4293  plm_loss=3.3906  time=1.7899  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.9961
+2026-09-15 09:38:06,248 INFO:   step  10  |  intra_contact_loss=3.8863  inter_contact_loss=4.4916  glob_loss=0.6508  epitope_loss=4.7750  total_loss=10.3629  plm_loss=3.6562  time=1.7938  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.9869
+2026-09-15 09:38:15,248 INFO:   step  15  |  intra_contact_loss=3.6814  inter_contact_loss=4.5237  glob_loss=0.1530  epitope_loss=4.4500  total_loss=9.9206  plm_loss=3.5625  time=1.7994  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.9725
+2026-09-15 09:38:24,263 INFO:   step  20  |  intra_contact_loss=3.7205  inter_contact_loss=3.8976  glob_loss=0.3844  epitope_loss=4.7250  total_loss=10.0140  plm_loss=3.7656  time=1.8014  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.9529
+2026-09-15 09:38:33,588 INFO:   step  25  |  intra_contact_loss=3.5466  inter_contact_loss=4.3490  glob_loss=0.3427  epitope_loss=3.8125  total_loss=9.7664  plm_loss=3.8438  time=1.8046  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.9284
+2026-09-15 09:38:42,628 INFO:   step  30  |  intra_contact_loss=2.9054  inter_contact_loss=2.8437  glob_loss=0.4205  epitope_loss=4.1250  total_loss=8.8805  plm_loss=3.8594  time=1.8054  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.8993
+2026-09-15 09:38:51,673 INFO:   step  35  |  intra_contact_loss=2.5415  inter_contact_loss=2.5608  glob_loss=0.4012  epitope_loss=4.2000  total_loss=8.4814  plm_loss=3.7500  time=1.8069  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.8658
+2026-09-15 09:39:00,725 INFO:   step  40  |  intra_contact_loss=2.3407  inter_contact_loss=2.5286  glob_loss=0.3298  epitope_loss=4.2125  total_loss=8.4818  plm_loss=3.8750  time=1.8074  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.8284
+2026-09-15 09:39:09,780 INFO:   step  45  |  intra_contact_loss=2.4213  inter_contact_loss=2.6863  glob_loss=0.3334  epitope_loss=4.0125  total_loss=8.3299  plm_loss=3.7031  time=1.8087  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.7875
+2026-09-15 09:39:18,841 INFO:   step  50  |  intra_contact_loss=2.2080  inter_contact_loss=2.4068  glob_loss=0.2826  epitope_loss=3.7625  total_loss=7.8077  plm_loss=3.5625  time=1.8097  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.7435
+2026-09-15 09:39:28,180 INFO:   step  55  |  intra_contact_loss=2.4529  inter_contact_loss=3.6706  glob_loss=0.2673  epitope_loss=3.0563  total_loss=8.1746  plm_loss=3.5312  time=1.8101  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.6968
+2026-09-15 09:39:37,245 INFO:   step  60  |  intra_contact_loss=2.1245  inter_contact_loss=2.4289  glob_loss=0.1770  epitope_loss=3.3688  total_loss=7.3715  plm_loss=3.3750  time=1.8084  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.6481
+2026-09-15 09:39:46,315 INFO:   step  65  |  intra_contact_loss=2.1148  inter_contact_loss=2.4142  glob_loss=0.1402  epitope_loss=2.9500  total_loss=6.8925  plm_loss=3.1250  time=1.8113  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.5978
+2026-09-15 09:39:55,389 INFO:   step  70  |  intra_contact_loss=2.1896  inter_contact_loss=2.4515  glob_loss=0.2712  epitope_loss=2.7500  total_loss=6.9373  plm_loss=3.1875  time=1.8104  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.5464
+2026-09-15 09:40:04,461 INFO:   step  75  |  intra_contact_loss=1.9386  inter_contact_loss=2.2799  glob_loss=0.0529  epitope_loss=2.7312  total_loss=6.5323  plm_loss=3.0469  time=1.8102  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.4946
+2026-09-15 09:40:13,807 INFO:   step  80  |  intra_contact_loss=1.8354  inter_contact_loss=2.2379  glob_loss=0.0670  epitope_loss=2.6937  total_loss=6.3657  plm_loss=2.9688  time=1.8114  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.4430
+2026-09-15 09:40:22,879 INFO:   step  85  |  intra_contact_loss=1.8887  inter_contact_loss=2.4617  glob_loss=0.0922  epitope_loss=3.2313  total_loss=6.9343  plm_loss=3.1250  time=1.8108  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.3920
+2026-09-15 09:40:31,952 INFO:   step  90  |  intra_contact_loss=2.9340  inter_contact_loss=3.7356  glob_loss=0.1362  epitope_loss=3.7125  total_loss=7.9214  plm_loss=2.7031  time=1.8097  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.3422
+2026-09-15 09:40:41,032 INFO:   step  95  |  intra_contact_loss=1.8317  inter_contact_loss=2.1733  glob_loss=0.0972  epitope_loss=2.5250  total_loss=5.7844  plm_loss=2.5000  time=1.8122  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.2942
+2026-09-15 09:40:50,115 INFO:   step 100  |  intra_contact_loss=2.1946  inter_contact_loss=3.9155  glob_loss=0.0756  epitope_loss=3.2625  total_loss=7.1702  plm_loss=2.4688  time=1.8143  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.2486
+2026-09-15 09:40:59,538 INFO:   step 105  |  intra_contact_loss=1.6491  inter_contact_loss=2.2383  glob_loss=-0.0220  epitope_loss=2.5625  total_loss=5.6268  plm_loss=2.4062  time=1.8128  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.2057
+2026-09-15 09:41:08,615 INFO:   step 110  |  intra_contact_loss=1.5968  inter_contact_loss=2.1691  glob_loss=-0.0941  epitope_loss=2.2500  total_loss=5.3016  plm_loss=2.3125  time=1.8137  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.1661
+2026-09-15 09:41:17,696 INFO:   step 115  |  intra_contact_loss=1.7016  inter_contact_loss=2.3124  glob_loss=-0.1314  epitope_loss=2.2875  total_loss=5.1245  plm_loss=2.0000  time=1.8133  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.1303
+2026-09-15 09:41:26,777 INFO:   step 120  |  intra_contact_loss=1.7039  inter_contact_loss=2.2866  glob_loss=-0.0358  epitope_loss=1.8906  total_loss=5.1678  plm_loss=2.2344  time=1.8124  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.0985
+2026-09-15 09:41:35,856 INFO:   step 125  |  intra_contact_loss=1.6113  inter_contact_loss=2.1748  glob_loss=-0.0402  epitope_loss=2.1250  total_loss=4.8538  plm_loss=1.9062  time=1.8124  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.0712
+2026-09-15 09:41:46,365 INFO:   step 130  |  intra_contact_loss=1.6393  inter_contact_loss=2.1884  glob_loss=-0.0825  epitope_loss=2.5125  total_loss=5.1380  plm_loss=1.9844  time=2.8587  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.0487
+2026-09-15 09:42:00,673 INFO:   step 135  |  intra_contact_loss=1.5605  inter_contact_loss=2.1326  glob_loss=-0.1245  epitope_loss=2.4625  total_loss=4.9591  plm_loss=1.9062  time=2.8591  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.0311
+2026-09-15 09:42:14,981 INFO:   step 140  |  intra_contact_loss=1.7100  inter_contact_loss=2.2632  glob_loss=-0.0525  epitope_loss=2.0531  total_loss=4.9558  plm_loss=1.9531  time=2.8572  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.0188
+2026-09-15 09:42:29,282 INFO:   step 145  |  intra_contact_loss=1.5507  inter_contact_loss=2.1617  glob_loss=-0.1208  epitope_loss=2.6250  total_loss=5.1367  plm_loss=1.9922  time=2.8583  peak_allocated_gib=17.9410  peak_reserved_gib=18.6992  T=0.0117
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 1/1 Hero Critic PDBs passed quality gate (iPTM≥0.5 [1 target chain(s)], binder=B, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 3: MPNN Inverse Folding
+============================================================
+[MPNN Redesign] /tmp/tmplvamdzra.pdb
+  Generated: 20 sequences
+  Interface residues fixed: 27
+  fix_pos: A,151,154,158,159,162,163,165,166,215,218,219,222,223,226,227,228,229,261,265,268,271,272,273,275,276,279,280
+  Score range: will be shown per-sequence
+[MPNN Redesign] Processed 1 PDBs → 20 total MPNN sequences
+
+============================================================
+[Pipeline] Stage 4: Refold & Screen
+============================================================
+[Refold] Loading scaling critic: ESMFold2-Experimental-Fast-base300M-step1500k
+[Scaling] 10/20  passed=10  last=0.5350
+[Scaling] 20/20  passed=17  last=0.7258
+[Scaling] Done: 17/20 passed (threshold=0.50)
+[Hero] Scoring 17 sequences with model: ESMFold2-Experimental-Cutoff2025
+[Hero] 1/17  SMTEEIIKKSKSPEY...  iPTM=0.8520  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 2/17  SLTEELIAKSKSPEY...  iPTM=0.8690  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 3/17  DLTKEWIAKSKSPKV...  iPTM=0.8275  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 4/17  SLTEEIIAKSKSKEA...  iPTM=0.8242  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 5/17  DLTEEWIAKSKSPEY...  iPTM=0.8181  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 6/17  DLTKKWQAESTSPLV...  iPTM=0.8320  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 7/17  DLTKEIIAKSKSPYY...  iPTM=0.8665  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 8/17  SLTEERIAKSKSPIY...  iPTM=0.8448  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 9/17  SLTEEIIAKSKSKDV...  iPTM=0.8452  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 10/17  DLTEEWIARSTSPEV...  iPTM=0.8329  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 11/17  NLTEEIIAKSKSPIY...  iPTM=0.8478  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 12/17  NRTQEWIAASTSPVY...  iPTM=0.8542  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 13/17  DLTKEWIAKSKSPEV...  iPTM=0.8395  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 14/17  SLVEERQAASKSPVY...  iPTM=0.8375  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 15/17  SLTEEWRAKSTSPEY...  iPTM=0.8418  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 16/17  SLTEQIQAASTSPIY...  iPTM=0.8459  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 17/17  SLTAEIQAASTSPDV...  iPTM=0.8575  model=ESMFold2-Experimental-Cutoff2025
+[Hero] Done: 17/17 successful predictions (17 sequences)
+[Refold] 17 hero predictions, 3 failed scaling
+
+============================================================
+[Pipeline] Stage 5: Rosetta Physical Scoring
+============================================================
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 13 passed / 5 failed
+  Selected: Top-84 = 13 designs
+  Best score: 0.7989
+  Best seq:   SLTAEIQAASTSPDVETPEAQYALQKLEMA...
+[Output] Ranking table saved: /home/taoyr/projects/pipeline/test/results/3RRQ_single/with_hotspot/full_pipeline/selection.parquet
+[Output] 13 PDBs saved: /home/taoyr/projects/pipeline/test/results/3RRQ_single/with_hotspot/full_pipeline/selected_structures
+
+[Pipeline] Total time: 4047s (67.4 min)
+[e2e] design_summary.txt 与 PDB REMARK(dG) 已写入 /home/taoyr/projects/pipeline/test/results/3RRQ_single/with_hotspot
+
+[e2e] DONE in 67.4 min — /home/taoyr/projects/pipeline/test/results/3RRQ_single/with_hotspot
+[e2e] stage1 候选 1, selected 13, quality 1/1
+2026-09-15 10:44:31 [3RRQ_single/with] run_e2e 结束 rc=0
+2026-09-15 10:44:31 [chain] pipeline 内 Stage 5 已产出 12 个 dG, 无需重评分 — 任务 3RRQ_single/with 完成
+2026-09-15 10:44:31 [chain] ===== 任务开始: 4ZQK_multi / no (阈值 23500MiB) =====
+2026-09-15 10:44:31 [4ZQK_multi/no] 检测到 GPU 1 空闲达标 (>=23500MiB), 开始 300s 跟踪
+2026-09-15 10:49:32 [4ZQK_multi/no] GPU 1 连续 300s 保持充足 (当前 24115MiB), 提交 e2e 任务 (CUDA_VISIBLE_DEVICES=GPU-49430b92-9084-dec3-450c-43516cada260)
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[e2e] task=4ZQK_multi hotspot=no seed=0 batch_size=1
+[e2e] target chains: [('A', 115), ('B', 118)]
+[e2e] hotspots: None
+[e2e] GPU: NVIDIA GeForce RTX 4090, free=23.2GiB
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=4ZQK_multi  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 83.58it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 80.80it/s]
+2026-09-15 10:50:24,471 INFO:   step   0  |  intra_contact_loss=4.5675  inter_contact_loss=4.7270  glob_loss=1.4090  total_loss=7.9915  plm_loss=3.0625  time=35.6510  peak_allocated_gib=20.8206  peak_reserved_gib=21.5430  T=0.9999
+2026-09-15 10:50:42,955 INFO:   step   5  |  intra_contact_loss=4.1831  inter_contact_loss=5.2644  glob_loss=1.1450  total_loss=8.3122  plm_loss=3.3594  time=3.6990  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.9961
+2026-09-15 10:51:01,529 INFO:   step  10  |  intra_contact_loss=3.3480  inter_contact_loss=4.3621  glob_loss=0.2874  total_loss=7.6000  plm_loss=3.6875  time=3.7157  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.9869
+2026-09-15 10:51:20,357 INFO:   step  15  |  intra_contact_loss=3.2607  inter_contact_loss=5.1098  glob_loss=0.0483  total_loss=8.0855  plm_loss=3.8906  time=3.7201  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.9725
+2026-09-15 10:51:38,994 INFO:   step  20  |  intra_contact_loss=3.3078  inter_contact_loss=5.0357  glob_loss=0.1635  total_loss=8.0951  plm_loss=3.8906  time=3.7274  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.9529
+2026-09-15 10:51:57,651 INFO:   step  25  |  intra_contact_loss=3.2588  inter_contact_loss=4.7425  glob_loss=0.1695  total_loss=7.8783  plm_loss=3.8438  time=3.7308  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.9284
+2026-09-15 10:52:16,332 INFO:   step  30  |  intra_contact_loss=2.8095  inter_contact_loss=4.3621  glob_loss=0.0973  total_loss=7.5271  plm_loss=3.9219  time=3.7359  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.8993
+2026-09-15 10:52:35,016 INFO:   step  35  |  intra_contact_loss=2.3587  inter_contact_loss=4.2639  glob_loss=0.1511  total_loss=7.1853  plm_loss=3.8438  time=3.7356  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.8658
+2026-09-15 10:52:53,915 INFO:   step  40  |  intra_contact_loss=2.2115  inter_contact_loss=3.9782  glob_loss=0.1984  total_loss=7.0876  plm_loss=3.9531  time=3.7372  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.8284
+2026-09-15 10:53:12,625 INFO:   step  45  |  intra_contact_loss=2.2116  inter_contact_loss=4.1648  glob_loss=0.1097  total_loss=6.8976  plm_loss=3.6875  time=3.7386  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.7875
+2026-09-15 10:53:31,334 INFO:   step  50  |  intra_contact_loss=2.1562  inter_contact_loss=3.5552  glob_loss=0.1518  total_loss=6.5892  plm_loss=3.7031  time=3.7411  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.7435
+2026-09-15 10:53:50,051 INFO:   step  55  |  intra_contact_loss=1.9137  inter_contact_loss=4.0570  glob_loss=0.0556  total_loss=6.6215  plm_loss=3.6250  time=3.7405  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.6968
+2026-09-15 10:54:08,770 INFO:   step  60  |  intra_contact_loss=1.9826  inter_contact_loss=3.6672  glob_loss=0.0408  total_loss=6.5831  plm_loss=3.7500  time=3.7404  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.6481
+2026-09-15 10:54:27,738 INFO:   step  65  |  intra_contact_loss=2.0952  inter_contact_loss=4.4225  glob_loss=0.0023  total_loss=6.8062  plm_loss=3.5469  time=3.7429  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.5978
+2026-09-15 10:54:46,452 INFO:   step  70  |  intra_contact_loss=1.7160  inter_contact_loss=3.6518  glob_loss=-0.0120  total_loss=6.1034  plm_loss=3.4219  time=3.7415  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.5464
+2026-09-15 10:55:05,172 INFO:   step  75  |  intra_contact_loss=1.7382  inter_contact_loss=2.6846  glob_loss=-0.0615  total_loss=5.4647  plm_loss=3.2656  time=3.7410  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.4946
+2026-09-15 10:55:23,892 INFO:   step  80  |  intra_contact_loss=1.6607  inter_contact_loss=2.4190  glob_loss=-0.0825  total_loss=5.1796  plm_loss=3.1562  time=3.7409  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.4430
+2026-09-15 10:55:42,815 INFO:   step  85  |  intra_contact_loss=1.6028  inter_contact_loss=2.5394  glob_loss=-0.0540  total_loss=5.0134  plm_loss=2.9531  time=3.7454  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.3920
+2026-09-15 10:56:01,553 INFO:   step  90  |  intra_contact_loss=1.5386  inter_contact_loss=2.4463  glob_loss=-0.0366  total_loss=5.0945  plm_loss=3.1094  time=3.7467  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.3422
+2026-09-15 10:56:20,298 INFO:   step  95  |  intra_contact_loss=1.7290  inter_contact_loss=2.6179  glob_loss=-0.1147  total_loss=4.8224  plm_loss=2.6719  time=3.7469  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.2942
+2026-09-15 10:56:39,045 INFO:   step 100  |  intra_contact_loss=1.4933  inter_contact_loss=2.2197  glob_loss=-0.0461  total_loss=4.5660  plm_loss=2.7188  time=3.7453  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.2486
+2026-09-15 10:56:57,988 INFO:   step 105  |  intra_contact_loss=1.5389  inter_contact_loss=2.0563  glob_loss=-0.0665  total_loss=4.1437  plm_loss=2.3594  time=3.9436  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.2057
+2026-09-15 10:57:16,738 INFO:   step 110  |  intra_contact_loss=1.6441  inter_contact_loss=2.3268  glob_loss=-0.0813  total_loss=4.0942  plm_loss=2.1250  time=3.7481  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.1661
+2026-09-15 10:57:35,490 INFO:   step 115  |  intra_contact_loss=1.4918  inter_contact_loss=2.1723  glob_loss=-0.0869  total_loss=3.9865  plm_loss=2.1719  time=3.7471  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.1303
+2026-09-15 10:57:54,238 INFO:   step 120  |  intra_contact_loss=1.3290  inter_contact_loss=2.0530  glob_loss=-0.0490  total_loss=3.6109  plm_loss=1.9297  time=3.7489  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.0985
+2026-09-15 10:58:12,989 INFO:   step 125  |  intra_contact_loss=1.2944  inter_contact_loss=1.8498  glob_loss=-0.0332  total_loss=3.3701  plm_loss=1.8047  time=3.7479  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.0712
+2026-09-15 10:58:32,985 INFO:   step 130  |  intra_contact_loss=1.4200  inter_contact_loss=2.0529  glob_loss=-0.0811  total_loss=3.5796  plm_loss=1.8594  time=4.7875  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.0487
+2026-09-15 10:58:56,912 INFO:   step 135  |  intra_contact_loss=1.4439  inter_contact_loss=2.0089  glob_loss=-0.0440  total_loss=3.5848  plm_loss=1.8672  time=4.7840  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.0311
+2026-09-15 10:59:20,834 INFO:   step 140  |  intra_contact_loss=1.3426  inter_contact_loss=1.9724  glob_loss=-0.0693  total_loss=3.4171  plm_loss=1.7734  time=4.7786  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.0188
+2026-09-15 10:59:44,747 INFO:   step 145  |  intra_contact_loss=1.4310  inter_contact_loss=2.1028  glob_loss=-0.0929  total_loss=3.5218  plm_loss=1.7734  time=4.7770  peak_allocated_gib=20.8560  peak_reserved_gib=21.8359  T=0.0117
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 1/1 Hero Critic PDBs passed quality gate (iPTM≥0.7 [2 target chain(s)], binder=C, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 3: MPNN Inverse Folding
+============================================================
+[MPNN Redesign] /tmp/tmpp32xxxfe.pdb
+  Generated: 20 sequences
+  Interface residues fixed: 38
+  fix_pos: A,B,246,247,251,254,255,258,259,262,263,265,266,269,270,273,288,291,295,297,298,300,301,302,304,305,307,308,309,311,312,313,324,327,328,331,335,385,386,389
+  Score range: will be shown per-sequence
+[MPNN Redesign] Processed 1 PDBs → 20 total MPNN sequences
+
+============================================================
+[Pipeline] Stage 4: Refold & Screen
+============================================================
+[Refold] Loading scaling critic: ESMFold2-Experimental-Fast-base300M-step1500k
+[Scaling] 10/20  passed=10  last=0.7357
+[Scaling] 20/20  passed=19  last=0.8083
+[Scaling] Done: 19/20 passed (threshold=0.50)
+[Hero] Scoring 19 sequences with model: ESMFold2-Experimental-Cutoff2025
+[Hero] 1/19  DPSLEPPVSFDSDED...  iPTM=0.8781  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 2/19  DPSLEPPRSLDSDED...  iPTM=0.8991  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 3/19  DPSLEPPVSLDSDED...  iPTM=0.9062  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 4/19  DPSAEPPLSLDSDED...  iPTM=0.8476  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 5/19  SPLLEPPRSDDSDED...  iPTM=0.9060  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 6/19  NPLLEPPVSLDSDED...  iPTM=0.9140  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 7/19  DPSLEPPKSLDSDED...  iPTM=0.8995  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 8/19  DPSLEPPVSLDSDED...  iPTM=0.8951  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 9/19  DPSLEPPVSTDSDED...  iPTM=0.8745  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 10/19  DPSLEPPPSTDSDED...  iPTM=0.8807  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 11/19  DPSAEPPVSTDSDED...  iPTM=0.8302  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 12/19  DPSAEPPVSTDSDED...  iPTM=0.8610  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 13/19  DSSLEPPKSDDSDED...  iPTM=0.9139  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 14/19  DPSLEPPKSDDSDED...  iPTM=0.8863  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 15/19  NPLLEPPLSLDSDED...  iPTM=0.8878  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 16/19  DPSLEPPKSYDSDED...  iPTM=0.8926  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 17/19  DPSLEPPKSDDSDED...  iPTM=0.7538  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 18/19  DPSAEPPLSLDSDED...  iPTM=0.8138  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 19/19  DSSLEPPKSTDSDES...  iPTM=0.8812  model=ESMFold2-Experimental-Cutoff2025
+[Hero] Done: 19/19 successful predictions (19 sequences)
+[Refold] 19 hero predictions, 1 failed scaling
+
+============================================================
+[Pipeline] Stage 5: Rosetta Physical Scoring
+============================================================
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 13 passed / 7 failed
+  Selected: Top-84 = 13 designs
+  Best score: 0.9178
+  Best seq:   DSSLEPPKSDDSDEDEEFKLESLLNRLAFN...
+[Output] Ranking table saved: /home/taoyr/projects/pipeline/test/results/4ZQK_multi/no_hotspot/full_pipeline/selection.parquet
+[Output] 13 PDBs saved: /home/taoyr/projects/pipeline/test/results/4ZQK_multi/no_hotspot/full_pipeline/selected_structures
+
+[Pipeline] Total time: 8297s (138.3 min)
+[e2e] design_summary.txt 与 PDB REMARK(dG) 已写入 /home/taoyr/projects/pipeline/test/results/4ZQK_multi/no_hotspot
+
+[e2e] DONE in 138.3 min — /home/taoyr/projects/pipeline/test/results/4ZQK_multi/no_hotspot
+[e2e] stage1 候选 1, selected 13, quality 1/1
+2026-09-15 13:08:02 [4ZQK_multi/no] run_e2e 结束 rc=0
+2026-09-15 13:08:03 [chain] pipeline 内 Stage 5 已产出 12 个 dG, 无需重评分 — 任务 4ZQK_multi/no 完成
+2026-09-15 13:08:03 [chain] ===== 任务开始: 4ZQK_multi / with (阈值 23500MiB) =====
+2026-09-15 13:08:03 [4ZQK_multi/with] 检测到 GPU 1 空闲达标 (>=23500MiB), 开始 300s 跟踪
+2026-09-15 13:13:03 [4ZQK_multi/with] GPU 1 连续 300s 保持充足 (当前 24115MiB), 提交 e2e 任务 (CUDA_VISIBLE_DEVICES=GPU-49430b92-9084-dec3-450c-43516cada260)
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[e2e] task=4ZQK_multi hotspot=with seed=0 batch_size=1
+[e2e] target chains: [('A', 115), ('B', 118)]
+[e2e] hotspots: ['B:P98', 'A:K58']
+[e2e] GPU: NVIDIA GeForce RTX 4090, free=23.2GiB
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=4ZQK_multi  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 83.66it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 80.64it/s]
+2026-09-15 13:13:31,625 INFO:   step   0  |  intra_contact_loss=4.5693  inter_contact_loss=4.7235  glob_loss=1.4145  epitope_loss=2.8187  total_loss=9.4012  plm_loss=3.0625  time=12.9224  peak_allocated_gib=20.8213  peak_reserved_gib=21.7695  T=0.9999
+2026-09-15 13:13:50,094 INFO:   step   5  |  intra_contact_loss=3.6452  inter_contact_loss=4.9845  glob_loss=2.0244  epitope_loss=2.7687  total_loss=9.8697  plm_loss=3.7656  time=3.6937  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9961
+2026-09-15 13:14:08,632 INFO:   step  10  |  intra_contact_loss=4.9315  inter_contact_loss=3.6907  glob_loss=2.0148  epitope_loss=1.9688  total_loss=9.8859  plm_loss=4.1875  time=3.7084  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9869
+2026-09-15 13:14:27,224 INFO:   step  15  |  intra_contact_loss=4.9105  inter_contact_loss=4.7728  glob_loss=2.1626  epitope_loss=1.6437  total_loss=11.0022  plm_loss=4.9062  time=3.7213  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9725
+2026-09-15 13:14:45,985 INFO:   step  20  |  intra_contact_loss=4.9506  inter_contact_loss=4.2856  glob_loss=2.1382  epitope_loss=1.5500  total_loss=10.8833  plm_loss=5.0625  time=3.7273  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9529
+2026-09-15 13:15:04,638 INFO:   step  25  |  intra_contact_loss=3.3621  inter_contact_loss=4.5967  glob_loss=2.1267  epitope_loss=2.2438  total_loss=11.1516  plm_loss=5.6250  time=3.7284  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.9284
+2026-09-15 13:15:23,307 INFO:   step  30  |  intra_contact_loss=3.4137  inter_contact_loss=4.6870  glob_loss=2.1193  epitope_loss=2.5750  total_loss=11.4180  plm_loss=5.6562  time=3.7331  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.8993
+2026-09-15 13:15:41,982 INFO:   step  35  |  intra_contact_loss=3.5668  inter_contact_loss=4.2320  glob_loss=2.1653  epitope_loss=1.7719  total_loss=10.8122  plm_loss=5.5938  time=3.7307  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.8658
+2026-09-15 13:16:00,793 INFO:   step  40  |  intra_contact_loss=3.8857  inter_contact_loss=3.7250  glob_loss=2.1891  epitope_loss=2.2125  total_loss=11.2869  plm_loss=5.9375  time=3.7329  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.8284
+2026-09-15 13:16:19,484 INFO:   step  45  |  intra_contact_loss=3.7401  inter_contact_loss=4.3829  glob_loss=2.2006  epitope_loss=1.7656  total_loss=11.0719  plm_loss=5.6875  time=3.7352  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.7875
+2026-09-15 13:16:38,172 INFO:   step  50  |  intra_contact_loss=3.8307  inter_contact_loss=3.7016  glob_loss=2.1857  epitope_loss=2.3312  total_loss=11.1502  plm_loss=5.7812  time=3.7320  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.7435
+2026-09-15 13:16:56,876 INFO:   step  55  |  intra_contact_loss=4.9427  inter_contact_loss=4.2075  glob_loss=2.2725  epitope_loss=0.5406  total_loss=10.6437  plm_loss=5.3438  time=3.7383  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.6968
+2026-09-15 13:17:15,714 INFO:   step  60  |  intra_contact_loss=3.4445  inter_contact_loss=4.4570  glob_loss=2.1493  epitope_loss=2.4062  total_loss=10.6775  plm_loss=5.0938  time=3.7402  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.6481
+2026-09-15 13:17:34,433 INFO:   step  65  |  intra_contact_loss=3.1830  inter_contact_loss=4.1210  glob_loss=2.0909  epitope_loss=1.9906  total_loss=10.3155  plm_loss=5.2500  time=3.7419  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.5978
+2026-09-15 13:17:53,154 INFO:   step  70  |  intra_contact_loss=4.8941  inter_contact_loss=4.4652  glob_loss=2.3257  epitope_loss=0.7797  total_loss=10.6597  plm_loss=5.1250  time=3.7423  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.5464
+2026-09-15 13:18:11,871 INFO:   step  75  |  intra_contact_loss=3.3676  inter_contact_loss=4.2272  glob_loss=2.1582  epitope_loss=2.4563  total_loss=10.3321  plm_loss=4.8750  time=3.7408  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.4946
+2026-09-15 13:18:30,723 INFO:   step  80  |  intra_contact_loss=2.8327  inter_contact_loss=3.8049  glob_loss=2.1444  epitope_loss=1.3656  total_loss=9.1180  plm_loss=4.6875  time=3.7422  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.4430
+2026-09-15 13:18:49,446 INFO:   step  85  |  intra_contact_loss=4.9307  inter_contact_loss=4.4681  glob_loss=2.5317  epitope_loss=1.3094  total_loss=10.3917  plm_loss=4.5312  time=3.7415  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.3920
+2026-09-15 13:19:08,161 INFO:   step  90  |  intra_contact_loss=5.0122  inter_contact_loss=4.4646  glob_loss=2.4908  epitope_loss=0.8297  total_loss=9.6514  plm_loss=4.0000  time=3.7390  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.3422
+2026-09-15 13:19:26,882 INFO:   step  95  |  intra_contact_loss=4.9918  inter_contact_loss=4.5157  glob_loss=2.5444  epitope_loss=0.9469  total_loss=9.1892  plm_loss=3.4531  time=3.7407  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.2942
+2026-09-15 13:19:45,730 INFO:   step 100  |  intra_contact_loss=4.7403  inter_contact_loss=3.4562  glob_loss=2.5748  epitope_loss=0.1727  total_loss=7.6526  plm_loss=2.9531  time=3.7410  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.2486
+2026-09-15 13:20:04,448 INFO:   step 105  |  intra_contact_loss=2.6546  inter_contact_loss=3.5678  glob_loss=2.2371  epitope_loss=1.9937  total_loss=6.9461  plm_loss=2.3906  time=3.7411  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.2057
+2026-09-15 13:20:23,174 INFO:   step 110  |  intra_contact_loss=2.3098  inter_contact_loss=3.3456  glob_loss=2.1089  epitope_loss=1.8156  total_loss=6.2510  plm_loss=2.0938  time=3.7410  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.1661
+2026-09-15 13:20:41,895 INFO:   step 115  |  intra_contact_loss=2.4272  inter_contact_loss=3.2783  glob_loss=2.1847  epitope_loss=2.0906  total_loss=5.9366  plm_loss=1.6016  time=3.7405  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.1303
+2026-09-15 13:21:00,733 INFO:   step 120  |  intra_contact_loss=4.0874  inter_contact_loss=3.8310  glob_loss=2.5237  epitope_loss=0.2594  total_loss=6.1093  plm_loss=1.5156  time=3.7371  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.0985
+2026-09-15 13:21:19,469 INFO:   step 125  |  intra_contact_loss=4.1070  inter_contact_loss=4.5814  glob_loss=2.4623  epitope_loss=1.3875  total_loss=6.7257  plm_loss=1.1953  time=3.7443  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.0712
+2026-09-15 13:21:39,216 INFO:   step 130  |  intra_contact_loss=2.4799  inter_contact_loss=3.0145  glob_loss=2.2303  epitope_loss=2.3000  total_loss=5.6089  plm_loss=1.2656  time=4.7631  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.0487
+2026-09-15 13:22:03,374 INFO:   step 135  |  intra_contact_loss=2.2669  inter_contact_loss=2.7904  glob_loss=2.1062  epitope_loss=1.9250  total_loss=4.9358  plm_loss=1.0234  time=5.0840  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.0311
+2026-09-15 13:22:27,232 INFO:   step 140  |  intra_contact_loss=3.8974  inter_contact_loss=4.6722  glob_loss=2.5531  epitope_loss=1.2875  total_loss=6.6033  plm_loss=1.1641  time=4.7837  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.0188
+2026-09-15 13:22:51,054 INFO:   step 145  |  intra_contact_loss=2.5353  inter_contact_loss=3.2239  glob_loss=2.2724  epitope_loss=1.9000  total_loss=5.4872  plm_loss=1.2031  time=4.7602  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.0117
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 0/1 Hero Critic PDBs passed quality gate (iPTM≥0.7 [2 target chain(s)], binder=C, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 0 passed / 1 failed
+  Selected: Top-84 = 0 designs
+
+[Pipeline] Total time: 611s (10.2 min)
+[e2e] design_summary.txt 与 PDB REMARK(dG) 已写入 /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+
+[e2e] DONE in 10.2 min — /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+[e2e] stage1 候选 1, selected 0, quality 0/1
+2026-09-15 13:23:26 [4ZQK_multi/with] run_e2e 结束 rc=0
+2026-09-15 13:23:26 [chain] pipeline 内 Stage 5 未产出 dG, 启动补救重评分 (CPU, ~25min)
+Traceback (most recent call last):
+  File "/home/taoyr/projects/pipeline/test/e2e/rescore_stage56.py", line 225, in <module>
+    main()
+  File "/home/taoyr/projects/pipeline/test/e2e/rescore_stage56.py", line 93, in main
+    sel = pd.read_parquet(base / "full_pipeline" / "selection.parquet")
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/pandas/io/parquet.py", line 671, in read_parquet
+    return impl.read(
+           ^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/pandas/io/parquet.py", line 253, in read
+    path_or_handle, handles, filesystem = _get_path_or_handle(
+                                          ^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/pandas/io/parquet.py", line 141, in _get_path_or_handle
+    handles = get_handle(
+              ^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/pandas/io/common.py", line 939, in get_handle
+    handle = open(handle, ioargs.mode)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^
+FileNotFoundError: [Errno 2] No such file or directory: '/home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot/full_pipeline/selection.parquet'
+2026-09-15 13:23:28 [chain] rescore rc=1 — 任务 4ZQK_multi/with 结束
+2026-09-15 13:23:28 [chain] 链结束: 成功 2 / 失败 1 / 共 3 个任务 (失败任务见上方日志)
+2026-09-15 13:57:54 [4ZQK_multi/with] 检测到 GPU 1 空闲达标 (>=23500MiB), 开始 300s 跟踪
+2026-09-15 14:02:55 [4ZQK_multi/with] GPU 1 连续 300s 保持充足 (当前 24115MiB), 提交 e2e 任务 (CUDA_VISIBLE_DEVICES=GPU-49430b92-9084-dec3-450c-43516cada260)
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[e2e] task=4ZQK_multi hotspot=with seed=0 batch_size=1
+[e2e] target chains: [('A', 115), ('B', 118)]
+[e2e] hotspots: ['B:S30', 'A:S100']
+[e2e] GPU: NVIDIA GeForce RTX 4090, free=23.2GiB
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=4ZQK_multi  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 81.21it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 76.23it/s]
+2026-09-15 14:03:24,599 INFO:   step   0  |  intra_contact_loss=4.5675  inter_contact_loss=4.7306  glob_loss=1.4085  epitope_loss=2.1312  total_loss=9.0589  plm_loss=3.0625  time=13.2725  peak_allocated_gib=20.8213  peak_reserved_gib=21.7695  T=0.9999
+2026-09-15 14:03:43,252 INFO:   step   5  |  intra_contact_loss=3.8728  inter_contact_loss=4.3943  glob_loss=1.0928  epitope_loss=0.6094  total_loss=8.0005  plm_loss=3.3438  time=3.7493  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.9961
+2026-09-15 14:04:01,980 INFO:   step  10  |  intra_contact_loss=3.3510  inter_contact_loss=3.4562  glob_loss=1.1715  epitope_loss=0.2262  total_loss=7.2510  plm_loss=3.5000  time=3.7569  peak_allocated_gib=20.8547  peak_reserved_gib=21.7695  T=0.9869
+2026-09-15 14:04:20,812 INFO:   step  15  |  intra_contact_loss=3.4036  inter_contact_loss=4.9965  glob_loss=1.1231  epitope_loss=1.3469  total_loss=8.8481  plm_loss=3.7500  time=3.8900  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.9725
+2026-09-15 14:04:49,277 INFO:   step  20  |  intra_contact_loss=3.4362  inter_contact_loss=5.2534  glob_loss=1.1365  epitope_loss=1.7188  total_loss=9.2909  plm_loss=3.8594  time=5.7302  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9529
+2026-09-15 14:05:17,791 INFO:   step  25  |  intra_contact_loss=3.2354  inter_contact_loss=3.9972  glob_loss=1.1531  epitope_loss=0.3445  total_loss=8.1442  plm_loss=4.1250  time=5.6789  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9284
+2026-09-15 14:05:46,381 INFO:   step  30  |  intra_contact_loss=3.1619  inter_contact_loss=4.0024  glob_loss=1.1356  epitope_loss=0.3539  total_loss=8.0800  plm_loss=4.0938  time=5.7416  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.8993
+2026-09-15 14:06:14,961 INFO:   step  35  |  intra_contact_loss=2.9204  inter_contact_loss=3.3051  glob_loss=1.0692  epitope_loss=0.0630  total_loss=7.3893  plm_loss=4.0312  time=5.7199  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.8658
+2026-09-15 14:06:43,624 INFO:   step  40  |  intra_contact_loss=3.0189  inter_contact_loss=4.3197  glob_loss=1.0218  epitope_loss=0.5172  total_loss=8.3823  plm_loss=4.2500  time=5.7555  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.8284
+2026-09-15 14:07:12,216 INFO:   step  45  |  intra_contact_loss=3.1297  inter_contact_loss=3.9914  glob_loss=1.0283  epitope_loss=0.9008  total_loss=8.1541  plm_loss=3.9375  time=5.7099  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.7875
+2026-09-15 14:07:40,799 INFO:   step  50  |  intra_contact_loss=2.8492  inter_contact_loss=3.1942  glob_loss=1.0003  epitope_loss=0.4872  total_loss=7.5591  plm_loss=4.0938  time=5.6860  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.7435
+2026-09-15 14:08:09,590 INFO:   step  55  |  intra_contact_loss=2.7713  inter_contact_loss=3.0050  glob_loss=1.3529  epitope_loss=0.1449  total_loss=7.3562  plm_loss=4.1250  time=5.6553  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.6968
+2026-09-15 14:08:38,002 INFO:   step  60  |  intra_contact_loss=2.8412  inter_contact_loss=4.4027  glob_loss=0.9959  epitope_loss=0.6172  total_loss=8.2860  plm_loss=4.1562  time=5.7032  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.6481
+2026-09-15 14:09:06,667 INFO:   step  65  |  intra_contact_loss=2.6421  inter_contact_loss=3.3650  glob_loss=1.0232  epitope_loss=0.1117  total_loss=7.0922  plm_loss=3.8281  time=5.7257  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.5978
+2026-09-15 14:09:35,392 INFO:   step  70  |  intra_contact_loss=3.1822  inter_contact_loss=3.0451  glob_loss=1.2474  epitope_loss=0.0850  total_loss=7.1868  plm_loss=3.7812  time=5.8500  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.5464
+2026-09-15 14:10:04,069 INFO:   step  75  |  intra_contact_loss=2.7362  inter_contact_loss=3.4550  glob_loss=1.0711  epitope_loss=0.1964  total_loss=7.1268  plm_loss=3.7188  time=5.8066  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.4946
+2026-09-15 14:10:32,894 INFO:   step  80  |  intra_contact_loss=2.7203  inter_contact_loss=4.1673  glob_loss=1.0173  epitope_loss=0.4039  total_loss=7.3961  plm_loss=3.5469  time=5.6722  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.4430
+2026-09-15 14:11:01,400 INFO:   step  85  |  intra_contact_loss=2.4606  inter_contact_loss=2.8569  glob_loss=1.2756  epitope_loss=0.1715  total_loss=6.3746  plm_loss=3.3750  time=5.6998  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.3920
+2026-09-15 14:11:30,071 INFO:   step  90  |  intra_contact_loss=2.3299  inter_contact_loss=2.6071  glob_loss=1.2641  epitope_loss=0.0844  total_loss=6.0604  plm_loss=3.2969  time=5.7894  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.3422
+2026-09-15 14:11:58,438 INFO:   step  95  |  intra_contact_loss=2.3856  inter_contact_loss=2.6609  glob_loss=1.2549  epitope_loss=0.0479  total_loss=5.7200  plm_loss=2.9219  time=5.6640  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.2942
+2026-09-15 14:12:27,103 INFO:   step 100  |  intra_contact_loss=2.3314  inter_contact_loss=2.5960  glob_loss=1.2395  epitope_loss=0.0291  total_loss=5.5387  plm_loss=2.8125  time=5.7826  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.2486
+2026-09-15 14:12:55,477 INFO:   step 105  |  intra_contact_loss=2.3625  inter_contact_loss=2.5738  glob_loss=1.0249  epitope_loss=0.0257  total_loss=5.3266  plm_loss=2.6406  time=5.6010  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.2057
+2026-09-15 14:13:23,914 INFO:   step 110  |  intra_contact_loss=2.4748  inter_contact_loss=4.6206  glob_loss=0.9118  epitope_loss=1.1125  total_loss=6.6613  plm_loss=2.3750  time=5.7221  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.1661
+2026-09-15 14:13:52,444 INFO:   step 115  |  intra_contact_loss=2.4016  inter_contact_loss=3.0229  glob_loss=0.8230  epitope_loss=0.2969  total_loss=5.0722  plm_loss=2.0469  time=5.7520  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.1303
+2026-09-15 14:14:21,023 INFO:   step 120  |  intra_contact_loss=2.2329  inter_contact_loss=2.5797  glob_loss=1.0956  epitope_loss=0.0365  total_loss=4.5343  plm_loss=1.8906  time=5.6721  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0985
+2026-09-15 14:14:49,233 INFO:   step 125  |  intra_contact_loss=2.2341  inter_contact_loss=2.4961  glob_loss=1.0896  epitope_loss=0.0163  total_loss=4.1771  plm_loss=1.5859  time=5.6820  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0712
+2026-09-15 14:15:18,818 INFO:   step 130  |  intra_contact_loss=2.3639  inter_contact_loss=3.2033  glob_loss=0.6590  epitope_loss=0.3376  total_loss=4.6780  plm_loss=1.5938  time=6.7850  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0487
+2026-09-15 14:15:50,090 INFO:   step 135  |  intra_contact_loss=2.4647  inter_contact_loss=4.4629  glob_loss=0.7846  epitope_loss=0.5141  total_loss=5.5965  plm_loss=1.7188  time=5.1082  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0311
+2026-09-15 14:16:14,104 INFO:   step 140  |  intra_contact_loss=2.1994  inter_contact_loss=2.5746  glob_loss=0.9423  epitope_loss=0.0354  total_loss=4.0228  plm_loss=1.4297  time=4.7969  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0188
+2026-09-15 14:16:38,119 INFO:   step 145  |  intra_contact_loss=2.4317  inter_contact_loss=4.4877  glob_loss=0.7991  epitope_loss=0.6734  total_loss=5.6047  plm_loss=1.6484  time=4.8102  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0117
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 0/1 Hero Critic PDBs passed quality gate (iPTM≥0.7 [2 target chain(s)], binder=C, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 0 passed / 1 failed
+  Selected: Top-84 = 0 designs
+
+[Pipeline] Total time: 846s (14.1 min)
+[e2e] design_summary.txt 与 PDB REMARK(dG) 已写入 /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+
+[e2e] DONE in 14.1 min — /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+[e2e] stage1 候选 1, selected 0, quality 0/1
+2026-09-15 14:17:13 [4ZQK_multi/with] run_e2e 结束 rc=0
+2026-09-15 14:44:04 [4ZQK_multi/with] 检测到 GPU 2 空闲达标 (>=23500MiB), 开始 300s 跟踪
+2026-09-15 14:49:05 [4ZQK_multi/with] GPU 2 连续 300s 保持充足 (当前 24115MiB), 提交 e2e 任务 (CUDA_VISIBLE_DEVICES=GPU-d62b93d4-58f5-6f10-45e6-c1f57f8fb1af)
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[e2e] task=4ZQK_multi hotspot=with seed=0 batch_size=1
+[e2e] target chains: [('A', 115), ('B', 118)]
+[e2e] hotspots: ['B:S30', 'A:S100']
+[e2e] GPU: NVIDIA GeForce RTX 4090, free=23.2GiB
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=4ZQK_multi  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 84.34it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 80.61it/s]
+2026-09-15 14:49:33,609 INFO:   step   0  |  intra_contact_loss=4.5685  inter_contact_loss=4.7289  glob_loss=1.4116  epitope_loss=2.1375  total_loss=8.4211  plm_loss=3.0625  time=12.8724  peak_allocated_gib=20.8213  peak_reserved_gib=21.7695  T=0.9999
+2026-09-15 14:49:52,030 INFO:   step   5  |  intra_contact_loss=4.0240  inter_contact_loss=5.0728  glob_loss=2.0435  epitope_loss=1.7750  total_loss=8.8902  plm_loss=3.5781  time=3.6915  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9961
+2026-09-15 14:50:10,547 INFO:   step  10  |  intra_contact_loss=4.7949  inter_contact_loss=4.1620  glob_loss=2.0783  epitope_loss=0.9406  total_loss=9.1448  plm_loss=4.0625  time=3.7107  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.9869
+2026-09-15 14:50:29,121 INFO:   step  15  |  intra_contact_loss=4.7268  inter_contact_loss=4.2468  glob_loss=2.0338  epitope_loss=0.8656  total_loss=9.4729  plm_loss=4.4062  time=3.7202  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9725
+2026-09-15 14:50:47,867 INFO:   step  20  |  intra_contact_loss=4.6285  inter_contact_loss=4.5086  glob_loss=1.9780  epitope_loss=0.8969  total_loss=9.3623  plm_loss=4.2188  time=3.7068  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9529
+2026-09-15 14:51:06,463 INFO:   step  25  |  intra_contact_loss=4.4181  inter_contact_loss=4.7465  glob_loss=2.1953  epitope_loss=1.0016  total_loss=9.8467  plm_loss=4.6250  time=3.7101  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.9284
+2026-09-15 14:51:25,127 INFO:   step  30  |  intra_contact_loss=4.5437  inter_contact_loss=4.4148  glob_loss=2.2585  epitope_loss=0.4563  total_loss=9.3347  plm_loss=4.3125  time=3.7265  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.8993
+2026-09-15 14:51:43,745 INFO:   step  35  |  intra_contact_loss=4.5290  inter_contact_loss=3.1138  glob_loss=2.1368  epitope_loss=0.1863  total_loss=8.8797  plm_loss=4.5938  time=3.7107  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.8658
+2026-09-15 14:52:02,531 INFO:   step  40  |  intra_contact_loss=4.5613  inter_contact_loss=4.2384  glob_loss=2.2718  epitope_loss=0.2891  total_loss=9.5995  plm_loss=4.6875  time=3.7323  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.8284
+2026-09-15 14:52:21,139 INFO:   step  45  |  intra_contact_loss=4.5130  inter_contact_loss=3.5622  glob_loss=2.0781  epitope_loss=0.4359  total_loss=8.9467  plm_loss=4.4062  time=3.7221  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.7875
+2026-09-15 14:52:39,759 INFO:   step  50  |  intra_contact_loss=4.4755  inter_contact_loss=2.9513  glob_loss=2.1792  epitope_loss=0.1283  total_loss=8.7061  plm_loss=4.5312  time=3.7132  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.7435
+2026-09-15 14:52:58,387 INFO:   step  55  |  intra_contact_loss=4.4428  inter_contact_loss=3.1614  glob_loss=1.7513  epitope_loss=0.1172  total_loss=9.1445  plm_loss=4.9688  time=3.7447  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.6968
+2026-09-15 14:53:17,181 INFO:   step  60  |  intra_contact_loss=4.5486  inter_contact_loss=4.0095  glob_loss=2.0770  epitope_loss=0.4934  total_loss=9.2619  plm_loss=4.4688  time=3.7156  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.6481
+2026-09-15 14:53:35,822 INFO:   step  65  |  intra_contact_loss=4.4011  inter_contact_loss=4.2751  glob_loss=2.0499  epitope_loss=0.2977  total_loss=9.2451  plm_loss=4.4375  time=3.7320  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.5978
+2026-09-15 14:53:54,477 INFO:   step  70  |  intra_contact_loss=4.2570  inter_contact_loss=3.5075  glob_loss=1.7801  epitope_loss=0.2977  total_loss=8.7666  plm_loss=4.4688  time=3.7487  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.5464
+2026-09-15 14:54:13,151 INFO:   step  75  |  intra_contact_loss=4.2765  inter_contact_loss=4.5459  glob_loss=1.8861  epitope_loss=0.6000  total_loss=9.2522  plm_loss=4.3438  time=3.7220  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.4946
+2026-09-15 14:54:31,906 INFO:   step  80  |  intra_contact_loss=4.3122  inter_contact_loss=4.5349  glob_loss=1.8527  epitope_loss=0.5688  total_loss=9.1891  plm_loss=4.2812  time=3.7440  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.4430
+2026-09-15 14:54:50,526 INFO:   step  85  |  intra_contact_loss=4.1908  inter_contact_loss=3.6260  glob_loss=1.4373  epitope_loss=0.5250  total_loss=8.3634  plm_loss=4.0625  time=3.7194  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.3920
+2026-09-15 14:55:09,161 INFO:   step  90  |  intra_contact_loss=4.2581  inter_contact_loss=3.5726  glob_loss=1.5305  epitope_loss=0.5188  total_loss=8.3096  plm_loss=3.9844  time=3.7251  peak_allocated_gib=20.8546  peak_reserved_gib=21.7695  T=0.3422
+2026-09-15 14:55:27,826 INFO:   step  95  |  intra_contact_loss=3.9674  inter_contact_loss=2.5052  glob_loss=1.5508  epitope_loss=0.0261  total_loss=7.2079  plm_loss=3.6562  time=3.7210  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.2942
+2026-09-15 14:55:46,541 INFO:   step 100  |  intra_contact_loss=4.0872  inter_contact_loss=3.1291  glob_loss=1.4785  epitope_loss=0.1934  total_loss=7.0675  plm_loss=3.1250  time=3.7232  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.2486
+2026-09-15 14:56:05,206 INFO:   step 105  |  intra_contact_loss=4.0025  inter_contact_loss=3.4467  glob_loss=1.5702  epitope_loss=0.3242  total_loss=7.0566  plm_loss=2.9531  time=3.7139  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.2057
+2026-09-15 14:56:23,813 INFO:   step 110  |  intra_contact_loss=4.1206  inter_contact_loss=4.5973  glob_loss=1.4133  epitope_loss=0.6625  total_loss=7.0554  plm_loss=2.2812  time=3.7234  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.1661
+2026-09-15 14:56:42,441 INFO:   step 115  |  intra_contact_loss=4.0922  inter_contact_loss=3.8336  glob_loss=1.2838  epitope_loss=0.4727  total_loss=6.1502  plm_loss=1.8359  time=3.7170  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.1303
+2026-09-15 14:57:01,175 INFO:   step 120  |  intra_contact_loss=3.9018  inter_contact_loss=3.3443  glob_loss=1.4318  epitope_loss=0.3633  total_loss=5.4664  plm_loss=1.4844  time=3.7246  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0985
+2026-09-15 14:57:19,814 INFO:   step 125  |  intra_contact_loss=3.6747  inter_contact_loss=3.5773  glob_loss=0.3207  epitope_loss=0.4164  total_loss=5.1641  plm_loss=1.3906  time=3.7333  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0712
+2026-09-15 14:57:39,486 INFO:   step 130  |  intra_contact_loss=4.0859  inter_contact_loss=3.8758  glob_loss=1.2677  epitope_loss=0.7023  total_loss=5.5468  plm_loss=1.1719  time=4.7521  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0487
+2026-09-15 14:58:03,680 INFO:   step 135  |  intra_contact_loss=4.0234  inter_contact_loss=4.6426  glob_loss=1.1736  epitope_loss=0.6406  total_loss=5.6880  plm_loss=0.9922  time=5.1211  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0311
+2026-09-15 14:58:27,496 INFO:   step 140  |  intra_contact_loss=3.3672  inter_contact_loss=3.0675  glob_loss=0.4586  epitope_loss=0.2523  total_loss=4.3986  plm_loss=1.0391  time=4.7584  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0188
+2026-09-15 14:58:51,476 INFO:   step 145  |  intra_contact_loss=4.0228  inter_contact_loss=4.7981  glob_loss=1.1528  epitope_loss=0.8828  total_loss=5.7746  plm_loss=0.9570  time=4.7623  peak_allocated_gib=20.8541  peak_reserved_gib=21.7695  T=0.0117
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 0/1 Hero Critic PDBs passed quality gate (iPTM≥0.7 [2 target chain(s)], binder=C, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 0 passed / 1 failed
+  Selected: Top-84 = 0 designs
+
+[Pipeline] Total time: 609s (10.2 min)
+[e2e] design_summary.txt 与 PDB REMARK(dG) 已写入 /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+
+[e2e] DONE in 10.2 min — /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+[e2e] stage1 候选 1, selected 0, quality 0/1
+2026-09-15 14:59:26 [4ZQK_multi/with] run_e2e 结束 rc=0
+2026-09-15 16:21:27 [4ZQK_multi/with] 检测到 GPU 2 空闲达标 (>=23500MiB), 开始 300s 跟踪
+2026-09-15 16:26:28 [4ZQK_multi/with] GPU 2 连续 300s 保持充足 (当前 24115MiB), 提交 e2e 任务 (CUDA_VISIBLE_DEVICES=GPU-d62b93d4-58f5-6f10-45e6-c1f57f8fb1af)
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[e2e] task=4ZQK_multi hotspot=with seed=0 batch_size=1
+[e2e] target chains: [('A', 115), ('B', 118)]
+[e2e] hotspots: ['A:S100']
+[e2e] GPU: NVIDIA GeForce RTX 4090, free=23.2GiB
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=4ZQK_multi  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 83.29it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 79.84it/s]
+2026-09-15 16:26:56,480 INFO:   step   0  |  intra_contact_loss=4.5702  inter_contact_loss=4.7297  glob_loss=1.4119  epitope_loss=2.2750  total_loss=9.1323  plm_loss=3.0625  time=12.8459  peak_allocated_gib=20.8213  peak_reserved_gib=21.7695  T=0.9999
+2026-09-15 16:27:14,881 INFO:   step   5  |  intra_contact_loss=4.0037  inter_contact_loss=5.2635  glob_loss=1.9569  epitope_loss=2.6125  total_loss=9.8156  plm_loss=3.4844  time=3.6830  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.9961
+2026-09-15 16:27:33,418 INFO:   step  10  |  intra_contact_loss=4.8106  inter_contact_loss=3.8487  glob_loss=2.1496  epitope_loss=0.2531  total_loss=9.0424  plm_loss=4.1562  time=3.6928  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.9869
+2026-09-15 16:27:51,954 INFO:   step  15  |  intra_contact_loss=4.8481  inter_contact_loss=4.6992  glob_loss=2.1713  epitope_loss=0.7375  total_loss=9.7954  plm_loss=4.2188  time=3.7086  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.9725
+2026-09-15 16:28:10,633 INFO:   step  20  |  intra_contact_loss=4.8799  inter_contact_loss=4.4569  glob_loss=2.2360  epitope_loss=0.4844  total_loss=9.5453  plm_loss=4.1875  time=3.7069  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.9529
+2026-09-15 16:28:29,207 INFO:   step  25  |  intra_contact_loss=3.4395  inter_contact_loss=4.3726  glob_loss=2.1594  epitope_loss=0.7500  total_loss=9.3692  plm_loss=4.6562  time=3.7135  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.9284
+2026-09-15 16:28:47,783 INFO:   step  30  |  intra_contact_loss=3.4372  inter_contact_loss=4.4653  glob_loss=2.1729  epitope_loss=0.7875  total_loss=9.5921  plm_loss=4.8125  time=3.7113  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.8993
+2026-09-15 16:29:06,415 INFO:   step  35  |  intra_contact_loss=3.5997  inter_contact_loss=4.4494  glob_loss=2.2050  epitope_loss=0.7937  total_loss=9.6124  plm_loss=4.7500  time=3.7161  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.8658
+2026-09-15 16:29:25,237 INFO:   step  40  |  intra_contact_loss=3.4959  inter_contact_loss=3.8745  glob_loss=2.2163  epitope_loss=0.1961  total_loss=8.8515  plm_loss=4.6250  time=3.7133  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.8284
+2026-09-15 16:29:43,907 INFO:   step  45  |  intra_contact_loss=3.7188  inter_contact_loss=4.5460  glob_loss=2.1956  epitope_loss=1.0625  total_loss=10.1341  plm_loss=5.0312  time=3.7646  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.7875
+2026-09-15 16:30:02,615 INFO:   step  50  |  intra_contact_loss=3.6120  inter_contact_loss=3.8989  glob_loss=2.1747  epitope_loss=0.1711  total_loss=9.2447  plm_loss=4.9688  time=3.7134  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.7435
+2026-09-15 16:30:21,185 INFO:   step  55  |  intra_contact_loss=4.9415  inter_contact_loss=4.4556  glob_loss=2.3228  epitope_loss=0.6750  total_loss=10.4069  plm_loss=4.9062  time=3.7128  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.6968
+2026-09-15 16:30:39,885 INFO:   step  60  |  intra_contact_loss=3.6567  inter_contact_loss=4.6320  glob_loss=2.0981  epitope_loss=1.0750  total_loss=9.6952  plm_loss=4.5938  time=3.7132  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.6481
+2026-09-15 16:30:58,474 INFO:   step  65  |  intra_contact_loss=3.6082  inter_contact_loss=4.1154  glob_loss=2.1201  epitope_loss=0.3469  total_loss=9.0843  plm_loss=4.6250  time=3.7265  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.5978
+2026-09-15 16:31:17,110 INFO:   step  70  |  intra_contact_loss=4.6871  inter_contact_loss=3.8374  glob_loss=2.3108  epitope_loss=0.2016  total_loss=9.5439  plm_loss=4.7188  time=3.7308  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.5464
+2026-09-15 16:31:35,728 INFO:   step  75  |  intra_contact_loss=3.3595  inter_contact_loss=4.3682  glob_loss=2.0698  epitope_loss=0.6719  total_loss=9.1137  plm_loss=4.5000  time=3.7152  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.4946
+2026-09-15 16:31:54,451 INFO:   step  80  |  intra_contact_loss=3.3092  inter_contact_loss=4.1825  glob_loss=2.0848  epitope_loss=0.4469  total_loss=9.1363  plm_loss=4.7500  time=3.7228  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.4430
+2026-09-15 16:32:13,160 INFO:   step  85  |  intra_contact_loss=4.4044  inter_contact_loss=5.0588  glob_loss=2.1373  epitope_loss=1.7000  total_loss=10.4153  plm_loss=4.4062  time=3.7241  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.3920
+2026-09-15 16:32:31,817 INFO:   step  90  |  intra_contact_loss=4.5152  inter_contact_loss=3.7045  glob_loss=2.3469  epitope_loss=0.3016  total_loss=8.4331  plm_loss=3.7031  time=3.7168  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.3422
+2026-09-15 16:32:50,414 INFO:   step  95  |  intra_contact_loss=4.1101  inter_contact_loss=4.6368  glob_loss=2.3027  epitope_loss=1.0187  total_loss=9.0308  plm_loss=3.6875  time=3.7187  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.2942
+2026-09-15 16:33:09,152 INFO:   step 100  |  intra_contact_loss=3.4037  inter_contact_loss=4.3459  glob_loss=2.3616  epitope_loss=0.9688  total_loss=7.8003  plm_loss=2.9688  time=3.7187  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.2486
+2026-09-15 16:33:27,745 INFO:   step 105  |  intra_contact_loss=3.2415  inter_contact_loss=4.6587  glob_loss=2.3434  epitope_loss=1.0125  total_loss=7.1125  plm_loss=2.1875  time=3.7136  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.2057
+2026-09-15 16:33:46,370 INFO:   step 110  |  intra_contact_loss=3.3807  inter_contact_loss=3.6448  glob_loss=2.4667  epitope_loss=0.2328  total_loss=6.0756  plm_loss=1.9531  time=3.7126  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.1661
+2026-09-15 16:34:04,971 INFO:   step 115  |  intra_contact_loss=3.2395  inter_contact_loss=3.4292  glob_loss=2.5024  epitope_loss=0.3187  total_loss=5.5411  plm_loss=1.5469  time=3.7124  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.1303
+2026-09-15 16:34:23,706 INFO:   step 120  |  intra_contact_loss=2.2841  inter_contact_loss=3.7079  glob_loss=2.4074  epitope_loss=0.9000  total_loss=5.1072  plm_loss=1.1797  time=3.7309  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.0985
+2026-09-15 16:34:42,295 INFO:   step 125  |  intra_contact_loss=2.7276  inter_contact_loss=3.7404  glob_loss=2.5813  epitope_loss=0.2438  total_loss=4.8096  plm_loss=0.9375  time=3.7125  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.0712
+2026-09-15 16:35:02,044 INFO:   step 130  |  intra_contact_loss=3.1955  inter_contact_loss=3.4859  glob_loss=2.5651  epitope_loss=0.2000  total_loss=4.7897  plm_loss=0.8359  time=4.8483  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.0487
+2026-09-15 16:35:26,287 INFO:   step 135  |  intra_contact_loss=2.9840  inter_contact_loss=3.6967  glob_loss=2.5346  epitope_loss=0.3891  total_loss=5.0731  plm_loss=1.0312  time=5.1008  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.0311
+2026-09-15 16:35:50,240 INFO:   step 140  |  intra_contact_loss=2.9998  inter_contact_loss=4.3626  glob_loss=2.5492  epitope_loss=0.6187  total_loss=5.5317  plm_loss=1.0312  time=4.7503  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.0188
+2026-09-15 16:36:14,148 INFO:   step 145  |  intra_contact_loss=3.0105  inter_contact_loss=4.0256  glob_loss=2.5508  epitope_loss=1.0000  total_loss=5.2391  plm_loss=0.7109  time=4.7543  peak_allocated_gib=20.8540  peak_reserved_gib=21.7695  T=0.0117
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 0/1 Hero Critic PDBs passed quality gate (iPTM≥0.7 [2 target chain(s)], binder=C, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 0 passed / 1 failed
+  Selected: Top-84 = 0 designs
+
+[Pipeline] Total time: 609s (10.1 min)
+[e2e] design_summary.txt 与 PDB REMARK(dG) 已写入 /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+
+[e2e] DONE in 10.2 min — /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot
+[e2e] stage1 候选 1, selected 0, quality 0/1
+2026-09-15 16:36:49 [4ZQK_multi/with] run_e2e 结束 rc=0

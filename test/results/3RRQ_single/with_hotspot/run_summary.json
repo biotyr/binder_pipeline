@@ -1,0 +1,34 @@
+{
+  "task": "3RRQ_single",
+  "hotspot": "with",
+  "seed": 0,
+  "batch_size": 1,
+  "hotspot_ids": [
+    "A:N85",
+    "A:R83"
+  ],
+  "target_chain_lengths": {
+    "A": 129
+  },
+  "config": {
+    "enable_mpnn": true,
+    "enable_rosetta": true,
+    "mpnn_num_seqs": 20,
+    "hero_critic_names": [
+      "ESMFold2-Experimental-Cutoff2025"
+    ],
+    "use_stage1_scaling": false,
+    "batch_size": 1,
+    "dtype": "trunk bf16 (native) + heads fp32"
+  },
+  "elapsed_s": 4046.9,
+  "n_stage1_candidates": 1,
+  "n_selected": 13,
+  "n_quality_passed": 1,
+  "n_quality_failed": 0,
+  "n_refold_results": 17,
+  "best_sequences": [
+    "WNPPTFSPALLVVTEGDNATFTCSFSNTSESFVLNWYRMSPSNQTDKLAAFPEDRSQPGQDCRFRVTQLPNGRDFHMSVVRARRNDSGTYLCGAISLAPKLQIKESLRAELRVTERRAEVPTAHPSPSP|DDDDDDSSSSSSSSSSSSSNQYANQALNMALNAFKKGGGSLSEEEIKLLKKVAKIFVKANLSSSDIESLEELLEKNDKLLSADVLEIIVYLSFLLIRNRNIQLKALQIILKIVDRKLKKDPGNADFKELREKLLRIIAMVEESLAEAALSSAASSSSQ"
+  ],
+  "peak_vram_gib": 17.941036701202393
+}

@@ -396,8 +396,9 @@ def select_top_n(
 ) -> list[PipelineResult]:
     """从通过过滤的设计中选取 Top-N。
 
-    按 selection_score 降序, 每个 (target_name, binder_name, stage)
-    组合最多取 top_n 条 (复现 notebook 的分组选择逻辑)。
+    按 selection_score 降序, 每个 (target_name, binder_name) 组合
+    最多取 top_n 条 (复现 notebook 的分组选择逻辑; stage 仅作为
+    元数据列保留, 不参与分组)。
     """
     if not passed:
         return []
@@ -466,7 +467,15 @@ class IntegratedPipeline:
         from esmcp.binder_design import ESMFold2Design
 
         app_design = ESMFold2Design()
-        app_design.load(use_scaling_critics=True)
+        ##### claude 2026/9/9 start #####
+        # Stage-1 scaling critics (15 个 base300M/600M/6B checkpoint) 仅产出
+        # is_scaling_critic=True 的诊断条目 (complex=None / 无 iPTM), 被
+        # Stage 2/3 与 _collect_results 显式排除, 对 IntegratedPipeline 下游
+        # 零影响; 且 base6B 组各自整载一个 6B 主干, 瞬态显存峰 ~+25GB/critic
+        # (fp32 全程峰值 ~58GB, 仅 H100 可容)。默认关闭; 需 scaling 曲线
+        # 诊断时在 H100 上改回 True, 或走 binder_design 自有入口显式传参。
+        app_design.load(use_scaling_critics=False)
+        ##### claude 2026/9/9 end #####
 
         best_sequences, trajectory, critic_results = app_design.design(
             target_name=target_name,
@@ -718,7 +727,14 @@ class IntegratedPipeline:
                 if self.config.verbose:
                     print(f"[Rosetta] Skip: no target_seq in result")
                 continue
-            _, binder_label = _derive_chain_metadata(target_chains)
+            ##### claude 2026/9/11 fix #####
+            # target_chains 的元素是"链序列"而非链名 — split("|") 每段是
+            # 整条氨基酸序列, 直接传给 screen_single_pdb 会在 hotspot_residues
+            # 的 structure[0][chain] 处 KeyError(整段序列)。改用链数推导
+            # asym_id 链名 (["A", ...]), binder 恒为末链。
+            labels, binder_label = _derive_chain_metadata(target_chains)
+            rosetta_target_labels = labels[:-1]
+            ##### claude 2026/9/11 fix end #####
             # refold 条目用 "sequence" 键存 binder 序列 (非 "binder_sequence")
             binder_seq = result.get(
                 "binder_sequence", result.get("sequence", "")
@@ -738,7 +754,7 @@ class IntegratedPipeline:
                     binder_sequence=binder_seq,
                     dssp_path=self.config.rosetta_dssp_path,
                     binder_chain=binder_label,
-                    target_chains=target_chains,
+                    target_chains=rosetta_target_labels,
                     relax_first=self.config.rosetta_relax_first,
                 )
                 ##### claude 2026/8/13 end #####

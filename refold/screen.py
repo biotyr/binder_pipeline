@@ -74,7 +74,8 @@ class RefoldScreen:
         Hero Critic 模型字典 ``{name: ESMFold2ExperimentalModel}``。
     config : RefoldScreenConfig | None
     seed : int | None
-        全局随机种子 (每个序列的 seed = base_seed + idx)。
+        全局随机种子 (每个序列的 seed = base_seed + idx * 10007,
+        见 :func:`_step_seed`)。
     """
 
     def __init__(
