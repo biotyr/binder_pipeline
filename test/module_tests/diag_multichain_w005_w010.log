@@ -1,0 +1,28 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 82.98it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 78.93it/s]
+[setup] 模型加载 6s (inversion=['ESMFold2-Experimental-Fast', 'ESMFold2-Experimental-Fast-Cutoff2025'])
+[D_4ZQK_AS100_w005] binder_len=158 target_len=233 hotspots=['A:S100']
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+[D_4ZQK_AS100_w005] step   0 T=1.000 intra=4.57 inter=4.72 glob=+1.40 epi=2.25 plm=3.06 dir={'intra_contact_loss': 0.1547, 'inter_contact_loss': 0.7066, 'glob_loss': 0.0127, 'epitope_loss': 0.126} cos=0.984375 degen=0.41 head=DQQPKKKGDTENPGLWAQDQ
+[D_4ZQK_AS100_w005] step   5 T=0.996 intra=4.19 inter=5.28 glob=+1.20 epi=2.36 plm=3.34 dir={'intra_contact_loss': 0.3144, 'inter_contact_loss': 0.5342, 'glob_loss': 0.0185, 'epitope_loss': 0.1329} cos=0.98046875 degen=0.36 head=DKKPKKKGDDEDPDLTSDDL
+[D_4ZQK_AS100_w005] step  10 T=0.987 intra=3.31 inter=4.19 glob=+0.36 epi=1.24 plm=3.69 dir={'intra_contact_loss': 0.3082, 'inter_contact_loss': 0.4879, 'glob_loss': 0.0203, 'epitope_loss': 0.1836} cos=0.953125 degen=0.37 head=DKKKKKKDDDDDDDDDLEDL
+[D_4ZQK_AS100_w005] step  15 T=0.972 intra=3.44 inter=5.44 glob=+0.06 epi=2.78 plm=3.56 dir={'intra_contact_loss': 0.2427, 'inter_contact_loss': 0.5173, 'glob_loss': 0.0189, 'epitope_loss': 0.2211} cos=0.9296875 degen=0.35 head=DKKKKKKDDDDDDDDELEEL
+[D_4ZQK_AS100_w005] step  20 T=0.953 intra=2.88 inter=3.81 glob=+0.32 epi=0.51 plm=3.70 dir={'intra_contact_loss': 0.3331, 'inter_contact_loss': 0.5458, 'glob_loss': 0.0141, 'epitope_loss': 0.107} cos=0.984375 degen=0.38 head=DKKKKKKDDDDDDDDELEEL
+[D_4ZQK_AS100_w005] step  25 T=0.928 intra=3.14 inter=4.69 glob=+0.25 epi=1.36 plm=3.83 dir={'intra_contact_loss': 0.2106, 'inter_contact_loss': 0.6573, 'glob_loss': 0.0092, 'epitope_loss': 0.1228} cos=0.984375 degen=0.34 head=DKKKKKKDDDDDDDDELEEF
+[D_4ZQK_AS100_w005] step  29 T=0.905 intra=2.50 inter=3.67 glob=+0.21 epi=0.42 plm=3.75 dir={'intra_contact_loss': 0.3722, 'inter_contact_loss': 0.52, 'glob_loss': 0.0103, 'epitope_loss': 0.0975} cos=0.9921875 degen=0.35 head=DKKKKKKDDDDDDDDSLEEF
+[D_4ZQK_AS100_w005] 完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot/probe_D_4ZQK_AS100_w005.json
+[E_4ZQK_AS100_w010] binder_len=158 target_len=233 hotspots=['A:S100']
+[E_4ZQK_AS100_w010] step   0 T=1.000 intra=4.57 inter=4.71 glob=+1.41 epi=2.25 plm=3.06 dir={'intra_contact_loss': 0.1384, 'inter_contact_loss': 0.6277, 'glob_loss': 0.0112, 'epitope_loss': 0.2227} cos=0.94140625 degen=0.43 head=DQQPKKKGDRENPGLWAQDQ
+[E_4ZQK_AS100_w010] step   5 T=0.996 intra=3.96 inter=5.49 glob=+0.70 epi=3.65 plm=3.53 dir={'intra_contact_loss': 0.1137, 'inter_contact_loss': 0.4611, 'glob_loss': 0.0074, 'epitope_loss': 0.4178} cos=0.76171875 degen=0.48 head=DQQPKPKGGPPDPSDQLSDL
+[E_4ZQK_AS100_w010] step  10 T=0.987 intra=3.91 inter=5.28 glob=+0.71 epi=2.53 plm=3.75 dir={'intra_contact_loss': 0.2586, 'inter_contact_loss': 0.3578, 'glob_loss': 0.016, 'epitope_loss': 0.3675} cos=0.765625 degen=0.49 head=DQQPPPPGGPPNPSSPSSSF
+[E_4ZQK_AS100_w010] step  15 T=0.972 intra=3.85 inter=4.80 glob=+0.86 epi=1.54 plm=3.72 dir={'intra_contact_loss': 0.2369, 'inter_contact_loss': 0.3865, 'glob_loss': 0.0143, 'epitope_loss': 0.3623} cos=0.78125 degen=0.49 head=DQQPPDPPSPPSPSSSSSSS
+[E_4ZQK_AS100_w010] step  20 T=0.953 intra=3.58 inter=3.91 glob=+0.36 epi=0.65 plm=3.83 dir={'intra_contact_loss': 0.2644, 'inter_contact_loss': 0.4483, 'glob_loss': 0.0178, 'epitope_loss': 0.2695} cos=0.88671875 degen=0.46 head=DQQPPDPPSPPSPSSSSSSS
+[E_4ZQK_AS100_w010] step  25 T=0.928 intra=3.37 inter=4.59 glob=+0.43 epi=0.76 plm=3.97 dir={'intra_contact_loss': 0.2356, 'inter_contact_loss': 0.5498, 'glob_loss': 0.0122, 'epitope_loss': 0.2023} cos=0.9453125 degen=0.46 head=DQQPPPPPSPPSPSSPLSSL
+[E_4ZQK_AS100_w010] step  29 T=0.905 intra=3.43 inter=5.13 glob=+0.35 epi=1.95 plm=3.88 dir={'intra_contact_loss': 0.2088, 'inter_contact_loss': 0.4115, 'glob_loss': 0.0155, 'epitope_loss': 0.3642} cos=0.78515625 degen=0.46 head=DQQPPPPPSPPSPSSPLSSF
+[E_4ZQK_AS100_w010] 完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot/probe_E_4ZQK_AS100_w010.json
+[diag] 全部完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot

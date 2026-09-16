@@ -1,0 +1,13 @@
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+[score1] stage1_ESMFold2-Experimental-Cutoff2025.pdb iPTM=0.8245 pI=5.12
+[score1] relax+评分 266s: dG=-47.67 sc=0.63 hbonds=9 unsat=4.0 clashes=0
+[score1] filter=FAIL unmet=['Average_pLDDT'] selected=0
+[score1] 产物: design_summary.txt / stage1_only/stage1_rosetta_scores.json / PDB REMARK

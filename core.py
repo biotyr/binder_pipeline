@@ -702,7 +702,11 @@ class IntegratedPipeline:
         self,
         hero_results: list[dict],
     ) -> list[dict]:
-        """对 Hero 预测结果执行 Rosetta 物理评分。"""
+        """对 Hero 预测结果执行 Rosetta 物理评分。
+
+        2026/9/16 起同时覆盖 MPNN 重折叠条目与 stage1 (critic) 设计条目:
+        两者均为 "annotated_pdb + 末段为 binder" 的复合物结构。
+        """
         if not self.config.enable_rosetta:
             return hero_results
 
@@ -721,7 +725,11 @@ class IntegratedPipeline:
             ##### claude 2026/8/13 start #####
             # 链名推导: refold_results 条目携带 "target_seq" ("T1|T2" 形式),
             # binder 为复合物最后一条链 (多链 target 时不再固定 "B")。
-            target_seq = result.get("target_seq", "")
+            # critic (stage1) 条目无 "target_seq" 键, 从 "designed_sequence"
+            # ("T1|T2|binder") 回退 — target 为除末段外全部链。(2026/9/16)
+            target_seq = result.get("target_seq") or "|".join(
+                result.get("designed_sequence", "").split("|")[:-1]
+            )
             target_chains = [c for c in target_seq.split("|") if c] if target_seq else []
             if not target_chains:
                 if self.config.verbose:
@@ -739,6 +747,12 @@ class IntegratedPipeline:
             binder_seq = result.get(
                 "binder_sequence", result.get("sequence", "")
             )
+            ##### claude 2026/9/16 start #####
+            # critic (stage1) 条目两者皆无, binder 取 designed_sequence 末段
+            if not binder_seq:
+                segments = result.get("designed_sequence", "").split("|")
+                binder_seq = segments[-1] if segments else ""
+            ##### claude 2026/9/16 end #####
             ##### claude 2026/8/13 end #####
 
             with tempfile.NamedTemporaryFile(
@@ -887,13 +901,22 @@ class IntegratedPipeline:
             torch.cuda.empty_cache()
 
         # ── 阶段 5: Rosetta 物理评分 ──────────────────────────────
-        if cfg.enable_rosetta and refold_results:
+        ##### claude 2026/9/16 start #####
+        # stage1 (critic) 设计与 MPNN 重折叠结果一并进入 Rosetta 队列,
+        # Stage 6 排序/筛选对两类候选统一使用物理能量。
+        if cfg.enable_rosetta and (refold_results or critic_results):
             if cfg.verbose:
                 print(f"\n{'='*60}")
                 print(f"[Pipeline] Stage 5: Rosetta Physical Scoring")
+                print(f"  critic(stage1)={len(critic_results)}  "
+                      f"refold(mpnn)={len(refold_results)}")
                 print(f"{'='*60}")
 
-            refold_results = self._rosetta_score(refold_results)
+            if critic_results:
+                critic_results = self._rosetta_score(critic_results)
+            if refold_results:
+                refold_results = self._rosetta_score(refold_results)
+        ##### claude 2026/9/16 end #####
 
         # ── 汇总为 PipelineResult ─────────────────────────────────
         all_results = _collect_results(
@@ -1011,6 +1034,16 @@ def _collect_results(
             final_loss=r.get("final_loss"),
             annotated_pdb=r.get("annotated_pdb"),
             complex=r.get("complex"),
+            ##### claude 2026/9/16 start #####
+            # Rosetta: stage1 设计经 Stage 5 评分后携带 rosetta_screening,
+            # 与 (B) 分支同式映射, 使 Stage 6 排序/筛选覆盖 stage1 候选。
+            rosetta_dG=_safe_get_rosetta(r, "interface_dG"),
+            rosetta_sc=_safe_get_rosetta(r, "interface_sc"),
+            rosetta_hbonds=_safe_get_rosetta(r, "interface_interface_hbonds"),
+            rosetta_unsat_hbonds=_safe_get_rosetta(r, "interface_delta_unsat_hbonds"),
+            rosetta_clashes=_safe_get_rosetta(r, "Relaxed_Clashes"),
+            rosetta_binder_energy=_safe_get_rosetta(r, "binder_score"),
+            ##### claude 2026/9/16 end #####
             isoelectric_point=_compute_pI(binder_seq) if binder_seq else None,
         ))
 

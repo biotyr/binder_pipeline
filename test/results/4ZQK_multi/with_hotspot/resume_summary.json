@@ -1,0 +1,13 @@
+{
+  "task": "4ZQK_multi",
+  "hotspot": "with",
+  "seed": 1,
+  "mpnn_num_seqs": 100,
+  "scaling_threshold": 0.5,
+  "n_mpnn": 100,
+  "n_scaling_passed": 3,
+  "n_filter_passed": 0,
+  "n_selected": 0,
+  "elapsed_s": 984.2,
+  "note": "Stage3-6 \u7eed\u8dd1: \u590d\u7528 stage1_only \u7684\u5df2\u8fc7\u8d28\u91cf\u95e8\u8bbe\u8ba1 (seed1, iPTM 0.8245), scaling \u9608\u503c\u7ef4\u6301 0.50 \u672a\u653e\u677e"
+}

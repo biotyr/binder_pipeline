@@ -1,0 +1,18 @@
+{
+  "task": "4ZQK_multi",
+  "hotspot": "with",
+  "seed": 1,
+  "iptm": 0.8245394229888916,
+  "isoelectric_point": 5.123716926574706,
+  "interface_dG": -47.67,
+  "interface_sc": 0.63,
+  "interface_hbonds": 9,
+  "delta_unsat_hbonds": 4.0,
+  "clashes": 0,
+  "binder_score": -265.2,
+  "filter_passed": false,
+  "filter_unmet": [
+    "Average_pLDDT"
+  ],
+  "selected": false
+}

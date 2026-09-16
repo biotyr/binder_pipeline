@@ -1,0 +1,44 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[resume] stage1: iPTM=0.8245 proxy=0.7020 pI=5.12 pdb=stage1_ESMFold2-Experimental-Cutoff2025.pdb
+[resume] target_len=233 chains=['A', 'B']/C mpnn_num_seqs=100
+[MPNN Redesign] /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot/stage1_only/stage1_ESMFold2-Experimental-Cutoff2025.pdb
+  Generated: 100 sequences
+  Interface residues fixed: 20
+  fix_pos: A,B,248,251,252,255,256,258,259,262,263,265,266,267,271,272,273,280,283,308,312,314
+  Score range: will be shown per-sequence
+[resume] Stage 3: 100 MPNN 序列 (10s)
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 82.94it/s]
+[Refold] Loading scaling critic: ESMFold2-Experimental-Fast-base300M-step1500k
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+[Scaling] 10/100  passed=0  last=0.3324
+[Scaling] 20/100  passed=0  last=0.3204
+[Scaling] 30/100  passed=1  last=0.3602
+[Scaling] 40/100  passed=1  last=0.3046
+[Scaling] 50/100  passed=1  last=0.3562
+[Scaling] 60/100  passed=1  last=0.3125
+[Scaling] 70/100  passed=1  last=0.3284
+[Scaling] 80/100  passed=2  last=0.3483
+[Scaling] 90/100  passed=3  last=0.3244
+[Scaling] 100/100  passed=3  last=0.3403
+[Scaling] Done: 3/100 passed (threshold=0.50)
+[Hero] Scoring 3 sequences with model: ESMFold2-Experimental-Cutoff2025
+[Hero] 1/3  EEERLKEEKKEELES...  iPTM=0.5511  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 2/3  SLEELLKTKAEEIES...  iPTM=0.5563  model=ESMFold2-Experimental-Cutoff2025
+[Hero] 3/3  SMEELLREKKDEIES...  iPTM=0.7547  model=ESMFold2-Experimental-Cutoff2025
+[Hero] Done: 3/3 successful predictions (3 sequences)
+[Refold] 3 hero predictions, 97 failed scaling
+[resume] Filter: 0 passed / 3 failed
+[resume] Selected: Top-84 = 0 designs
+[resume] DONE — /home/taoyr/projects/pipeline/test/results/4ZQK_multi/with_hotspot/resume_summary.json

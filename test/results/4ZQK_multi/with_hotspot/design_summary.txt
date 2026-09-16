@@ -1,9 +1,9 @@
-# e2e 设计结果  task=4ZQK_multi  hotspot=with  seed=0  batch_size=1  epitope_weight=0.5
-# 生成时间 2026-09-15 16:36:44  |  精度: 主干bf16(原生)+头fp32  hero=1(Cutoff2025)  Stage1-scaling=off
+# e2e 设计结果 (stage1-only 离线评分; MPNN 后代阴性)  task=4ZQK_multi  hotspot=with  seed=1  epitope_weight=0.05  steps=150
+# 生成时间(恢复): 2026-09-16  |  Rosetta weight=0.3, 链 target=[A,B]/binder=C
+# 背景: Stage-1 设计过质量门 (iPTM=0.8245, pLDDT≥0.7, pI=5.12); Stage3-6 续跑 100 条 MPNN 后代 scaling 3/100、hero iPTM 0.55/0.56/0.75、Stage-6 0/3 → 0 selected。本表 = stage1 设计本体 (最优解)。
+# 恢复说明: 本设计曾被 steps=300 实验覆写, 由 relax 副本与离线评分 JSON 完整恢复 (见 stage1_only/RESTORE_NOTE.md); 结构文件为 relax 后版本 (即 dG 的评分对象), 未 relax 原始结构不可恢复。300 步失败设计存档于 stage1_only/steps300_attempt/。
 
-# [stage1_only] Stage-1 hero 原始设计 (未经 MPNN/重折叠/Rosetta, dG=NA)
-rank  hero_model                              iptm        dG  binder_sequence
-   1  ESMFold2-Experimental-Cutoff2025      0.4660        NA  TTPPPPPPPPPPPPPPPTPTPPPSTPPPPPPPSPPPPPPPDPPPPPPPPPSSSSSSSSSNSKSQWRKLILLLQQQLQNRRNNNNNNNSLSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSLPPPPPPPPPPPPPPPPPPTPPSSSSLLLVP
+rank  stage          iptm         dG     plddt     score  filter  sel  binder_sequence
+   1  esmfold2   0.8245     -47.67        NA  0.4700  FAIL      N  EEEEEEEESSSSSSSFFRALSAMFELAAAAAGGGGGGGGGGGAARSIFERMRRLMERMGMSPNQIHIYFLLQLQRLRSRGGGGGVIALLLEFLQ
 
-# [full_pipeline] 最终 selected (MPNN 重设计 → 重折叠 → Rosetta)
-rank  stage         iptm        dG     score  binder_sequence
+# filter unmet: Average_pLDDT (Rosetta 指标全部达标: dG=-47.67≤0, SC=0.63≥0.6, hbonds=9≥3, unsat=4.0≤4, clashes=0)

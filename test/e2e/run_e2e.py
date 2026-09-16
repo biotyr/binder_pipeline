@@ -112,6 +112,8 @@ def main() -> None:
     ap.add_argument("--mpnn-num-seqs", type=int, default=20)
     ap.add_argument("--epitope-weight", type=float, default=None,
                     help="覆盖 Stage-1 epitope loss 权重 (pipeline 默认 0.5)")
+    ap.add_argument("--steps", type=int, default=None,
+                    help="覆盖 Stage-1 优化步数 (pipeline 默认 150, 余弦日程随之拉伸)")
     args = ap.parse_args()
 
     task_dir = RESULTS_ROOT / args.task / f"{args.hotspot}_hotspot"
@@ -128,6 +130,10 @@ def main() -> None:
     # 复现, iPTM 0.446/0.463), 降权重缓和不折衷。不指定时保持 pipeline 默认 0.5。
     if args.epitope_weight is not None:
         bd.LOSS_WEIGHTS["epitope"] = args.epitope_weight
+    # 步数拉伸 (2026-09-16): seed1 w0.05 轨迹显示 inter/epitope 共存解在中段
+    # 出现 (2.96/0.05) 但退火过快丢失 — 拉长日程推迟锁定。不指定保持 150。
+    if args.steps is not None:
+        bd.STEPS = args.steps
 
     print(f"[e2e] task={args.task} hotspot={args.hotspot} seed={args.seed} "
           f"batch_size={args.batch_size}")
@@ -208,7 +214,8 @@ def main() -> None:
     txt = [
         f"# e2e 设计结果  task={args.task}  hotspot={args.hotspot}  "
         f"seed={args.seed}  batch_size={args.batch_size}  "
-        f"epitope_weight={args.epitope_weight if args.epitope_weight is not None else 0.5}",
+        f"epitope_weight={args.epitope_weight if args.epitope_weight is not None else 0.5}  "
+        f"steps={args.steps if args.steps is not None else 150}",
         f"# 生成时间 {time.strftime('%F %T')}  |  精度: 主干bf16(原生)+头fp32  "
         f"hero=1(Cutoff2025)  Stage1-scaling=off",
         "",
@@ -250,6 +257,7 @@ def main() -> None:
                    "hero_critic_names": cfg.hero_critic_names,
                    "use_stage1_scaling": False, "batch_size": args.batch_size,
                    "epitope_weight": args.epitope_weight if args.epitope_weight is not None else 0.5,
+                   "steps": args.steps if args.steps is not None else 150,
                    "dtype": "trunk bf16 (native) + heads fp32"},
         "elapsed_s": round(elapsed, 1),
         "n_stage1_candidates": len(s1_rows),

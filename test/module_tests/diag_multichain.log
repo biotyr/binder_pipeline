@@ -1,0 +1,37 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 82.88it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 78.99it/s]
+[setup] 模型加载 6s (inversion=['ESMFold2-Experimental-Fast', 'ESMFold2-Experimental-Fast-Cutoff2025'])
+[A_4ZQK_nohotspot] binder_len=158 target_len=233 hotspots=None
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+[A_4ZQK_nohotspot] step   0 T=1.000 intra=4.57 inter=4.72 glob=+1.41 epi=None plm=3.06 dir={'intra_contact_loss': 0.1762, 'inter_contact_loss': 0.8094, 'glob_loss': 0.0144} cos=None degen=0.39 head=DQQPKKKGDTEDPPLWAQDQ
+[A_4ZQK_nohotspot] step   5 T=0.996 intra=3.26 inter=5.07 glob=+0.16 epi=None plm=3.31 dir={'intra_contact_loss': 0.2586, 'inter_contact_loss': 0.7251, 'glob_loss': 0.0163} cos=None degen=0.33 head=DKQPKKKKDDEDPDDWLMAL
+[A_4ZQK_nohotspot] step  10 T=0.987 intra=3.23 inter=4.37 glob=+0.25 epi=None plm=3.58 dir={'intra_contact_loss': 0.3646, 'inter_contact_loss': 0.6126, 'glob_loss': 0.0228} cos=None degen=0.32 head=DKKKKKKKDEIDPTSYLNAL
+[A_4ZQK_nohotspot] step  15 T=0.972 intra=3.12 inter=4.47 glob=+0.29 epi=None plm=3.61 dir={'intra_contact_loss': 0.3491, 'inter_contact_loss': 0.6283, 'glob_loss': 0.0226} cos=None degen=0.34 head=DKKKKKKKDEIDPTSDLNAL
+[A_4ZQK_nohotspot] step  20 T=0.953 intra=2.83 inter=4.10 glob=+0.38 epi=None plm=4.03 dir={'intra_contact_loss': 0.4218, 'inter_contact_loss': 0.5584, 'glob_loss': 0.0199} cos=None degen=0.31 head=DKKKKKKKDDPDPTSDLNAL
+[A_4ZQK_nohotspot] step  25 T=0.928 intra=2.14 inter=4.81 glob=+0.17 epi=None plm=3.80 dir={'intra_contact_loss': 0.3439, 'inter_contact_loss': 0.6478, 'glob_loss': 0.0083} cos=None degen=0.30 head=DKKKKKKKDDPDPTTQLNAL
+[A_4ZQK_nohotspot] step  29 T=0.905 intra=2.08 inter=3.84 glob=+0.21 epi=None plm=3.77 dir={'intra_contact_loss': 0.4318, 'inter_contact_loss': 0.5585, 'glob_loss': 0.0097} cos=None degen=0.27 head=KKKKKKKKDEPDKTTQLNAL
+[A_4ZQK_nohotspot] 完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot/probe_A_4ZQK_nohotspot.json
+[B_4ZQK_hotspot_AS100] binder_len=158 target_len=233 hotspots=['A:S100']
+[B_4ZQK_hotspot_AS100] step   0 T=1.000 intra=4.57 inter=4.72 glob=+1.41 epi=2.22 plm=3.06 dir={'intra_contact_loss': 0.073, 'inter_contact_loss': 0.3334, 'glob_loss': 0.006, 'epitope_loss': 0.5876} cos=0.5 degen=0.47 head=KEQPKYAGSRPNPGDWAQEW
+[B_4ZQK_hotspot_AS100] step   5 T=0.996 intra=3.79 inter=5.25 glob=+2.03 epi=2.28 plm=3.70 dir={'intra_contact_loss': 0.269, 'inter_contact_loss': 0.1197, 'glob_loss': 0.0069, 'epitope_loss': 0.6044} cos=0.4375 degen=0.53 head=DERPPPGGGRPPPGGGGSSS
+[B_4ZQK_hotspot_AS100] step  10 T=0.987 intra=4.76 inter=4.58 glob=+2.07 epi=1.12 plm=4.03 dir={'intra_contact_loss': 0.193, 'inter_contact_loss': 0.1287, 'glob_loss': 0.01, 'epitope_loss': 0.6683} cos=0.333984375 degen=0.51 head=DERPPPGGGRPPPGGGGSSS
+[B_4ZQK_hotspot_AS100] step  15 T=0.972 intra=4.78 inter=4.64 glob=+2.02 epi=0.84 plm=4.12 dir={'intra_contact_loss': 0.1937, 'inter_contact_loss': 0.1771, 'glob_loss': 0.011, 'epitope_loss': 0.6182} cos=0.392578125 degen=0.51 head=TRRPPPPGGRPPPPGGSSSS
+[B_4ZQK_hotspot_AS100] step  20 T=0.953 intra=4.76 inter=4.82 glob=+2.04 epi=1.29 plm=4.47 dir={'intra_contact_loss': 0.1834, 'inter_contact_loss': 0.1448, 'glob_loss': 0.0101, 'epitope_loss': 0.6616} cos=0.33203125 degen=0.53 head=DRRPPPPGGRPPPPGGSSSS
+[B_4ZQK_hotspot_AS100] step  25 T=0.928 intra=4.05 inter=4.49 glob=+2.17 epi=0.84 plm=4.41 dir={'intra_contact_loss': 0.4054, 'inter_contact_loss': 0.1613, 'glob_loss': 0.0085, 'epitope_loss': 0.4247} cos=0.71875 degen=0.54 head=DRRPPPPPPRPPPPPGSSSS
+[B_4ZQK_hotspot_AS100] step  29 T=0.905 intra=4.76 inter=4.63 glob=+1.92 epi=0.85 plm=5.28 dir={'intra_contact_loss': 0.2147, 'inter_contact_loss': 0.163, 'glob_loss': 0.0138, 'epitope_loss': 0.6084} cos=0.40625 degen=0.56 head=TRRPPPPPPRPPPPPGSSSS
+[B_4ZQK_hotspot_AS100] 完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot/probe_B_4ZQK_hotspot_AS100.json
+[C_3RRQ_hotspot] binder_len=158 target_len=129 hotspots=['A:N85', 'A:R83']
+[C_3RRQ_hotspot] step   0 T=1.000 intra=4.25 inter=5.11 glob=+0.37 epi=4.2 plm=3.06 dir={'intra_contact_loss': 0.0582, 'inter_contact_loss': 0.1799, 'glob_loss': 0.0048, 'epitope_loss': 0.7572} cos=0.2421875 degen=0.44 head=WEDDKDKTSRKNPRQAAQLF
+[C_3RRQ_hotspot] step   5 T=0.996 intra=3.90 inter=4.49 glob=+0.39 epi=4.1 plm=3.25 dir={'intra_contact_loss': 0.069, 'inter_contact_loss': 0.1708, 'glob_loss': 0.0048, 'epitope_loss': 0.7554} cos=0.2373046875 degen=0.41 head=MEDDKDKSSRKSERQAARLL
+[C_3RRQ_hotspot] step  10 T=0.987 intra=3.66 inter=3.99 glob=+0.01 epi=3.85 plm=3.47 dir={'intra_contact_loss': 0.101, 'inter_contact_loss': 0.1987, 'glob_loss': 0.0062, 'epitope_loss': 0.6942} cos=0.3046875 degen=0.41 head=PEDDDDSSSRKNRRSSNQPL
+[C_3RRQ_hotspot] step  15 T=0.972 intra=3.57 inter=4.23 glob=+0.02 epi=3.81 plm=3.58 dir={'intra_contact_loss': 0.101, 'inter_contact_loss': 0.216, 'glob_loss': 0.0065, 'epitope_loss': 0.6765} cos=0.333984375 degen=0.44 head=PDDDDDSSSRSARRSSNQQL
+[C_3RRQ_hotspot] step  20 T=0.953 intra=3.65 inter=4.17 glob=+0.06 epi=3.99 plm=4.06 dir={'intra_contact_loss': 0.094, 'inter_contact_loss': 0.1981, 'glob_loss': 0.0059, 'epitope_loss': 0.702} cos=0.298828125 degen=0.45 head=DDDDDDSSSRSSRRSSNQQA
+[C_3RRQ_hotspot] step  25 T=0.928 intra=3.37 inter=2.86 glob=+0.03 epi=4.05 plm=4.16 dir={'intra_contact_loss': 0.0953, 'inter_contact_loss': 0.2332, 'glob_loss': 0.0057, 'epitope_loss': 0.6658} cos=0.353515625 degen=0.40 head=DDDDDDSSSRSSRRSSNQQA
+[C_3RRQ_hotspot] step  29 T=0.905 intra=3.51 inter=4.19 glob=+0.14 epi=3.55 plm=4.03 dir={'intra_contact_loss': 0.1014, 'inter_contact_loss': 0.2084, 'glob_loss': 0.0066, 'epitope_loss': 0.6835} cos=0.3203125 degen=0.41 head=DDDDDDSSSRSSRRSSNQRA
+[C_3RRQ_hotspot] 完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot/probe_C_3RRQ_hotspot.json
+[diag] 全部完成 → /home/taoyr/projects/pipeline/test/module_results/diag_multichain_hotspot
