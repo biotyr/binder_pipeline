@@ -1,0 +1,18 @@
+{
+  "tag": "i_BS30_AE28",
+  "hotspots": [
+    "B:S30",
+    "A:E28"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.4582861065864563,
+  "ptm": 0.6061890125274658,
+  "proxy": 0.356215092822893,
+  "seq_health": {
+    "entropy": 2.68,
+    "max_homopolymer": 19,
+    "top2_aa_frac": 0.59
+  },
+  "binder_sequence": "NRRPPPPPPRRSSSSSSSSSSSSSRSSSSSSGSGGGGGGGGGGGGGGGGGNSNNRENNQQQQQRENFLPIQRALLKYYKKNRKNRNNNNNNNSSSSSSSSSSSSSSSGGGGGGSSSSSSSSSSSSSSSAAAAAAAAASSSSSSSSSSSSSSSSSSSAA",
+  "elapsed_s": 687.7
+}

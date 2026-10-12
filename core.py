@@ -370,8 +370,19 @@ def _build_data_dict(result: PipelineResult) -> dict[str, Any]:
 
     if result.refold_ptm is not None:
         d["Average_pTM"] = result.refold_ptm
+    ##### claude 2026/9/16 start #####
+    # 真实 pLDDT 闸: "Average_pLDDT" 槽位 (default_filters.json, ≥0.8) 改喂
+    # refold_plddt (hero 重折叠全局平均 pLDDT), 不再借用 distogram_iptm_proxy
+    # (旧实现名实不符, 实为 proxy≥0.8 闸)。stage1 (esmfold2) 条目无
+    # refold_plddt → 该闸跳过; 其 pLDDT 已由 Stage-2 质量门 (≥0.70) 管控。
+    if result.refold_plddt is not None:
+        d["Average_pLDDT"] = result.refold_plddt
+    ##### claude 2026/9/16 start #####
+    # proxy 闸回归 (具名独立槽位): Average_pLDDT 改喂真 pLDDT 后, distogram
+    # 折叠置信度代理改走自有标签 (default_filters.json ≥0.8, 与旧隐性闸一致)。
     if result.distogram_iptm_proxy is not None:
-        d["Average_pLDDT"] = result.distogram_iptm_proxy
+        d["Average_distogram_binding_confidence"] = result.distogram_iptm_proxy
+    ##### claude 2026/9/16 end #####
 
     # Rosetta 指标
     if result.rosetta_dG is not None:

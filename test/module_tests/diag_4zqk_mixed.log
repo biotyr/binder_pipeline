@@ -1,0 +1,113 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 81.44it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 78.04it/s]
+[mixed] 模型加载 9s; w=0.5, factory(158), seed0
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+Traceback (most recent call last):
+  File "/home/taoyr/projects/pipeline/test/module_tests/diag_4zqk_mixed.py", line 105, in <module>
+    main()
+  File "/home/taoyr/projects/pipeline/test/module_tests/diag_4zqk_mixed.py", line 99, in main
+    run_one("i_BS30_AE28", ["B:S30", "A:E28"], app, target_seq)
+  File "/home/taoyr/projects/pipeline/test/module_tests/diag_4zqk_mixed.py", line 55, in run_one
+    best_sequences, trajectory, critic_results = app.design(
+                                                 ^^^^^^^^^^^
+  File "/home/taoyr/projects/pipeline/esmcp/binder_design.py", line 1497, in design
+    return design_binder(
+           ^^^^^^^^^^^^^^
+  File "/home/taoyr/projects/pipeline/esmcp/binder_design.py", line 1273, in design_binder
+    logits, sequences, iptm = run_step(
+                              ^^^^^^^^^
+  File "/home/taoyr/projects/pipeline/esmcp/binder_design.py", line 1200, in run_step
+    fold_result = fold_and_get_distogram(
+                  ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/projects/pipeline/esmcp/binder_design.py", line 779, in fold_and_get_distogram
+    output = model(
+             ^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformers/models/esmfold2/modeling_esmfold2_experimental.py", line 1017, in forward
+    z = self.folding_trunk(z, pair_attention_mask=pair_mask)
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformers/models/esmfold2/modeling_esmfold2_common.py", line 2714, in forward
+    pair = checkpoint(fn, pair, use_reentrant=False)  # pyright: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_compile.py", line 53, in inner
+    return disable_fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 929, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/utils/checkpoint.py", line 495, in checkpoint
+    ret = function(*args, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1773, in _wrapped_call_impl
+    return self._call_impl(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/nn/modules/module.py", line 1784, in _call_impl
+    return forward_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 736, in compile_wrapper
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformers/models/esmfold2/modeling_esmfold2_common.py", line 2660, in forward
+    def forward(
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_dynamo/eval_frame.py", line 929, in _fn
+    return fn(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/aot_autograd.py", line 1241, in forward
+    return compiled_fn(full_args)
+           ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 370, in runtime_wrapper
+    all_outs = call_func_at_runtime_with_args(
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 126, in call_func_at_runtime_with_args
+    out = normalize_as_list(f(args))
+                            ^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 100, in g
+    return f(*args)
+           ^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/autograd/function.py", line 576, in apply
+    return super().apply(*args, **kwargs)  # type: ignore[misc]
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 2074, in forward
+    fw_outs = call_func_at_runtime_with_args(
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/utils.py", line 126, in call_func_at_runtime_with_args
+    out = normalize_as_list(f(args))
+                            ^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_functorch/_aot_autograd/runtime_wrappers.py", line 556, in wrapper
+    return compiled_fn(runtime_args)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_inductor/output_code.py", line 584, in __call__
+    return self.current_callable(inputs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/torch/_inductor/utils.py", line 2716, in run
+    out = model(new_inputs)
+          ^^^^^^^^^^^^^^^^^
+  File "/tmp/torchinductor_taoyr/gp/cgp4dssujc35itggzr42bwvdimyju3bwzir3idmlil7qfv2fowzg.py", line 2059, in call
+    buf123 = empty_strided_cuda((1, 391, 391, 256), (39137536, 100096, 256, 1), torch.bfloat16)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+torch.OutOfMemoryError: CUDA out of memory. Tried to allocate 76.00 MiB. GPU 0 has a total capacity of 23.55 GiB of which 33.50 MiB is free. Process 98696 has 3.40 GiB memory in use. Including non-PyTorch memory, this process has 20.10 GiB memory in use. Of the allocated memory 19.29 GiB is allocated by PyTorch, and 342.57 MiB is reserved by PyTorch but unallocated. If reserved but unallocated memory is large try setting PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True to avoid fragmentation.  See documentation for Memory Management  (https://pytorch.org/docs/stable/notes/cuda.html#environment-variables)

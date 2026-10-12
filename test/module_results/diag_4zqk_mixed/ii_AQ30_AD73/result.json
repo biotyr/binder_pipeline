@@ -1,0 +1,18 @@
+{
+  "tag": "ii_AQ30_AD73",
+  "hotspots": [
+    "A:Q30",
+    "A:D73"
+  ],
+  "gate": "PASS",
+  "iptm": 0.7130259871482849,
+  "ptm": 0.6523553729057312,
+  "proxy": 0.7019514318624505,
+  "seq_health": {
+    "entropy": 2.98,
+    "max_homopolymer": 16,
+    "top2_aa_frac": 0.47
+  },
+  "binder_sequence": "TTTTTTTTTTTTTTTTSSSSSSSPLTSLLQSLLSSLQSQLQQLQQQQQENQEQITSLLRLWLKLLRNNNSNPGYLEDLLKLLQQAQQQNHQNNQKIQQVLLQLQLVQLSLSSLLSSSSSSSSSSSTTTTTTTTTTTTTTTTSSSSSSSSSPDDTTTTP",
+  "elapsed_s": 678.2
+}

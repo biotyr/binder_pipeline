@@ -1,78 +1,304 @@
 {
-    "Average_pLDDT": {"threshold": 0.8, "higher": true},
-    "1_pLDDT": {"threshold": 0.8, "higher": true},
-    "2_pLDDT": {"threshold": 0.8, "higher": true},
-    "3_pLDDT": {"threshold": null, "higher": true},
-    "4_pLDDT": {"threshold": null, "higher": true},
-    "5_pLDDT": {"threshold": null, "higher": true},
-    "Average_pTM": {"threshold": 0.55, "higher": true},
-    "1_pTM": {"threshold": 0.55, "higher": true},
-    "2_pTM": {"threshold": 0.55, "higher": true},
-    "Average_i_pTM": {"threshold": 0.5, "higher": true},
-    "1_i_pTM": {"threshold": 0.5, "higher": true},
-    "2_i_pTM": {"threshold": 0.5, "higher": true},
-    "Average_i_pAE": {"threshold": 0.35, "higher": false},
-    "1_i_pAE": {"threshold": 0.35, "higher": false},
-    "2_i_pAE": {"threshold": 0.35, "higher": false},
-    "Average_Binder_Energy_Score": {"threshold": 0, "higher": false},
-    "1_Binder_Energy_Score": {"threshold": 0, "higher": false},
-    "2_Binder_Energy_Score": {"threshold": 0, "higher": false},
-    "Average_Surface_Hydrophobicity": {"threshold": 0.35, "higher": false},
-    "1_Surface_Hydrophobicity": {"threshold": 0.35, "higher": false},
-    "2_Surface_Hydrophobicity": {"threshold": 0.35, "higher": false},
-    "Average_ShapeComplementarity": {"threshold": 0.6, "higher": true},
-    "1_ShapeComplementarity": {"threshold": 0.55, "higher": true},
-    "2_ShapeComplementarity": {"threshold": 0.55, "higher": true},
-    "Average_dG": {"threshold": 0, "higher": false},
-    "1_dG": {"threshold": 0, "higher": false},
-    "2_dG": {"threshold": 0, "higher": false},
-    "Average_dSASA": {"threshold": 1, "higher": true},
-    "1_dSASA": {"threshold": 1, "higher": true},
-    "2_dSASA": {"threshold": 1, "higher": true},
-    "Average_n_InterfaceResidues": {"threshold": 7, "higher": true},
-    "1_n_InterfaceResidues": {"threshold": 7, "higher": true},
-    "2_n_InterfaceResidues": {"threshold": 7, "higher": true},
-    "Average_n_InterfaceHbonds": {"threshold": 3, "higher": true},
-    "1_n_InterfaceHbonds": {"threshold": 3, "higher": true},
-    "2_n_InterfaceHbonds": {"threshold": 3, "higher": true},
-    "Average_n_InterfaceUnsatHbonds": {"threshold": 4, "higher": false},
-    "1_n_InterfaceUnsatHbonds": {"threshold": 4, "higher": false},
-    "2_n_InterfaceUnsatHbonds": {"threshold": 4, "higher": false},
-    "Average_Binder_Loop%": {"threshold": 90, "higher": false},
-    "1_Binder_Loop%": {"threshold": 90, "higher": false},
-    "2_Binder_Loop%": {"threshold": 90, "higher": false},
-    "Average_Binder_pLDDT": {"threshold": 0.8, "higher": true},
-    "1_Binder_pLDDT": {"threshold": 0.8, "higher": true},
-    "2_Binder_pLDDT": {"threshold": 0.8, "higher": true},
-    "3_Binder_pLDDT": {"threshold": 0.8, "higher": true},
-    "4_Binder_pLDDT": {"threshold": 0.8, "higher": true},
-    "5_Binder_pLDDT": {"threshold": 0.8, "higher": true},
-    "Average_Binder_RMSD": {"threshold": 3.5, "higher": false},
-    "1_Binder_RMSD": {"threshold": 3.5, "higher": false},
-    "2_Binder_RMSD": {"threshold": 3.5, "higher": false},
-    "3_Binder_RMSD": {"threshold": 3.5, "higher": false},
-    "4_Binder_RMSD": {"threshold": 3.5, "higher": false},
-    "5_Binder_RMSD": {"threshold": 3.5, "higher": false},
-    "Average_InterfaceAAs": {
-        "K": {"threshold": 3, "higher": false},
-        "M": {"threshold": 3, "higher": false},
-        "A": {"threshold": null, "higher": false},
-        "C": {"threshold": null, "higher": false},
-        "D": {"threshold": null, "higher": false},
-        "E": {"threshold": null, "higher": false},
-        "F": {"threshold": null, "higher": false},
-        "G": {"threshold": null, "higher": false},
-        "H": {"threshold": null, "higher": false},
-        "I": {"threshold": null, "higher": false},
-        "L": {"threshold": null, "higher": false},
-        "N": {"threshold": null, "higher": false},
-        "P": {"threshold": null, "higher": false},
-        "Q": {"threshold": null, "higher": false},
-        "R": {"threshold": null, "higher": false},
-        "S": {"threshold": null, "higher": false},
-        "T": {"threshold": null, "higher": false},
-        "V": {"threshold": null, "higher": false},
-        "W": {"threshold": null, "higher": false},
-        "Y": {"threshold": null, "higher": false}
+  "Average_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "Average_distogram_binding_confidence": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "1_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "2_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "3_pLDDT": {
+    "threshold": null,
+    "higher": true
+  },
+  "4_pLDDT": {
+    "threshold": null,
+    "higher": true
+  },
+  "5_pLDDT": {
+    "threshold": null,
+    "higher": true
+  },
+  "Average_pTM": {
+    "threshold": 0.55,
+    "higher": true
+  },
+  "1_pTM": {
+    "threshold": 0.55,
+    "higher": true
+  },
+  "2_pTM": {
+    "threshold": 0.55,
+    "higher": true
+  },
+  "Average_i_pTM": {
+    "threshold": 0.5,
+    "higher": true
+  },
+  "1_i_pTM": {
+    "threshold": 0.5,
+    "higher": true
+  },
+  "2_i_pTM": {
+    "threshold": 0.5,
+    "higher": true
+  },
+  "Average_i_pAE": {
+    "threshold": 0.35,
+    "higher": false
+  },
+  "1_i_pAE": {
+    "threshold": 0.35,
+    "higher": false
+  },
+  "2_i_pAE": {
+    "threshold": 0.35,
+    "higher": false
+  },
+  "Average_Binder_Energy_Score": {
+    "threshold": 0,
+    "higher": false
+  },
+  "1_Binder_Energy_Score": {
+    "threshold": 0,
+    "higher": false
+  },
+  "2_Binder_Energy_Score": {
+    "threshold": 0,
+    "higher": false
+  },
+  "Average_Surface_Hydrophobicity": {
+    "threshold": 0.35,
+    "higher": false
+  },
+  "1_Surface_Hydrophobicity": {
+    "threshold": 0.35,
+    "higher": false
+  },
+  "2_Surface_Hydrophobicity": {
+    "threshold": 0.35,
+    "higher": false
+  },
+  "Average_ShapeComplementarity": {
+    "threshold": 0.6,
+    "higher": true
+  },
+  "1_ShapeComplementarity": {
+    "threshold": 0.55,
+    "higher": true
+  },
+  "2_ShapeComplementarity": {
+    "threshold": 0.55,
+    "higher": true
+  },
+  "Average_dG": {
+    "threshold": 0,
+    "higher": false
+  },
+  "1_dG": {
+    "threshold": 0,
+    "higher": false
+  },
+  "2_dG": {
+    "threshold": 0,
+    "higher": false
+  },
+  "Average_dSASA": {
+    "threshold": 1,
+    "higher": true
+  },
+  "1_dSASA": {
+    "threshold": 1,
+    "higher": true
+  },
+  "2_dSASA": {
+    "threshold": 1,
+    "higher": true
+  },
+  "Average_n_InterfaceResidues": {
+    "threshold": 7,
+    "higher": true
+  },
+  "1_n_InterfaceResidues": {
+    "threshold": 7,
+    "higher": true
+  },
+  "2_n_InterfaceResidues": {
+    "threshold": 7,
+    "higher": true
+  },
+  "Average_n_InterfaceHbonds": {
+    "threshold": 3,
+    "higher": true
+  },
+  "1_n_InterfaceHbonds": {
+    "threshold": 3,
+    "higher": true
+  },
+  "2_n_InterfaceHbonds": {
+    "threshold": 3,
+    "higher": true
+  },
+  "Average_n_InterfaceUnsatHbonds": {
+    "threshold": 4,
+    "higher": false
+  },
+  "1_n_InterfaceUnsatHbonds": {
+    "threshold": 4,
+    "higher": false
+  },
+  "2_n_InterfaceUnsatHbonds": {
+    "threshold": 4,
+    "higher": false
+  },
+  "Average_Binder_Loop%": {
+    "threshold": 90,
+    "higher": false
+  },
+  "1_Binder_Loop%": {
+    "threshold": 90,
+    "higher": false
+  },
+  "2_Binder_Loop%": {
+    "threshold": 90,
+    "higher": false
+  },
+  "Average_Binder_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "1_Binder_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "2_Binder_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "3_Binder_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "4_Binder_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "5_Binder_pLDDT": {
+    "threshold": 0.8,
+    "higher": true
+  },
+  "Average_Binder_RMSD": {
+    "threshold": 3.5,
+    "higher": false
+  },
+  "1_Binder_RMSD": {
+    "threshold": 3.5,
+    "higher": false
+  },
+  "2_Binder_RMSD": {
+    "threshold": 3.5,
+    "higher": false
+  },
+  "3_Binder_RMSD": {
+    "threshold": 3.5,
+    "higher": false
+  },
+  "4_Binder_RMSD": {
+    "threshold": 3.5,
+    "higher": false
+  },
+  "5_Binder_RMSD": {
+    "threshold": 3.5,
+    "higher": false
+  },
+  "Average_InterfaceAAs": {
+    "K": {
+      "threshold": 3,
+      "higher": false
+    },
+    "M": {
+      "threshold": 3,
+      "higher": false
+    },
+    "A": {
+      "threshold": null,
+      "higher": false
+    },
+    "C": {
+      "threshold": null,
+      "higher": false
+    },
+    "D": {
+      "threshold": null,
+      "higher": false
+    },
+    "E": {
+      "threshold": null,
+      "higher": false
+    },
+    "F": {
+      "threshold": null,
+      "higher": false
+    },
+    "G": {
+      "threshold": null,
+      "higher": false
+    },
+    "H": {
+      "threshold": null,
+      "higher": false
+    },
+    "I": {
+      "threshold": null,
+      "higher": false
+    },
+    "L": {
+      "threshold": null,
+      "higher": false
+    },
+    "N": {
+      "threshold": null,
+      "higher": false
+    },
+    "P": {
+      "threshold": null,
+      "higher": false
+    },
+    "Q": {
+      "threshold": null,
+      "higher": false
+    },
+    "R": {
+      "threshold": null,
+      "higher": false
+    },
+    "S": {
+      "threshold": null,
+      "higher": false
+    },
+    "T": {
+      "threshold": null,
+      "higher": false
+    },
+    "V": {
+      "threshold": null,
+      "higher": false
+    },
+    "W": {
+      "threshold": null,
+      "higher": false
+    },
+    "Y": {
+      "threshold": null,
+      "higher": false
     }
+  }
 }
