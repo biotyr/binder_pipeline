@@ -95,6 +95,17 @@ BinderPromptStr = str
 # Design
 LOSS_WEIGHTS = {"intra_contact": 0.5, "inter_contact": 0.5, "glob": 0.2, "epitope": 0.5}
 STEPS = 150
+# Hotspot-neighborhood inter-loss mode: a parallel implementation of the
+# inter contact loss that averages over surface-accessible target residues
+# near the hotspots instead of every target residue. Opt-in per run via
+# ``inter_loss_mode="hotspot_neighborhood"``; the default full-coverage
+# behavior is unchanged. Thresholds are provisional defaults — calibration
+# pending.
+INTER_NEIGHBORHOOD_RADIUS = 15.0      # Å: expected distogram distance to any hotspot
+INTER_BURIAL_CONTACT_DISTANCE = 10.0  # Å: distogram cutoff of the contact-number burial proxy
+INTER_BURIAL_QUANTILE = 0.5           # burial quantile below which a residue counts as accessible
+INTER_BURIAL_MIN_SEP = 2              # sequence pairs closer than this are excluded from burial
+INTER_NEIGHBORHOOD_MIN_SIZE = 10      # fewer selected residues: fall back to full coverage
 LOG_INTERVAL = 5
 LEARNING_RATE = 0.1
 TEMPERATURE_MIN = 1e-2
@@ -351,6 +362,42 @@ def compute_inter_contact_loss(
     )
 
 
+def compute_inter_contact_loss_neighborhood(
+    distogram_logits: torch.Tensor,
+    binder_length: int,
+    bin_distance: torch.Tensor,
+    neighborhood_mask: torch.Tensor,
+) -> torch.Tensor:
+    """Binder-target interface restricted to hotspot-neighborhood residues.
+
+    Parallel mode to :func:`compute_inter_contact_loss`: identical engine and
+    cutoffs (k=1, min_sep=0, cutoff=22A), but the averaging domain is the
+    precomputed surface-accessible hotspot neighborhood instead of every
+    target residue, so the loss no longer demands binder contacts over the
+    whole target surface.
+
+    ``neighborhood_mask`` is a boolean ``(1, T)`` tensor over the target
+    residues (computed once from a pre-optimization fold by
+    :func:`derive_hotspot_neighborhood_mask`); it is shared across the batch,
+    matching the 1-D masks used by the other contact losses.
+    """
+
+    full_len = distogram_logits.shape[1]
+    is_binder = torch.ones(full_len, device=distogram_logits.device)
+    is_binder[:-binder_length] *= 0.0
+    chain_mask = torch.zeros(full_len, device=distogram_logits.device)
+    chain_mask[:-binder_length] = neighborhood_mask[0].to(torch.float32)
+    return compute_contact_loss(
+        distogram_logits,
+        bin_distance,
+        num_contacts=1,
+        min_sep=0,
+        cutoff=22.0,
+        chain_mask=chain_mask,
+        binder_mask=is_binder,
+    )
+
+
 def compute_globularity_loss(
     distogram_logits: torch.Tensor, binder_length: int, bin_distance: torch.Tensor
 ) -> torch.Tensor:
@@ -502,23 +549,177 @@ def compute_epitope_loss(
     return masked_average(epitope_loss, mask=epitope_mask)
 
 
+def derive_hotspot_neighborhood_mask(
+    target_block_logits: torch.Tensor,
+    bin_distance: torch.Tensor,
+    hotspot_positions: torch.Tensor,
+    neighborhood_radius: float = INTER_NEIGHBORHOOD_RADIUS,
+    burial_contact_distance: float = INTER_BURIAL_CONTACT_DISTANCE,
+    burial_quantile: float = INTER_BURIAL_QUANTILE,
+    burial_min_sep: int = INTER_BURIAL_MIN_SEP,
+    min_size: int = INTER_NEIGHBORHOOD_MIN_SIZE,
+) -> torch.Tensor | None:
+    """Surface-accessible target residues near the hotspots, from a distogram.
+
+    Parallel-mode helper for the inter contact loss: instead of demanding
+    binder contacts over every target residue ("full coverage"), restrict the
+    inter-loss averaging domain to target residues that are both
+
+    - near a hotspot: expected distogram distance to any hotspot below
+      ``neighborhood_radius``;
+    - surface accessible: contact number of the target self-block — a classic
+      burial proxy computable from pairwise distance predictions alone, no
+      atomic coordinates or solvent model required — below the
+      ``burial_quantile`` quantile of the target.
+
+    The target sequence is fixed during gradient optimization, so this is
+    computed ONCE from a single pre-optimization fold and used as a constant
+    mask thereafter (same non-gradient status as ``binder_mask`` and
+    ``epitope_mask``).
+
+    Parameters
+    ----------
+    target_block_logits
+        Target self-block of the full-complex distogram, ``(B, T, T, num_bins)``.
+        For a multi-chain target this spans all target chains in
+        ``split("|")`` order, so interface-buried residues (including
+        target-target chain interfaces) are correctly counted as buried.
+    bin_distance
+        Distance represented by each distogram bin, ``(num_bins,)``.
+    hotspot_positions
+        0-indexed absolute positions of the hotspots within the target block,
+        1-D long tensor.
+    min_size
+        Returns ``None`` when fewer residues survive (caller falls back to
+        the full-coverage inter loss with a warning).
+
+    Returns
+    -------
+    torch.Tensor | None
+        Boolean mask ``(B, T)`` with True at usable inter-loss residues, or
+        ``None`` when the neighborhood is degenerately small.
+    """
+
+    T = target_block_logits.shape[1]
+    # Design-loop distogram logits are bf16 (autocast); the mask math runs
+    # once on CPU/GPU-safe float32 — quantile() rejects bf16 and the contact
+    # sums keep full precision.
+    probs = torch.softmax(target_block_logits.to(torch.float32), dim=-1)
+    # (B, T): expected distance from every residue to its nearest hotspot.
+    exp_dist = (probs * bin_distance).sum(-1)
+    near = (exp_dist[:, hotspot_positions, :] < neighborhood_radius).any(dim=1)
+    # (B, T): contact number of the target self-block (burial proxy).
+    # Sequence-adjacent pairs are excluded: they contact trivially (constant
+    # offset for every residue) and, for multi-chain targets, a chain
+    # junction is sequence-adjacent while spatially unrelated.
+    position = torch.arange(T, device=target_block_logits.device)
+    sep_mask = (position[:, None] - position[None, :]).abs() >= burial_min_sep
+    contact_prob = (probs * (bin_distance < burial_contact_distance)).sum(-1)
+    burial = (contact_prob * sep_mask).sum(-1)
+    threshold = torch.quantile(burial, burial_quantile, dim=-1, keepdim=True)
+    accessible = burial < threshold
+    mask = near & accessible
+    mask[:, hotspot_positions] = True  # hotspots anchor the neighborhood
+    if int(mask.sum()) < min_size:
+        return None
+    return mask
+
+
+def precompute_inter_neighborhood_mask(
+    inversion_model: ESMFold2ExperimentalModel,
+    target_sequence: str,
+    target_one_hot: torch.Tensor,
+    binder_length: int,
+    target_hotspot_ids: list[str],
+    batch_size: int = 1,
+    device: str = "cuda",
+    seed: int = 0,
+    neighborhood_radius: float = INTER_NEIGHBORHOOD_RADIUS,
+    burial_contact_distance: float = INTER_BURIAL_CONTACT_DISTANCE,
+    burial_quantile: float = INTER_BURIAL_QUANTILE,
+    burial_min_sep: int = INTER_BURIAL_MIN_SEP,
+    min_size: int = INTER_NEIGHBORHOOD_MIN_SIZE,
+) -> torch.Tensor | None:
+    """One-shot fold of the fixed target; returns the neighborhood mask.
+
+    Parallel-mode companion to ``inter_loss_mode="hotspot_neighborhood"``:
+    wraps :func:`derive_hotspot_neighborhood_mask` (the mask semantics) with
+    the model I/O — a single no-grad fold of ``target + poly-A placeholder``
+    and chain-qualified hotspot resolution. The target sequence does not
+    change during optimization, so this runs ONCE before the design loop and
+    the mask is a constant thereafter.
+
+    Returns a boolean ``(1, T)`` mask over the target residues, or ``None``
+    when the neighborhood is degenerately small (caller falls back to the
+    full-coverage inter loss).
+    """
+
+    # Poly-A placeholder: only the target self-block of the distogram is
+    # consumed, the binder part is irrelevant.
+    dummy_design = torch.zeros(batch_size, binder_length, AA_DIMS, device=device)
+    dummy_design[..., 0] = 1.0
+    with torch.no_grad():
+        pre_fold = fold_and_get_distogram(
+            inversion_model,
+            target_sequence,
+            target_one_hot,
+            dummy_design,
+            num_loops=1,
+            num_sampling_steps=1,
+            calculate_confidence=False,
+            seed=seed,
+        )
+    total_target = pre_fold["distogram_logits"].shape[1] - binder_length
+    assert sum(len(c) for c in target_sequence.split("|")) == total_target
+    hotspot_positions = get_epitope_mask(
+        target_chains=target_sequence.split("|"),
+        binder_length=binder_length,
+        target_hotspot_ids=target_hotspot_ids,
+        batch_size=1,
+        device=device,
+    )[0].nonzero(as_tuple=True)[0]
+    target_block = pre_fold["distogram_logits"][:, :total_target, :total_target]
+    return derive_hotspot_neighborhood_mask(
+        target_block,
+        get_mid_points().to(target_block.device),
+        hotspot_positions,
+        neighborhood_radius=neighborhood_radius,
+        burial_contact_distance=burial_contact_distance,
+        burial_quantile=burial_quantile,
+        burial_min_sep=burial_min_sep,
+        min_size=min_size,
+    )
+
+
 def compute_structure_losses(
     distogram_logits: torch.Tensor,
     binder_length: int,
     target_sequence: str | None = None,
     target_hotspot_ids: list[str] | None = None,
     epitope_contact_distance: float = 12.0,
+    inter_neighborhood_mask: torch.Tensor | None = None,
 ) -> dict[str, torch.Tensor]:
-    """Compute structural losses and a weighted total."""
+    """Compute structural losses and a weighted total.
+
+    ``inter_neighborhood_mask`` switches the inter contact loss to the
+    hotspot-neighborhood parallel mode (see
+    :func:`compute_inter_contact_loss_neighborhood`); ``None`` keeps the
+    default full-coverage inter loss.
+    """
 
     bin_distance = get_mid_points().to(distogram_logits.device)
     losses: dict[str, torch.Tensor] = {}
     losses["intra_contact_loss"] = compute_intra_contact_loss(
         distogram_logits, binder_length, bin_distance
     )
-    losses["inter_contact_loss"] = compute_inter_contact_loss(
-        distogram_logits, binder_length, bin_distance
-    )
+    if inter_neighborhood_mask is not None:
+        losses["inter_contact_loss"] = compute_inter_contact_loss_neighborhood(
+            distogram_logits, binder_length, bin_distance, inter_neighborhood_mask
+        )
+    else:
+        losses["inter_contact_loss"] = compute_inter_contact_loss(
+            distogram_logits, binder_length, bin_distance
+        )
     losses["glob_loss"] = compute_globularity_loss(
         distogram_logits, binder_length, bin_distance
     )
@@ -1107,6 +1308,7 @@ def design_binder(
     batch_size: int = 1,
     target_hotspot_ids: list[str] | None = None,
     epitope_contact_distance: float = 12.0,
+    inter_loss_mode: str = "full_coverage",
 ) -> tuple[list[str], Trajectory, list[dict]]:
     """
     Algorithm 11 Gradient-Guided Binder Sequence Optimization.
@@ -1122,6 +1324,12 @@ def design_binder(
     ``target_hotspot_ids`` enables epitope loss; hotspot IDs are chain-qualified
     as ``<chain>:<residue><idx>`` (e.g. ``["A:L150"]``) with 1-indexed residue
     positions within the named target chain.
+
+    ``inter_loss_mode`` selects the inter contact loss implementation:
+    ``"full_coverage"`` (default) averages over every target residue;
+    ``"hotspot_neighborhood"`` precomputes — once, from a distogram of the
+    fixed target — the surface-accessible hotspot neighborhood and averages
+    over that only (parallel mode; requires ``target_hotspot_ids``).
     """
     # Setup
     device = "cuda"
@@ -1171,6 +1379,54 @@ def design_binder(
     assert "|" not in binder_sequence
     ##### claude 2026/8/13 end #####
 
+    ##### claude 2026/10/12 start #####
+    # Parallel inter-loss mode: precompute (ONCE) the surface-accessible
+    # hotspot neighborhood from a distogram of the fixed target and restrict
+    # the inter contact loss averaging domain to it. The target sequence does
+    # not change during optimization, so the mask is a constant thereafter.
+    # The default "full_coverage" path is byte-for-byte unchanged; see
+    # precompute_inter_neighborhood_mask / derive_hotspot_neighborhood_mask.
+    # (Placed after binder_sequence resolution: needs binder_length.)
+    inter_neighborhood_mask: torch.Tensor | None = None
+    if inter_loss_mode == "full_coverage":
+        pass
+    elif inter_loss_mode == "hotspot_neighborhood":
+        if target_hotspot_ids is None:
+            raise ValueError(
+                'inter_loss_mode="hotspot_neighborhood" requires target_hotspot_ids.'
+            )
+        inter_neighborhood_mask = precompute_inter_neighborhood_mask(
+            next(iter(inversion_models.values())),
+            target_sequence,
+            target_one_hot,
+            binder_length,
+            target_hotspot_ids,
+            batch_size=batch_size,
+            device=device,
+            seed=seed,
+        )
+        if inter_neighborhood_mask is None:
+            logger.warning(
+                "inter_loss_mode='hotspot_neighborhood': neighborhood mask is "
+                "degenerately small (<%d residues); falling back to full "
+                "coverage inter loss.",
+                INTER_NEIGHBORHOOD_MIN_SIZE,
+            )
+        else:
+            logger.info(
+                "inter_loss_mode='hotspot_neighborhood': %d/%d target residues "
+                "selected for the inter loss domain (hotspots %s).",
+                int(inter_neighborhood_mask.sum()),
+                len(target_sequence.replace("|", "")),
+                target_hotspot_ids,
+            )
+    else:
+        raise ValueError(
+            f"Unknown inter_loss_mode {inter_loss_mode!r}; expected "
+            '"full_coverage" or "hotspot_neighborhood".'
+        )
+    ##### claude 2026/10/12 end #####
+
     with seed_context(seed), torch.device(device):
         logits = build_initial_soft_sequence_logits(
             binder_sequence, batch_size=batch_size
@@ -1214,6 +1470,7 @@ def design_binder(
             target_sequence=target_sequence,
             target_hotspot_ids=target_hotspot_ids,
             epitope_contact_distance=epitope_contact_distance,
+            inter_neighborhood_mask=inter_neighborhood_mask,
         )
         structure_loss = losses["total_loss"]
         structure_grad = torch.autograd.grad(structure_loss.mean(), logits)[0]
@@ -1493,6 +1750,7 @@ class ESMFold2Design:
         batch_size: int = 1,
         target_hotspot_ids: list[str] | None = None,
         epitope_contact_distance: float = 12.0,
+        inter_loss_mode: str = "full_coverage",
     ) -> tuple[list[str], Trajectory, list[dict]]:
         return design_binder(
             self.inversion_models,
@@ -1508,6 +1766,7 @@ class ESMFold2Design:
             batch_size=batch_size,
             target_hotspot_ids=target_hotspot_ids,
             epitope_contact_distance=epitope_contact_distance,
+            inter_loss_mode=inter_loss_mode,
         )
 
 

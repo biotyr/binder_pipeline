@@ -1,0 +1,33 @@
+{
+  "hotspots": [
+    "A:Q30",
+    "A:D73"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.48090970516204834,
+  "ptm": 0.6216221451759338,
+  "proxy": 0.45159063462690885,
+  "binder_sequence": "NQQQQNNNNNNNRNSSSSSSSSSRSRRLLSSLLSLLRRILNNNNNNNNNNNNRRRNRRNLLAFIRRNRRYLRGFFRNPLLFQQLLLAVRRYVNNNNNNNLNNLLQLLRLLASLLSSLSSSSSSSSTTTTITITITTTTSSSSSSLLTITITITITLLT",
+  "scheduler": {
+    "phase": 2,
+    "events": [
+      {
+        "step": 25,
+        "event": "checkpoint",
+        "intra_last5_mean": 4.6
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.60>3.8)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.15
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 602.7
+}

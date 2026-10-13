@@ -1,0 +1,77 @@
+{
+  "tag": "ii_noniface_NB",
+  "hotspots": [
+    "A:Q30",
+    "A:D73"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.44335004687309265,
+  "ptm": 0.5943446755409241,
+  "proxy": 0.2290477037508719,
+  "binder_sequence": "SSRRSSSSSDDDDDDDSSSSSSSSSSSSSRSSSRSSSSNNSNNSNNNLLNYARRNRKNLNSPNSAKNLLLLLLYNNNYYNNRINNNNNLNNLNNNNNNNNNNNNNGSSSSSSSRSSSSSSSSSSSSSSSRSSSSSSSSRSSRSSSRSSSSSSRSGGPP",
+  "elapsed_s": 593.4,
+  "seq_health": {
+    "entropy": 2.34,
+    "max_homopolymer": 15,
+    "top2_aa_frac": 0.7
+  },
+  "plddt_profile": {
+    "A": {
+      "n": 115,
+      "mean": 93.6,
+      "min": 81.7
+    },
+    "B": {
+      "n": 118,
+      "mean": 90.5,
+      "min": 49.5
+    },
+    "C": {
+      "n": 158,
+      "mean": 33.4,
+      "min": 25.6
+    }
+  },
+  "hotspot_contacts": {
+    "A:Q30": {
+      "found": true,
+      "min_cb_dist": 16.4,
+      "n_binder_within_12A": 0
+    },
+    "A:D73": {
+      "found": true,
+      "min_cb_dist": 21.1,
+      "n_binder_within_12A": 0
+    }
+  },
+  "traj": {
+    "intra_contact_loss": {
+      "first5": 4.657,
+      "last5": 4.349,
+      "min": 3.892
+    },
+    "inter_contact_loss": {
+      "first5": 4.563,
+      "last5": 3.425,
+      "min": 1.78
+    },
+    "epitope_loss": {
+      "first5": 3.199,
+      "last5": 2.188,
+      "min": 0.477
+    },
+    "glob_loss": {
+      "first5": 1.9,
+      "last5": 1.816,
+      "min": 1.409
+    },
+    "plm_loss": {
+      "first5": 3.275,
+      "last5": 1.105,
+      "min": 0.988
+    },
+    "corr_epitope_vs_inter": -0.011,
+    "corr_epitope_vs_intra": -0.138
+  },
+  "hotspot_contacts_note": "\u79bb\u7ebf\u91cd\u7b97: \u8f93\u51faPDB\u4e3a\u590d\u5408\u4f53\u987a\u5e8f\u7f16\u53f7, \u94fe\u5185\u5e8f\u53f7+\u524d\u5e8f\u94fe\u957f\u6362\u7b97"
+}

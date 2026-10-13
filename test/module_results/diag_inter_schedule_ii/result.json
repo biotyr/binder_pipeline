@@ -1,0 +1,108 @@
+{
+  "hotspots": [
+    "A:Q30",
+    "A:D73"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.48090970516204834,
+  "ptm": 0.6216221451759338,
+  "proxy": 0.45159063462690885,
+  "binder_sequence": "NQQQQNNNNNNNRNSSSSSSSSSRSRRLLSSLLSLLRRILNNNNNNNNNNNNRRRNRRNLLAFIRRNRRYLRGFFRNPLLFQQLLLAVRRYVNNNNNNNLNNLLQLLRLLASLLSSLSSSSSSSSTTTTITITITTTTSSSSSSLLTITITITITLLT",
+  "scheduler": {
+    "phase": 2,
+    "events": [
+      {
+        "step": 25,
+        "event": "checkpoint",
+        "intra_last5_mean": 4.6
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.60>3.8)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.15
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 602.7,
+  "seq_health": {
+    "entropy": 3.02,
+    "max_homopolymer": 12,
+    "top2_aa_frac": 0.41
+  },
+  "plddt_profile": {
+    "A": {
+      "n": 115,
+      "mean": 90.9,
+      "min": 65.7
+    },
+    "B": {
+      "n": 118,
+      "mean": 87.0,
+      "min": 45.0
+    },
+    "C": {
+      "n": 158,
+      "mean": 48.8,
+      "min": 27.1
+    }
+  },
+  "hotspot_contacts": {
+    "A:Q30": {
+      "found": true,
+      "min_cb": 12.1,
+      "n12": 0,
+      "n8": 0
+    },
+    "A:D73": {
+      "found": true,
+      "min_cb": 18.2,
+      "n12": 0,
+      "n8": 0
+    }
+  },
+  "traj": {
+    "intra_contact_loss": {
+      "first5": 4.593,
+      "last5": 2.748,
+      "min": 2.498
+    },
+    "inter_contact_loss": {
+      "first5": 4.36,
+      "last5": 3.088,
+      "min": 1.872
+    },
+    "epitope_loss": {
+      "first5": 3.044,
+      "last5": 2.602,
+      "min": 1.509
+    },
+    "glob_loss": {
+      "first5": 1.815,
+      "last5": 0.084,
+      "min": -0.155
+    },
+    "plm_loss": {
+      "first5": 3.234,
+      "last5": 1.222,
+      "min": 1.086
+    },
+    "corr_epitope_vs_inter": 0.55
+  },
+  "prev_ii_baseline": {
+    "iptm": 0.4434,
+    "binder_plddt_mean": 33.4,
+    "entropy": 2.34,
+    "hotspot_min_cb": [
+      16.4,
+      21.1
+    ],
+    "note": "\u4e0a\u6b21\u65e0\u8c03\u5ea6\u81c2 ii"
+  },
+  "hotspot_contacts_note": "\u79bb\u7ebf\u91cd\u7b97(\u4fee\u6b633\u21921\u5b57\u6bcd\u6bd4\u8f83)"
+}

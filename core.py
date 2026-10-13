@@ -463,6 +463,7 @@ class IntegratedPipeline:
         batch_size: int,
         target_hotspot_ids: list[str] | None,
         epitope_contact_distance: float,
+        inter_loss_mode: str = "full_coverage",
     ) -> tuple[list[str], Any, list[dict], Any]:
         """执行原始 ESMFold2 binder design。
 
@@ -498,6 +499,7 @@ class IntegratedPipeline:
             batch_size=batch_size,
             target_hotspot_ids=target_hotspot_ids,
             epitope_contact_distance=epitope_contact_distance,
+            inter_loss_mode=inter_loss_mode,
         )
 
         # Stage 1 设计完成后, inversion models 和 ESMC LM head 已无用,
@@ -808,6 +810,7 @@ class IntegratedPipeline:
         batch_size: int = 1,
         target_hotspot_ids: list[str] | None = None,
         epitope_contact_distance: float = 12.0,
+        inter_loss_mode: str = "full_coverage",
     ) -> dict[str, Any]:
         """执行完整的集成 Pipeline。
 
@@ -841,6 +844,7 @@ class IntegratedPipeline:
                 target_sequence, binder_sequence,
                 is_antibody, seed, batch_size,
                 target_hotspot_ids, epitope_contact_distance,
+                inter_loss_mode,
             )
         )
         # Stage 1 之后保留模型 (供 Stage 4 复用): 按 hero_critic_names 过滤,

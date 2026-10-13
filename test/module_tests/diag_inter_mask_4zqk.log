@@ -1,0 +1,58 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[mask4zqk] 热点 = ['B:S30', 'A:E28']
+[mask4zqk] target: A(PD-L1)=115aa + B(PD-1)=118aa
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 82.60it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 78.09it/s]
+[mask4zqk] 模型加载 11s
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+[mask4zqk] 生产路径预计算 10s → 28 残基
+[mask4zqk] DSSP RSA: 217 残基
+[mask4zqk] 身份校验: 未建模 12, 错配 0 (均不计入金标准指标)
+
+[mask4zqk] 埋藏代理 vs 金标准 (n=217):
+  Spearman(proxy_burial10, true_CN10) = 0.931
+  Spearman(proxy_burial10, DSSP RSA)  = -0.836  (期望为负)
+
+[mask4zqk] 阈值扫描 (Jaccard vs 晶体同公式真值; 括号=纯度RSA≥20%):
+  R=  10: q0.3=0.67(1.00)  q0.5=0.62(1.00)  q0.6=0.73(0.93)  q0.7=0.61(0.82)
+  R=  12: q0.3=0.64(1.00)  q0.5=0.67(1.00)  q0.6=0.69(0.95)  q0.7=0.63(0.84)
+  R=  15: q0.3=0.48(0.88)  q0.5=0.48(0.92)  q0.6=0.57(0.81)  q0.7=0.56(0.76)
+  R=  18: q0.3=0.50(0.89)  q0.5=0.60(0.94)  q0.6=0.63(0.83)  q0.7=0.61(0.79)
+  R=  20: q0.3=0.43(0.92)  q0.5=0.60(0.95)  q0.6=0.66(0.84)  q0.7=0.62(0.80)
+
+[mask4zqk] 默认阈值 (R=15, q=0.5) mask = 28 残基:
+  HOT A  28 E (author 45)  RSA=0.48  d_hs=  3.8Å
+   *  A  29 K (author 46)  RSA=0.47  d_hs=  5.2Å
+   *  A  30 Q (author 47)  RSA=0.85  d_hs=  7.4Å
+   *  A  31 L (author 48)  RSA=0.23  d_hs=  7.8Å
+   *  A  32 D (author 49)  RSA=0.56  d_hs=  9.5Å
+   *  A  33 L (author 50)  RSA=0.44  d_hs= 13.6Å
+   *  A  35 A (author 52)  RSA=0.31  d_hs= 11.5Å
+   *  A  76 S (author 93)  RSA=0.45  d_hs= 11.2Å
+   *  A  77 L (author 94)  RSA=0.68  d_hs= 12.0Å
+   *  B  25 S (author 57)  RSA=0.65  d_hs= 13.7Å
+   *  B  26 N (author 58)  RSA=0.27  d_hs=  9.8Å
+   *  B  27 T (author 59)  RSA=0.83  d_hs=  9.8Å
+   *  B  28 S (author 60)  RSA=0.20  d_hs=  8.0Å
+   *  B  29 E (author 61)  RSA=0.75  d_hs=  5.4Å
+  HOT B  30 S (author 62)  RSA=0.37  d_hs= 24.1Å
+   *  B  51 P (author 83)  RSA=0.51  d_hs= 10.4Å
+   *  B  52 E (author 84)  RSA=0.72  d_hs= 14.8Å
+   *  B  54 R (author 86)  RSA=  ?   d_hs= 13.0Å
+   *  B  55 S (author 87)  RSA=  ?   d_hs= 10.6Å
+   *  B  56 Q (author 88)  RSA=  ?   d_hs= 11.8Å
+   *  B  57 P (author 89)  RSA=  ?   d_hs= 13.0Å
+   *  B  67 Q (author 99)  RSA=0.47  d_hs= 14.9Å
+   *  B  71 G (author 103)  RSA=0.18  d_hs= 14.3Å
+   *  B  72 R (author 104)  RSA=0.50  d_hs= 14.9Å
+   *  B  97 A (author 129)  RSA=0.22  d_hs=  7.4Å
+   *  B  98 P (author 130)  RSA=0.55  d_hs= 10.7Å
+   *  B  99 K (author 131)  RSA=0.19  d_hs= 12.3Å
+   *  B 101 Q (author 133)  RSA=0.45  d_hs= 11.2Å
+
+[mask4zqk] 默认 mask 表面纯度 (RSA≥20%): 0.92 | 平均 RSA: 0.47
+[mask4zqk] 产物 → /home/taoyr/projects/pipeline/test/module_results/diag_inter_mask_4zqk/result.json
