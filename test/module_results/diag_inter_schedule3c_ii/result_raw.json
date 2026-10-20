@@ -1,0 +1,133 @@
+{
+  "hotspots": [
+    "A:Q30",
+    "A:D73"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.5356253981590271,
+  "ptm": 0.6582692265510559,
+  "proxy": 0.45953859644391015,
+  "binder_sequence": "NQPEQDDDDDNNRNNRNNSSSSSSSSSSSSSSSSSSSSNSSIRRKLRRLLRRLLRNRPRLSAAAIALQINNFLNLNNNNNNNNNQQQQQQQQQQQNNNNNNNNNNNNNNSSSSSSSSSSSSSSSNNTTTTTVTTTSSTVTITSSSNNTTTTITVTLVL",
+  "scheduler": {
+    "final_phase": 2,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.402
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.40)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.2,
+          "glob": 0.2,
+          "epitope": 0.25
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.336
+      },
+      {
+        "step": 55,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.447
+      },
+      {
+        "step": 60,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.528
+      },
+      {
+        "step": 65,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.339
+      },
+      {
+        "step": 70,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.155
+      },
+      {
+        "step": 75,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.093
+      },
+      {
+        "step": 80,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.999
+      },
+      {
+        "step": 85,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.936
+      },
+      {
+        "step": 90,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.793
+      },
+      {
+        "step": 95,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.654
+      },
+      {
+        "step": 100,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.653
+      },
+      {
+        "step": 105,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.671
+      },
+      {
+        "step": 110,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.632
+      },
+      {
+        "step": 115,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.487
+      },
+      {
+        "step": 120,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.37
+      },
+      {
+        "step": 125,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.35
+      },
+      {
+        "step": 130,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.389
+      },
+      {
+        "step": 135,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.483
+      },
+      {
+        "step": 140,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.418
+      },
+      {
+        "step": 145,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.375
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 628.7
+}

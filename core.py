@@ -26,6 +26,7 @@
 from __future__ import annotations
 
 import json
+import math
 import os
 import sys
 import tempfile
@@ -86,6 +87,8 @@ class PipelineConfig:
         界面, 无 target-target 稀释), 默认 0.50。
     quality_min_binder_plddt : float
         PDB 质量闸门的最低 binder pLDDT。
+    iptm_metric : str
+        置信度指标源 ("global" | "pair_chains"), 见字段注释。
     top_n : int
         最终输出的 Top-N 设计数。
     output_dir : str
@@ -102,17 +105,37 @@ class PipelineConfig:
     mpnn_fix_interface: bool = True
 
     # Quality gate
-    ##### claude 2026/8/13 start #####
-    # iPTM 双阈值: 按 target 链数选择。单链 target 时 iPTM ≈ binder-target
-    # 界面置信度, 用 0.50; 多链 target 时 iPTM 混入 target-target 链间
-    # 置信度 (通常偏高), 阈值上调到 0.70。
+    ##### claude 2026/10/19 start #####
+    # ipTM 阈值: 按 target 链数选择, 喂给 iptm_metric 选中的指标。
+    # pair_chains 模式 (默认) 下为 binder-target pair_chains_iptm 的定标值
+    # (2026-10-19 回放, diag_pair_iptm_replay, 8 真实产物):
+    #   多链: 真解 founder 0.487 / nohot_4z 0.684 vs 退化 wrapper 0.255 /
+    #   seed2 0.059 / seed4 0.203 → 分离区间 (0.26, 0.49) 取 0.40;
+    #   单链: 真解 0.563-0.586, 无退化样本, 沿用 0.50 (留 0.06 边际)。
+    #   块均值系统性低于旧全局 max-over-rows 值 (典型 -0.2~-0.3), 勿与旧
+    #   0.50/0.70 数值混比。
+    # global 模式 (过渡诊断用): 阈值同为上述数值, 未按全局值重标定。
     quality_min_iptm_single: float = 0.50
-    quality_min_iptm_multi: float = 0.70
+    quality_min_iptm_multi: float = 0.40
+    ##### claude 2026/10/19 end #####
     # 界面级质量闸门: distogram binding confidence (纯 binder×target
     # 界面熵, 无 target-target 稀释), 与 Stage 4 scaling 阈值惯例一致。
     quality_min_distogram_binding_confidence: float = 0.50
     ##### claude 2026/8/13 end #####
     quality_min_binder_plddt: float = 0.70
+
+    ##### claude 2026/10/19 start #####
+    # 置信度指标源 (Stage-2 质量门 + Stage-6 过滤/排序的 ipTM 槽位):
+    # "pair_chains" (默认) = binder-target pair_chains_iptm (ConfidenceHead
+    #            链对子块均值的 [target][binder] 方向残基加权合并 — 固定
+    #            target 评估 binder 位置置信度; 多链 target 剔除 target-
+    #            target 对的膨胀。组装置信度语义, 非接触度量 — 接触意图由
+    #            热点几何门另行核验)。2026-10-19 定标后切为默认:
+    #            wrapper 全局 0.888 / pair 0.255 的膨胀实证;
+    # "global" = 全局 ipTM (旧行为, 过渡诊断用; 多链被 target-target 对
+    #            稀释虚高, 阈值未按全局值重标定)。
+    iptm_metric: str = "pair_chains"
+    ##### claude 2026/10/19 end #####
 
     # Refold screening
     scaling_threshold: float = 0.50
@@ -160,6 +183,13 @@ class PipelineResult:
     distogram_iptm_proxy: float | None = None
     final_loss: float | None = None
 
+    ##### claude 2026/10/19 start #####
+    # binder-target pair ipTM (t2b 方向残基加权合并值; iptm_metric=
+    # "pair_chains" 时为 Stage-2/6 置信度槽位的指标源)。b2t/逐链明细
+    # 不进 dataclass, 留在源结果 dict。
+    pair_chains_iptm: float | None = None
+    ##### claude 2026/10/19 end #####
+
     # 重折叠后指标
     refold_iptm: float | None = None
     refold_ptm: float | None = None
@@ -193,6 +223,7 @@ class PipelineResult:
 def compute_selection_score(
     results: list[PipelineResult],
     rosetta_weight: float = 0.0,
+    iptm_metric: str = "global",
 ) -> list[PipelineResult]:
     """计算每条设计的综合选择评分。
 
@@ -213,6 +244,10 @@ def compute_selection_score(
     results : list[PipelineResult]
     rosetta_weight : float
         Rosetta 物理评分在综合评分中的权重 (0-1), 默认 0。
+    iptm_metric : str
+        ipTM 槽位指标源 (2026/10/19): "global" 用 refold/全局 ipTM;
+        "pair_chains" 优先取 binder-target pair_chains_iptm (t2b 合并值),
+        缺失时回退全局 (过渡兼容旧行)。
 
     Returns
     -------
@@ -223,9 +258,17 @@ def compute_selection_score(
         return results
 
     # ── 置信度部分 ──
-    iptm_vals = np.array([
-        (r.refold_iptm or r.iptm or 0.0) for r in results
-    ])
+    ##### claude 2026/10/19 start #####
+    if iptm_metric == "pair_chains":
+        iptm_vals = np.array([
+            (r.pair_chains_iptm or r.refold_iptm or r.iptm or 0.0)
+            for r in results
+        ])
+    else:
+        iptm_vals = np.array([
+            (r.refold_iptm or r.iptm or 0.0) for r in results
+        ])
+    ##### claude 2026/10/19 end #####
     proxy_vals = np.array([
         (r.distogram_iptm_proxy or 0.0) for r in results
     ])
@@ -291,6 +334,7 @@ def apply_filters(
     results: list[PipelineResult],
     filters_json: str | None = None,
     pI_max: float = 6.0,
+    iptm_metric: str = "global",
 ) -> tuple[list[PipelineResult], list[PipelineResult]]:
     """执行 BindCraft 风格的阈值过滤 + 等电点筛选。
 
@@ -326,7 +370,7 @@ def apply_filters(
 
     for r in results:
         # 构建 data_dict
-        data_dict = _build_data_dict(r)
+        data_dict = _build_data_dict(r, iptm_metric=iptm_metric)
 
         # BindCraft 阈值检查
         filter_result = check_filters(data_dict, filters)
@@ -355,18 +399,27 @@ def apply_filters(
     return passed, failed
 
 
-def _build_data_dict(result: PipelineResult) -> dict[str, Any]:
+def _build_data_dict(
+    result: PipelineResult,
+    iptm_metric: str = "global",
+) -> dict[str, Any]:
     """从 PipelineResult 构建 check_filters 所需的 data_dict。
 
     仅使用有实际测量值的指标, 缺失的用 None (check_filters 会跳过)。
+    ``iptm_metric="pair_chains"`` 时 Average_i_pTM 槽位优先取
+    binder-target pair_chains_iptm (t2b 合并值), 缺失回退全局 ipTM。
     """
     d: dict[str, Any] = {}
 
     # 置信度指标 (前缀 Average_, 模拟 BindCraft 的多模型平均)
-    if result.refold_iptm is not None:
+    ##### claude 2026/10/19 start #####
+    if iptm_metric == "pair_chains" and result.pair_chains_iptm is not None:
+        d["Average_i_pTM"] = result.pair_chains_iptm
+    elif result.refold_iptm is not None:
         d["Average_i_pTM"] = result.refold_iptm
     elif result.iptm is not None:
         d["Average_i_pTM"] = result.iptm
+    ##### claude 2026/10/19 end #####
 
     if result.refold_ptm is not None:
         d["Average_pTM"] = result.refold_ptm
@@ -463,7 +516,8 @@ class IntegratedPipeline:
         batch_size: int,
         target_hotspot_ids: list[str] | None,
         epitope_contact_distance: float,
-        inter_loss_mode: str = "full_coverage",
+        inter_loss_mode: str | None = None,
+        fold_rescue_schedule: bool = False,
     ) -> tuple[list[str], Any, list[dict], Any]:
         """执行原始 ESMFold2 binder design。
 
@@ -500,6 +554,7 @@ class IntegratedPipeline:
             target_hotspot_ids=target_hotspot_ids,
             epitope_contact_distance=epitope_contact_distance,
             inter_loss_mode=inter_loss_mode,
+            fold_rescue_schedule=fold_rescue_schedule,
         )
 
         # Stage 1 设计完成后, inversion models 和 ESMC LM head 已无用,
@@ -512,11 +567,94 @@ class IntegratedPipeline:
 
     # ── 阶段 2: 质量预过滤 ────────────────────────────────────────
 
+    @staticmethod
+    def _hotspot_contact_check(
+        pdb_text: str,
+        target_hotspot_ids: list[str],
+        target_sequence: str,
+        min_cb: float = 10.0,
+        min_contacts: int = 3,
+        contact_distance: float = 12.0,
+    ) -> tuple[bool, str]:
+        """热点几何核验 (2026-10-14 新增, 热点任务额外质量门)。
+
+        现有质量门 (iPTM/pLDDT/proxy) 不度量热点 honoring——实证: 一个放弃
+        热点 (28-30Å) 的 binder 可全线过门。本门要求**每个** hotspot 在
+        hero 结构中被 binder 真实接触: 最近 binder Cβ (gly 用 CA) 距离
+        ≤ ``min_cb`` 且 ``contact_distance`` 内 binder 残基数 ≥
+        ``min_contacts``。
+
+        输出 PDB 为复合体顺序编号 (靶链 A,B.. 在前, binder 最后一链), 热点
+        的链内 1-indexed 序号 + 前序靶链长度 = flat 序号; 残基字母校验不符
+        时在 ±2 内找回 (仅容差, 不改变判定对象)。
+        """
+        aa3to1 = {'ALA': 'A', 'ARG': 'R', 'ASN': 'N', 'ASP': 'D', 'CYS': 'C',
+                  'GLN': 'Q', 'GLU': 'E', 'GLY': 'G', 'HIS': 'H', 'ILE': 'I',
+                  'LEU': 'L', 'LYS': 'K', 'MET': 'M', 'PHE': 'F', 'PRO': 'P',
+                  'SER': 'S', 'THR': 'T', 'TRP': 'W', 'TYR': 'Y', 'VAL': 'V'}
+        chain_lens = [len(c) for c in target_sequence.split("|")]
+        atoms: dict[tuple[str, int], dict] = {}
+        order: list[str] = []
+        for ln in pdb_text.split("\n"):
+            if not ln.startswith("ATOM"):
+                continue
+            el = ln[12:16].strip()
+            if el not in ("CA", "CB"):
+                continue
+            ch, num = ln[21], int(ln[22:26])
+            rec = atoms.setdefault(
+                (ch, num),
+                {"aa": aa3to1.get(ln[17:20].strip(), "?"), "cb": None,
+                 "ca": None})
+            if ch not in order:
+                order.append(ch)
+            rec["cb" if el == "CB" else "ca"] = (
+                float(ln[30:38]), float(ln[38:46]), float(ln[46:54]))
+        if not order:
+            return False, "PDB 无 ATOM 记录"
+        binder = [v for (c, _), v in atoms.items() if c == order[-1]]
+        reasons: list[str] = []
+        for hs in target_hotspot_ids:
+            ch, rid = hs.split(":")
+            aa_letter, idx = rid[0], int(rid[1:])
+            ci = order.index(ch) if ch in order else -1
+            flat = sum(chain_lens[:ci]) + idx if ci >= 0 else idx
+            rec = atoms.get((ch, flat))
+            if rec is None or rec["aa"] != aa_letter:
+                for k in (1, 2):  # ±2 容差找回
+                    cand = atoms.get((ch, flat + k)) or atoms.get((ch, flat - k))
+                    if cand is not None and cand["aa"] == aa_letter:
+                        rec = cand
+                        break
+                    rec = None
+            if rec is None or not (rec["cb"] or rec["ca"]):
+                reasons.append(f"{hs}: 未定位")
+                continue
+            ref = rec["cb"] or rec["ca"]
+            dists = sorted(math.dist(ref, b["cb"] or b["ca"]) for b in binder
+                           if b["cb"] or b["ca"])
+            n12 = sum(1 for d in dists if d < contact_distance)
+            if not (dists and dists[0] <= min_cb and n12 >= min_contacts):
+                reasons.append(
+                    f"{hs}: min={dists[0]:.1f}Å n12={n12} "
+                    f"(要求 ≤{min_cb}Å ∧ ≥{min_contacts})"
+                )
+        if reasons:
+            return False, "; ".join(reasons)
+        return True, "全部热点接触达标"
+
     def _quality_filter_critic_results(
         self,
         critic_results: list[dict],
+        target_hotspot_ids: list[str] | None = None,
+        target_sequence: str | None = None,
     ) -> tuple[list[dict], list[dict]]:
-        """对 Hero Critic 输出的 PDB 做质量预过滤。"""
+        """对 Hero Critic 输出的 PDB 做质量预过滤。
+
+        ``target_hotspot_ids`` 非空时 (热点设计模式) 追加热点几何核验门
+        (见 :meth:`_hotspot_contact_check`), 作为现有 iPTM/pLDDT/proxy 门
+        的额外补充; 核验失败的条目进入 failed 并记录原因。
+        """
         from inverse_optimize.quality_filter import (
             QualityFilterConfig,
             filter_pdb_by_quality,
@@ -548,8 +686,16 @@ class IntegratedPipeline:
             else self.config.quality_min_iptm_single
         )
 
+        ##### claude 2026/10/19 start #####
+        # ipTM 指标源开关: pair_chains 模式把同一阈值喂给 pair 门 (REMARK 键
+        # pair_chains_iptm, t2b 合并值), global 模式保持原 iPTM 门。
+        use_pair = self.config.iptm_metric == "pair_chains"
+        ##### claude 2026/10/19 end #####
         cfg = QualityFilterConfig(
-            min_iptm=min_iptm,
+            ##### claude 2026/10/19 start #####
+            min_iptm=None if use_pair else min_iptm,
+            min_pair_chains_iptm=min_iptm if use_pair else None,
+            ##### claude 2026/10/19 end #####
             min_binder_plddt=self.config.quality_min_binder_plddt,
             ##### claude 2026/8/13 start #####
             # 界面级质量闸门 (distogram binding confidence, 来自 REMARK 250)
@@ -580,6 +726,17 @@ class IntegratedPipeline:
                 qc = filter_pdb_by_quality(pdb_path, config=cfg)
                 ##### claude 2026/8/13 end #####
                 entry = {**result, "quality_check": qc}
+                if qc["passed"] and target_hotspot_ids and target_sequence:
+                    ##### claude 2026/10/14 start #####
+                    # 热点设计模式的额外几何核验门 (质量门不度量热点
+                    # honoring, 假阳性实证见 2026-10-14 多 seed 记录)。
+                    hs_ok, hs_detail = self._hotspot_contact_check(
+                        pdb_str, target_hotspot_ids, target_sequence
+                    )
+                    entry["hotspot_check"] = {"passed": hs_ok,
+                                              "detail": hs_detail}
+                    qc = {**qc, "passed": qc["passed"] and hs_ok}
+                    ##### claude 2026/10/14 end #####
                 if qc["passed"]:
                     passed.append(entry)
                 else:
@@ -592,7 +749,8 @@ class IntegratedPipeline:
             print(
                 f"[Quality] {len(passed)}/{len(hero_results)} Hero Critic PDBs "
                 f"passed quality gate "
-                f"(iPTM≥{min_iptm} [{len(target_chains)} target chain(s)], "
+                f"({'pair_chains_iptm' if use_pair else 'iPTM'}≥{min_iptm} "
+                f"[{len(target_chains)} target chain(s)], "
                 f"binder={binder_label}, "
                 f"pLDDT≥{self.config.quality_min_binder_plddt}, "
                 f"proxy≥{self.config.quality_min_distogram_binding_confidence})"
@@ -675,6 +833,9 @@ class IntegratedPipeline:
         screen_cfg = RefoldScreenConfig(
             scaling_threshold=self.config.scaling_threshold,
             is_antibody=is_antibody,
+            ##### claude 2026/10/19 start #####
+            iptm_metric=self.config.iptm_metric,
+            ##### claude 2026/10/19 end #####
             verbose=self.config.verbose,
         )
 
@@ -810,7 +971,8 @@ class IntegratedPipeline:
         batch_size: int = 1,
         target_hotspot_ids: list[str] | None = None,
         epitope_contact_distance: float = 12.0,
-        inter_loss_mode: str = "full_coverage",
+        inter_loss_mode: str | None = None,
+        fold_rescue_schedule: bool = False,
     ) -> dict[str, Any]:
         """执行完整的集成 Pipeline。
 
@@ -831,6 +993,13 @@ class IntegratedPipeline:
         t_start = time.time()
         cfg = self.config
 
+        ##### claude 2026/10/19 start #####
+        assert cfg.iptm_metric in ("global", "pair_chains"), (
+            f"iptm_metric must be 'global' or 'pair_chains', "
+            f"got {cfg.iptm_metric!r}"
+        )
+        ##### claude 2026/10/19 end #####
+
         # ── 阶段 1: ESMFold2 设计 ─────────────────────────────────
         if cfg.verbose:
             print(f"{'='*60}")
@@ -844,7 +1013,7 @@ class IntegratedPipeline:
                 target_sequence, binder_sequence,
                 is_antibody, seed, batch_size,
                 target_hotspot_ids, epitope_contact_distance,
-                inter_loss_mode,
+                inter_loss_mode, fold_rescue_schedule,
             )
         )
         # Stage 1 之后保留模型 (供 Stage 4 复用): 按 hero_critic_names 过滤,
@@ -884,7 +1053,9 @@ class IntegratedPipeline:
             print(f"{'='*60}")
 
         quality_passed, quality_failed = self._quality_filter_critic_results(
-            critic_results
+            critic_results,
+            target_hotspot_ids=target_hotspot_ids,
+            target_sequence=target_sequence,
         )
 
         # ── 阶段 3: MPNN 逆折叠 ───────────────────────────────────
@@ -946,7 +1117,9 @@ class IntegratedPipeline:
 
         # ── 计算排名评分 ──────────────────────────────────────────
         rosetta_w = 0.3 if cfg.enable_rosetta else 0.0
-        all_results = compute_selection_score(all_results, rosetta_weight=rosetta_w)
+        all_results = compute_selection_score(
+            all_results, rosetta_weight=rosetta_w, iptm_metric=cfg.iptm_metric
+        )
 
         # ── 过滤 ──────────────────────────────────────────────────
         if cfg.verbose:
@@ -954,7 +1127,7 @@ class IntegratedPipeline:
             print(f"[Pipeline] Stage 6: Filter & Select")
             print(f"{'='*60}")
 
-        passed, failed = apply_filters(all_results)
+        passed, failed = apply_filters(all_results, iptm_metric=cfg.iptm_metric)
 
         # ── 选择 Top-N ───────────────────────────────────────────
         selected = select_top_n(passed, top_n=cfg.top_n)
@@ -1047,6 +1220,9 @@ def _collect_results(
             ptm=r.get("ptm"),
             distogram_iptm_proxy=r.get("distogram_iptm_proxy"),
             final_loss=r.get("final_loss"),
+            ##### claude 2026/10/19 start #####
+            pair_chains_iptm=r.get("pair_chains_iptm"),
+            ##### claude 2026/10/19 end #####
             annotated_pdb=r.get("annotated_pdb"),
             complex=r.get("complex"),
             ##### claude 2026/9/16 start #####
@@ -1087,6 +1263,9 @@ def _collect_results(
             refold_ptm=mr.get("ptm"),
             refold_plddt=mr.get("plddt"),
             distogram_iptm_proxy=mr.get("distogram_iptm_proxy"),
+            ##### claude 2026/10/19 start #####
+            pair_chains_iptm=mr.get("pair_chains_iptm"),
+            ##### claude 2026/10/19 end #####
             annotated_pdb=mr.get("annotated_pdb"),
             complex=mr.get("complex"),
             # Rosetta
@@ -1153,6 +1332,7 @@ def _save_outputs(
             "binder_sequence": r.binder_sequence,
             "selection_score": round(r.selection_score, 4),
             "iptm": r.refold_iptm or r.iptm,
+            "pair_chains_iptm": r.pair_chains_iptm,
             "distogram_iptm_proxy": r.distogram_iptm_proxy,
             "rosetta_dG": r.rosetta_dG,
             "rosetta_sc": r.rosetta_sc,

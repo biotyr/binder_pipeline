@@ -114,6 +114,21 @@ def main() -> None:
                     help="覆盖 Stage-1 epitope loss 权重 (pipeline 默认 0.5)")
     ap.add_argument("--steps", type=int, default=None,
                     help="覆盖 Stage-1 优化步数 (pipeline 默认 150, 余弦日程随之拉伸)")
+    ap.add_argument("--inter-loss-mode", choices=["auto", "full_coverage",
+                                                  "hotspot_neighborhood"],
+                    default="auto",
+                    help="inter contact loss 分支 (2026-10-14, 已入源码): "
+                         "auto = 指定热点→邻域可及mask, 无热点→全覆盖")
+    ap.add_argument("--fold-rescue-schedule", action="store_true",
+                    help="热点设计三阶段调度 (P1原生→P2折叠挽救→P3界面精修, "
+                         "intra 横盘检测自动转移; 仅限指定热点)")
+    ap.add_argument("--iptm-metric", choices=["global", "pair_chains"],
+                    default="pair_chains",
+                    help="置信度指标源 (Stage-2 门 + Stage-6 过滤/排序, "
+                         "2026-10-19 定标后默认 pair_chains): "
+                         "global=全局 iPTM (旧行为, 过渡诊断用); "
+                         "pair_chains=binder-target pair_chains_iptm "
+                         "(t2b 方向残基加权合并, 阈值 0.50/0.40 定标)")
     args = ap.parse_args()
 
     task_dir = RESULTS_ROOT / args.task / f"{args.hotspot}_hotspot"
@@ -149,6 +164,7 @@ def main() -> None:
         rosetta_relax_first=True,
         mpnn_num_seqs=args.mpnn_num_seqs,
         hero_critic_names=["ESMFold2-Experimental-Cutoff2025"],
+        iptm_metric=args.iptm_metric,
         top_n=84,
         output_dir=str(full_dir),
         save_pdbs=True,
@@ -166,6 +182,9 @@ def main() -> None:
         batch_size=args.batch_size,
         target_hotspot_ids=hotspots,
         epitope_contact_distance=12.0,
+        inter_loss_mode=(None if args.inter_loss_mode == "auto"
+                         else args.inter_loss_mode),
+        fold_rescue_schedule=args.fold_rescue_schedule,
     )
     elapsed = time.time() - t0
 
@@ -182,6 +201,7 @@ def main() -> None:
             "binder_sequence": r.binder_sequence,
             "binder_len": len(r.binder_sequence),
             "iptm": r.iptm, "ptm": r.ptm,
+            "pair_chains_iptm": r.pair_chains_iptm,
             "distogram_iptm_proxy": r.distogram_iptm_proxy,
             "final_loss": r.final_loss,
             "isoelectric_point": r.isoelectric_point,
@@ -258,6 +278,7 @@ def main() -> None:
                    "use_stage1_scaling": False, "batch_size": args.batch_size,
                    "epitope_weight": args.epitope_weight if args.epitope_weight is not None else 0.5,
                    "steps": args.steps if args.steps is not None else 150,
+                   "iptm_metric": args.iptm_metric,
                    "dtype": "trunk bf16 (native) + heads fp32"},
         "elapsed_s": round(elapsed, 1),
         "n_stage1_candidates": len(s1_rows),

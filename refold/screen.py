@@ -49,6 +49,11 @@ class RefoldScreenConfig:
         精确预测回收迭代数, 默认 3。
     is_antibody : bool
         Binder 是否为抗体 (影响 CDR distogram 计算)。
+    iptm_metric : str
+        置信度指标源 (2026/10/19): "global" = 全局 ipTM (默认, 旧行为);
+        "pair_chains" = binder-target pair_chains_iptm (t2b 方向残基加权
+        合并值, 缺失时回退全局 ipTM) — 用于多 hero 的 winner-takes-all
+        比较与结果排序。
     verbose : bool
         是否打印进度。
     """
@@ -58,6 +63,7 @@ class RefoldScreenConfig:
     hero_steps: int = 200
     hero_loops: int = 3
     is_antibody: bool = False
+    iptm_metric: str = "global"
     verbose: bool = True
 
 
@@ -233,6 +239,8 @@ class RefoldScreen:
             - "annotated_pdb": str | None   (含 REMARK 标注)
             - "iptm": float | None
             - "ptm": float | None
+            - "pair_chains_iptm": float | None   (binder-target t2b 合并值)
+            - "pair_chains_iptm_detail": dict | None
             - "plddt": float | None
             - "distogram_iptm_proxy": float
             - "cdr_distogram_iptm_proxy": float
@@ -270,7 +278,20 @@ class RefoldScreen:
                     iptm_val = full.get("iptm") or -1.0
                     prev_iptm = best_per_idx.get(idx, {}).get("iptm") or -1.0
 
-                    if iptm_val > prev_iptm:
+                    ##### claude 2026/10/19 start #####
+                    # winner-takes-all 比较键跟随指标开关: pair_chains 模式
+                    # 用 binder-target t2b 合并值 (缺失回退全局 ipTM)。
+                    if self.config.iptm_metric == "pair_chains":
+                        cmp_val = full.get("pair_chains_iptm") or iptm_val
+                        prev_cmp = (
+                            best_per_idx.get(idx, {}).get("pair_chains_iptm")
+                            or prev_iptm
+                        )
+                    else:
+                        cmp_val, prev_cmp = iptm_val, prev_iptm
+
+                    if cmp_val > prev_cmp:
+                    ##### claude 2026/10/19 end #####
                         best_per_idx[idx] = {
                             "sequence": binder_seq,
                             "target_seq": self.target_seq,
@@ -278,6 +299,12 @@ class RefoldScreen:
                             "annotated_pdb": full["annotated_pdb"],
                             "iptm": full["iptm"],
                             "ptm": full["ptm"],
+                            ##### claude 2026/10/19 start #####
+                            "pair_chains_iptm": full.get("pair_chains_iptm"),
+                            "pair_chains_iptm_detail": full.get(
+                                "pair_chains_iptm_detail"
+                            ),
+                            ##### claude 2026/10/19 end #####
                             "plddt": full["plddt"],
                             "distogram_iptm_proxy": full["distogram_iptm_proxy"],
                             "cdr_distogram_iptm_proxy": full["cdr_distogram_iptm_proxy"],
@@ -307,6 +334,10 @@ class RefoldScreen:
                             "annotated_pdb": None,
                             "iptm": None,
                             "ptm": None,
+                            ##### claude 2026/10/19 start #####
+                            "pair_chains_iptm": None,
+                            "pair_chains_iptm_detail": None,
+                            ##### claude 2026/10/19 end #####
                             "plddt": None,
                             "distogram_iptm_proxy": float("nan"),
                             "cdr_distogram_iptm_proxy": float("nan"),
@@ -321,12 +352,22 @@ class RefoldScreen:
             del model
             torch.cuda.empty_cache()
 
-        # 按索引还原顺序, 再按 iPTM 降序
+        # 按索引还原顺序, 再按置信度降序 (指标源跟随 iptm_metric)
         results = [best_per_idx[i] for i in sorted(best_per_idx)]
-        results.sort(
-            key=lambda r: r["iptm"] if r["iptm"] is not None else -1.0,
-            reverse=True,
-        )
+
+        ##### claude 2026/10/19 start #####
+        if self.config.iptm_metric == "pair_chains":
+            results.sort(
+                key=lambda r: r.get("pair_chains_iptm")
+                or (r["iptm"] if r["iptm"] is not None else -1.0),
+                reverse=True,
+            )
+        else:
+            results.sort(
+                key=lambda r: r["iptm"] if r["iptm"] is not None else -1.0,
+                reverse=True,
+            )
+        ##### claude 2026/10/19 end #####
 
         if self.config.verbose:
             n_ok = sum(1 for r in results if r["complex"] is not None)

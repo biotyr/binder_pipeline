@@ -1,0 +1,192 @@
+{
+  "founder": {
+    "class": "good_multi",
+    "note": "junction founder, dG-47.67 真锚定",
+    "src": "4ZQK_multi/with_hotspot_junction/stage1_only (parquet row 0)",
+    "orig_iptm": 0.8245394229888916,
+    "binder_len": 94,
+    "chain_lens": [
+      115,
+      118
+    ],
+    "global_iptm_replay": 0.7823382019996643,
+    "merged_t2b": 0.4871195449849567,
+    "merged_b2t": 0.37390986545403115,
+    "chains": {
+      "A": {
+        "t2b": 0.5043262839317322,
+        "b2t": 0.3804575502872467
+      },
+      "B": {
+        "t2b": 0.4703502655029297,
+        "b2t": 0.36752864718437195
+      }
+    },
+    "elapsed_s": 16.8
+  },
+  "nohot_4z": {
+    "class": "good_multi",
+    "note": "4ZQK 无热点 (iPTM 0.9077)",
+    "src": "4ZQK_multi/no_hotspot/stage1_only (parquet row 0)",
+    "orig_iptm": 0.9076993465423584,
+    "binder_len": 158,
+    "chain_lens": [
+      115,
+      118
+    ],
+    "global_iptm_replay": 0.9084089398384094,
+    "merged_t2b": 0.6837094963364335,
+    "merged_b2t": 0.7007116790493159,
+    "chains": {
+      "A": {
+        "t2b": 0.740035355091095,
+        "b2t": 0.7228236198425293
+      },
+      "B": {
+        "t2b": 0.6288156509399414,
+        "b2t": 0.6791619062423706
+      }
+    },
+    "elapsed_s": 10.7
+  },
+  "nohot_3r": {
+    "class": "good_single",
+    "note": "3RRQ 无热点 (iPTM 0.8597)",
+    "src": "3RRQ_single/no_hotspot/stage1_only (parquet row 0)",
+    "orig_iptm": 0.859668493270874,
+    "binder_len": 158,
+    "chain_lens": [
+      129
+    ],
+    "global_iptm_replay": 0.8597409129142761,
+    "merged_t2b": 0.5857641696929932,
+    "merged_b2t": 0.6251718997955322,
+    "chains": {
+      "A": {
+        "t2b": 0.5857641696929932,
+        "b2t": 0.6251718997955322
+      }
+    },
+    "elapsed_s": 7.1
+  },
+  "groov_3r": {
+    "class": "good_single",
+    "note": "3RRQ 凹槽热点 (iPTM 0.8575)",
+    "src": "3RRQ_single/with_hotspot_groove/stage1_only (parquet row 0)",
+    "orig_iptm": 0.8464809656143188,
+    "binder_len": 158,
+    "chain_lens": [
+      129
+    ],
+    "global_iptm_replay": 0.8466689586639404,
+    "merged_t2b": 0.5625775456428528,
+    "merged_b2t": 0.6147736310958862,
+    "chains": {
+      "A": {
+        "t2b": 0.5625775456428528,
+        "b2t": 0.6147736310958862
+      }
+    },
+    "elapsed_s": 7.1
+  },
+  "seed2": {
+    "class": "quality_ok_multi",
+    "note": "3g junction seed2 (质量合格, seed3 热点假阳性)",
+    "src": "diag_inter_schedule3g_junction/seed2",
+    "orig_iptm": 0.5962015986442566,
+    "binder_len": 74,
+    "chain_lens": [
+      115,
+      118
+    ],
+    "global_iptm_replay": 0.5974519848823547,
+    "merged_t2b": 0.05908542268713656,
+    "merged_b2t": 0.05253649795579808,
+    "chains": {
+      "A": {
+        "t2b": 0.05932341888546944,
+        "b2t": 0.04953918233513832
+      },
+      "B": {
+        "t2b": 0.058853477239608765,
+        "b2t": 0.05545761063694954
+      }
+    },
+    "elapsed_s": 8.1
+  },
+  "seed3": {
+    "class": "quality_ok_multi",
+    "note": "3g junction seed3 (质量合格, seed3 热点假阳性)",
+    "src": "diag_inter_schedule3g_junction/seed3",
+    "orig_iptm": 0.7791620492935181,
+    "binder_len": 120,
+    "chain_lens": [
+      115,
+      118
+    ],
+    "global_iptm_replay": 0.787257730960846,
+    "merged_t2b": 0.49611850306711486,
+    "merged_b2t": 0.36009561030649834,
+    "chains": {
+      "A": {
+        "t2b": 0.46631920337677,
+        "b2t": 0.29400166869163513
+      },
+      "B": {
+        "t2b": 0.5251601934432983,
+        "b2t": 0.424509197473526
+      }
+    },
+    "elapsed_s": 9.6
+  },
+  "seed4": {
+    "class": "quality_ok_multi",
+    "note": "3g junction seed4 (质量合格, seed3 热点假阳性)",
+    "src": "diag_inter_schedule3g_junction/seed4",
+    "orig_iptm": 0.6849378943443298,
+    "binder_len": 120,
+    "chain_lens": [
+      115,
+      118
+    ],
+    "global_iptm_replay": 0.5708244442939758,
+    "merged_t2b": 0.2025628637346587,
+    "merged_b2t": 0.15029130626645723,
+    "chains": {
+      "A": {
+        "t2b": 0.2100074589252472,
+        "b2t": 0.16167321801185608
+      },
+      "B": {
+        "t2b": 0.19530753791332245,
+        "b2t": 0.13919876515865326
+      }
+    },
+    "elapsed_s": 9.1
+  },
+  "wrapper": {
+    "class": "degraded_multi",
+    "note": "S/R 低复杂度包裹型 (iPTM 0.9003, pLDDT 门拦截)",
+    "src": "diag_len158/w0.5/result.json",
+    "orig_iptm": 0.9003251194953918,
+    "binder_len": 158,
+    "chain_lens": [
+      115,
+      118
+    ],
+    "global_iptm_replay": 0.8883199691772461,
+    "merged_t2b": 0.2549692073860905,
+    "merged_b2t": 0.19213376894529285,
+    "chains": {
+      "A": {
+        "t2b": 0.26256948709487915,
+        "b2t": 0.19630399346351624
+      },
+      "B": {
+        "t2b": 0.24756215512752533,
+        "b2t": 0.18806956708431244
+      }
+    },
+    "elapsed_s": 18.5
+  }
+}

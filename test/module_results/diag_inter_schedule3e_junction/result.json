@@ -1,0 +1,114 @@
+{
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.6462292075157166,
+  "ptm": 0.7305113077163696,
+  "proxy": 0.5588881191564267,
+  "binder_sequence": "PPPPPPPPPPPPLRSLLRLLRRLFRLLRALFDQLESLVQRLLKALARNSKDPKEALKMARKMQKLMSRIRAFFFLARILLGRAGGGGGGGGLRRLRRLLRRLLALMKKLLRQIERLMNRFFSRAVRRKLRRKFRKLFRELRRVLRSILRQLRRLLGGG",
+  "scheduler": {
+    "final_phase": 1,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 2.696
+      },
+      {
+        "step": 35,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 2.594
+      },
+      {
+        "step": 35,
+        "event": "stay_phase1"
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 604.0,
+  "seq_health": {
+    "entropy": 3.34,
+    "max_homopolymer": 12,
+    "top2_aa_frac": 0.46
+  },
+  "plddt_profile": {
+    "A": {
+      "n": 115,
+      "mean": 92.6,
+      "min": 71.3
+    },
+    "B": {
+      "n": 118,
+      "mean": 89.1,
+      "min": 52.9
+    },
+    "C": {
+      "n": 158,
+      "mean": 83.7,
+      "min": 40.3
+    }
+  },
+  "hotspot_contacts": {
+    "B:S30": {
+      "found": true,
+      "min_cb": 5.3,
+      "n12": 21,
+      "n8": 5
+    },
+    "A:S100": {
+      "found": true,
+      "min_cb": 7.7,
+      "n12": 6,
+      "n8": 1
+    }
+  },
+  "traj": {
+    "intra_contact_loss": {
+      "first5": 4.116,
+      "last5": 1.835,
+      "min": 1.632
+    },
+    "inter_contact_loss": {
+      "first5": 4.967,
+      "last5": 2.512,
+      "min": 2.004
+    },
+    "epitope_loss": {
+      "first5": 2.551,
+      "last5": 0.149,
+      "min": 0.048
+    },
+    "glob_loss": {
+      "first5": 1.315,
+      "last5": 0.108,
+      "min": 0.062
+    },
+    "plm_loss": {
+      "first5": 3.156,
+      "last5": 1.722,
+      "min": 1.516
+    },
+    "corr_epitope_vs_inter": 0.941
+  },
+  "baselines": {
+    "no_schedule_ii": {
+      "iptm": 0.4434,
+      "binder_plddt": 33.4,
+      "entropy": 2.34,
+      "gate": "FAIL"
+    },
+    "two_phase_ii": {
+      "iptm": 0.4809,
+      "binder_plddt": 48.8,
+      "entropy": 3.02,
+      "gate": "FAIL"
+    },
+    "full_coverage_ii": {
+      "iptm": 0.713,
+      "gate": "PASS"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "seed": 3,
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "PASS",
+  "iptm": 0.7791620492935181,
+  "ptm": 0.8346683979034424,
+  "proxy": 0.6820815273199472,
+  "binder_sequence": "SSSSSSSALAALLRALAALLAAAGGGGAARLRLALGGGGGSLSITFTANKGTFTLRLILRRGGRILAAFFFRLSLAKLKKLYKILKKAKSSKQALRLLLLLLSRNFSSFLSLLSLLSSSS",
+  "scheduler": {
+    "final_phase": 3,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.019
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.02)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.1
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.381
+      },
+      {
+        "step": 55,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.19
+      },
+      {
+        "step": 60,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.103
+      },
+      {
+        "step": 65,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.055
+      },
+      {
+        "step": 70,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 2.907
+      },
+      {
+        "step": 70,
+        "event": "phase3 (folded intra 2.91)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.5,
+          "glob": 0.2,
+          "epitope": 0.5
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 494.6
+}

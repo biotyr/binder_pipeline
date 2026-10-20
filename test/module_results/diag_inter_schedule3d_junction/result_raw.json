@@ -1,0 +1,133 @@
+{
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.784656822681427,
+  "ptm": 0.6640037894248962,
+  "proxy": 0.7238083268592042,
+  "binder_sequence": "TTRPRPRPRRPRPPRPRPGRPRPGRPRPGRPSPRRRRRRRRRRRRRRRRRRRRRRRRNQFLDSSELWRRLWAKIRREYRRSRNGSSSSSRANRRRRRRRRRRRRRRRRRRRRRRRRRRPGRRGRRRRARRRRRRRRRRRRRRRRRRRRRRRRRRRRRK",
+  "scheduler": {
+    "final_phase": 2,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.463
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.46)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.2,
+          "glob": 0.2,
+          "epitope": 0.25
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.353
+      },
+      {
+        "step": 55,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.463
+      },
+      {
+        "step": 60,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.58
+      },
+      {
+        "step": 65,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.327
+      },
+      {
+        "step": 70,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.302
+      },
+      {
+        "step": 75,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.31
+      },
+      {
+        "step": 80,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.016
+      },
+      {
+        "step": 85,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.009
+      },
+      {
+        "step": 90,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.283
+      },
+      {
+        "step": 95,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.348
+      },
+      {
+        "step": 100,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.129
+      },
+      {
+        "step": 105,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.154
+      },
+      {
+        "step": 110,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.146
+      },
+      {
+        "step": 115,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.086
+      },
+      {
+        "step": 120,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.066
+      },
+      {
+        "step": 125,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.928
+      },
+      {
+        "step": 130,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.648
+      },
+      {
+        "step": 135,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.332
+      },
+      {
+        "step": 140,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.38
+      },
+      {
+        "step": 145,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.452
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 603.5
+}

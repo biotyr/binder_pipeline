@@ -1,0 +1,50 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+============================================================
+[Pipeline] Stage 1: ESMFold2 Design
+  target=smoke_3rrq  binder=minibinder  seed=0
+============================================================
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 82.03it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 78.87it/s]
+2026-10-19 17:55:25,006 INFO:   step   0  |  intra_contact_loss=4.2510  inter_contact_loss=5.1084  glob_loss=0.3730  total_loss=7.8168  plm_loss=3.0625  time=11.0683  peak_allocated_gib=17.9089  peak_reserved_gib=18.5898  T=0.9973
+2026-10-19 17:55:33,934 INFO:   step   5  |  intra_contact_loss=3.8522  inter_contact_loss=4.4720  glob_loss=0.7499  total_loss=7.5308  plm_loss=3.2188  time=1.7844  peak_allocated_gib=17.9401  peak_reserved_gib=18.6699  T=0.9055
+2026-10-19 17:55:42,874 INFO:   step  10  |  intra_contact_loss=3.3109  inter_contact_loss=4.4985  glob_loss=0.0931  total_loss=7.2827  plm_loss=3.3594  time=1.7861  peak_allocated_gib=17.9401  peak_reserved_gib=18.6699  T=0.7063
+2026-10-19 17:55:51,830 INFO:   step  15  |  intra_contact_loss=2.4711  inter_contact_loss=3.4284  glob_loss=0.2052  total_loss=6.3971  plm_loss=3.4062  time=1.7904  peak_allocated_gib=17.9401  peak_reserved_gib=18.6699  T=0.4533
+2026-10-19 17:56:01,009 INFO:   step  20  |  intra_contact_loss=2.0816  inter_contact_loss=2.7887  glob_loss=0.5510  total_loss=5.7797  plm_loss=3.2344  time=2.0080  peak_allocated_gib=17.9401  peak_reserved_gib=18.6699  T=0.2140
+2026-10-19 17:56:09,987 INFO:   step  25  |  intra_contact_loss=1.7898  inter_contact_loss=2.4908  glob_loss=0.1334  total_loss=4.8545  plm_loss=2.6875  time=1.7938  peak_allocated_gib=17.9401  peak_reserved_gib=18.6699  T=0.0528
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+
+============================================================
+[Pipeline] Stage 2: Quality Pre-filter
+============================================================
+[Quality] 1/1 Hero Critic PDBs passed quality gate (pair_chains_iptm≥0.5 [1 target chain(s)], binder=B, pLDDT≥0.7, proxy≥0.5)
+
+============================================================
+[Pipeline] Stage 6: Filter & Select
+============================================================
+  Filter: 1 passed / 0 failed
+  Selected: Top-84 = 1 designs
+  Best score: 0.5000
+  Best seq:   MSRRRSRGGRGDPGGFDDLFGSGGLAGFAG...
+[Output] Ranking table saved: /home/taoyr/projects/pipeline/test/module_results/smoke_pair_iptm/selection.parquet
+[Output] 1 PDBs saved: /home/taoyr/projects/pipeline/test/module_results/smoke_pair_iptm/selected_structures
+
+[Pipeline] Total time: 84s (1.4 min)
+
+[smoke] ---- 检查点 ----
+[smoke] 1. critic ESMFold2-Experimental-Cutoff2025: iptm=0.8386 pair=0.5207  REMARK ✓
+[smoke] 2. quality_check 携带 pair 键 ✓ (passed=1 failed=0)
+[smoke] 3. PipelineResult + selection.parquet pair 列 ✓
+[smoke] 4. 全链路冒烟通过 ✓  (全局/逐结果数值见上方日志)

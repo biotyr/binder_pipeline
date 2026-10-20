@@ -1,0 +1,42 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+[replay] 8 条待重折: ['founder', 'groov_3r', 'nohot_3r', 'nohot_4z', 'seed2', 'seed3', 'seed4', 'wrapper']
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 81.82it/s]
+[replay] founder: 已有结果, 跳过
+[replay] nohot_4z: 已有结果, 跳过
+[replay] nohot_3r: 已有结果, 跳过
+[replay] groov_3r: 已有结果, 跳过
+[replay] seed2: 已有结果, 跳过
+[replay] seed3: 已有结果, 跳过
+[replay] seed4: 已有结果, 跳过
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+[replay] wrapper: global=0.8883 t2b=0.2550 b2t=0.1921 (degraded_multi, 18.5s)
+
+[replay] 汇总 (按 replay t2b 降序):
+label      class                 t2b     b2t  global    orig
+nohot_4z   good_multi         0.6837  0.7007  0.9084  0.9077
+nohot_3r   good_single        0.5858  0.6252  0.8597  0.8597
+groov_3r   good_single        0.5626  0.6148  0.8467  0.8465
+seed3      quality_ok_multi   0.4961  0.3601  0.7873  0.7792
+founder    good_multi         0.4871  0.3739  0.7823  0.8245
+wrapper    degraded_multi     0.2550  0.1921  0.8883  0.9003
+seed4      quality_ok_multi   0.2026  0.1503  0.5708  0.6849
+seed2      quality_ok_multi   0.0591  0.0525  0.5975  0.5962
+
+[replay] 阈值建议 (真解全过 + 退化拦截):
+  多链 quality_min_iptm_multi → ≤0.4871 (good_multi 最小 t2b); 退化样本 t2b=0.2550 → 取区间 (0.25, 0.49) 内
+  单链 quality_min_iptm_single → ≤0.5626 (good_single 最小 t2b)
+  Average_i_pTM 槽 (default_filters.json) 与多链门同理下移; 最终取值由用户拍板
+
+[replay] 结果已写 /home/taoyr/projects/pipeline/test/module_results/diag_pair_iptm_replay/result.json

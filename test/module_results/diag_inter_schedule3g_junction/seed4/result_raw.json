@@ -1,0 +1,49 @@
+{
+  "seed": 4,
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.6849378943443298,
+  "ptm": 0.7719501852989197,
+  "proxy": 0.5807450141531803,
+  "binder_sequence": "LGGEFRELRGLRRALLRGLSQSQRLRLLQLMQQLLLLQRRYLSKRRQRGGGGGGLRRVLRLMLSLLRRLLRYVRRLLRSALSSSSSSSSSLRLLRRMLRALRRLRRLLRRLLRRLRRLLR",
+  "scheduler": {
+    "final_phase": 3,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.616
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.62)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.1
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 2.641
+      },
+      {
+        "step": 50,
+        "event": "phase3 (folded intra 2.64)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.5,
+          "glob": 0.2,
+          "epitope": 0.5
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 486.9
+}

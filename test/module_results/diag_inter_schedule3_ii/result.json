@@ -1,0 +1,155 @@
+{
+  "hotspots": [
+    "A:Q30",
+    "A:D73"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.5671353340148926,
+  "ptm": 0.6795278191566467,
+  "proxy": 0.4635125773524108,
+  "binder_sequence": "TTPTNNNNNNNNNNSSSNRSLSALLILLNLLIRINNNNNNNNNNSINNLLNRLRRQASSPPMNLAQFKILLDKLTKKIFNNNNNNKQIRSLLLLLNLLLSLLLSSSSSSLSLSLSSSSSSSTTTITITINTTTITITITSSSSSTTITITTTTTTTTT",
+  "scheduler": {
+    "final_phase": 3,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.501
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.50)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.15
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 4.04
+      },
+      {
+        "step": 55,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.767
+      },
+      {
+        "step": 60,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.479
+      },
+      {
+        "step": 65,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.422
+      },
+      {
+        "step": 70,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.259
+      },
+      {
+        "step": 75,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 2.969
+      },
+      {
+        "step": 75,
+        "event": "phase3 (folded intra 2.97)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.5,
+          "glob": 0.2,
+          "epitope": 0.5
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 603.5,
+  "seq_health": {
+    "entropy": 2.97,
+    "max_homopolymer": 10,
+    "top2_aa_frac": 0.41
+  },
+  "plddt_profile": {
+    "A": {
+      "n": 115,
+      "mean": 92.6,
+      "min": 74.0
+    },
+    "B": {
+      "n": 118,
+      "mean": 89.3,
+      "min": 47.2
+    },
+    "C": {
+      "n": 158,
+      "mean": 68.0,
+      "min": 24.8
+    }
+  },
+  "hotspot_contacts": {
+    "A:Q30": {
+      "found": true,
+      "min_cb": 10.5,
+      "n12": 2,
+      "n8": 0
+    },
+    "A:D73": {
+      "found": true,
+      "min_cb": 20.4,
+      "n12": 0,
+      "n8": 0
+    }
+  },
+  "traj": {
+    "intra_contact_loss": {
+      "first5": 4.757,
+      "last5": 2.469,
+      "min": 2.074
+    },
+    "inter_contact_loss": {
+      "first5": 4.74,
+      "last5": 3.643,
+      "min": 2.469
+    },
+    "epitope_loss": {
+      "first5": 3.045,
+      "last5": 3.343,
+      "min": 1.781
+    },
+    "glob_loss": {
+      "first5": 2.021,
+      "last5": -0.276,
+      "min": -0.361
+    },
+    "plm_loss": {
+      "first5": 3.328,
+      "last5": 1.427,
+      "min": 1.242
+    },
+    "corr_epitope_vs_inter": -0.118
+  },
+  "baselines": {
+    "no_schedule_ii": {
+      "iptm": 0.4434,
+      "binder_plddt": 33.4,
+      "entropy": 2.34,
+      "gate": "FAIL"
+    },
+    "two_phase_ii": {
+      "iptm": 0.4809,
+      "binder_plddt": 48.8,
+      "entropy": 3.02,
+      "gate": "FAIL"
+    },
+    "full_coverage_ii": {
+      "iptm": 0.713,
+      "gate": "PASS"
+    }
+  }
+}

@@ -1,0 +1,135 @@
+{
+  "3": {
+    "seed": 3,
+    "hotspots": [
+      "B:S30",
+      "A:S100"
+    ],
+    "gate": "PASS",
+    "iptm": 0.7791620492935181,
+    "ptm": 0.8346683979034424,
+    "proxy": 0.6820815273199472,
+    "binder_sequence": "SSSSSSSALAALLRALAALLAAAGGGGAARLRLALGGGGGSLSITFTANKGTFTLRLILRRGGRILAAFFFRLSLAKLKKLYKILKKAKSSKQALRLLLLLLSRNFSSFLSLLSLLSSSS",
+    "scheduler": {
+      "final_phase": 3,
+      "events": [
+        {
+          "step": 25,
+          "event": "p1_checkpoint",
+          "intra_last5_mean": 4.019
+        },
+        {
+          "step": 25,
+          "event": "phase2 (intra plateau 4.02)",
+          "weights": {
+            "intra_contact": 0.5,
+            "inter_contact": 0.1,
+            "glob": 0.2,
+            "epitope": 0.1
+          }
+        },
+        {
+          "step": 50,
+          "event": "p2_checkpoint",
+          "intra_last10_mean": 3.381
+        },
+        {
+          "step": 55,
+          "event": "p2_checkpoint",
+          "intra_last10_mean": 3.19
+        },
+        {
+          "step": 60,
+          "event": "p2_checkpoint",
+          "intra_last10_mean": 3.103
+        },
+        {
+          "step": 65,
+          "event": "p2_checkpoint",
+          "intra_last10_mean": 3.055
+        },
+        {
+          "step": 70,
+          "event": "p2_checkpoint",
+          "intra_last10_mean": 2.907
+        },
+        {
+          "step": 70,
+          "event": "phase3 (folded intra 2.91)",
+          "weights": {
+            "intra_contact": 0.5,
+            "inter_contact": 0.5,
+            "glob": 0.2,
+            "epitope": 0.5
+          }
+        }
+      ],
+      "n_calls": 150
+    },
+    "elapsed_s": 494.6,
+    "seq_health": {
+      "entropy": 3.05,
+      "max_homopolymer": 7,
+      "top2_aa_frac": 0.43
+    },
+    "plddt_profile": {
+      "A": {
+        "n": 115,
+        "mean": 95.0,
+        "min": 83.9
+      },
+      "B": {
+        "n": 118,
+        "mean": 90.0,
+        "min": 47.2
+      },
+      "C": {
+        "n": 120,
+        "mean": 72.3,
+        "min": 28.6
+      }
+    },
+    "hotspot_contacts": {
+      "B:S30": {
+        "found": true,
+        "min_cb": 28.3,
+        "n12": 0,
+        "n8": 0
+      },
+      "A:S100": {
+        "found": true,
+        "min_cb": 30.8,
+        "n12": 0,
+        "n8": 0
+      }
+    },
+    "traj": {
+      "intra_contact_loss": {
+        "first5": 4.06,
+        "last5": 2.544,
+        "min": 1.879
+      },
+      "inter_contact_loss": {
+        "first5": 4.666,
+        "last5": 3.823,
+        "min": 2.272
+      },
+      "epitope_loss": {
+        "first5": 2.214,
+        "last5": 1.224,
+        "min": 0.022
+      },
+      "glob_loss": {
+        "first5": 1.338,
+        "last5": -0.061,
+        "min": -0.234
+      },
+      "plm_loss": {
+        "first5": 3.094,
+        "last5": 2.017,
+        "min": 1.758
+      },
+      "corr_epitope_vs_inter": 0.958
+    }
+  }
+}

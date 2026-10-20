@@ -40,7 +40,7 @@
     "higher": true
   },
   "Average_i_pTM": {
-    "threshold": 0.5,
+    "threshold": 0.4,
     "higher": true
   },
   "1_i_pTM": {

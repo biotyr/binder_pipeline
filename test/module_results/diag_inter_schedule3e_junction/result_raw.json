@@ -1,0 +1,32 @@
+{
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.6462292075157166,
+  "ptm": 0.7305113077163696,
+  "proxy": 0.5588881191564267,
+  "binder_sequence": "PPPPPPPPPPPPLRSLLRLLRRLFRLLRALFDQLESLVQRLLKALARNSKDPKEALKMARKMQKLMSRIRAFFFLARILLGRAGGGGGGGGLRRLRRLLRRLLALMKKLLRQIERLMNRFFSRAVRRKLRRKFRKLFRELRRVLRSILRQLRRLLGGG",
+  "scheduler": {
+    "final_phase": 1,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 2.696
+      },
+      {
+        "step": 35,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 2.594
+      },
+      {
+        "step": 35,
+        "event": "stay_phase1"
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 604.0
+}

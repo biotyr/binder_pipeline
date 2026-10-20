@@ -1,0 +1,79 @@
+/home/taoyr/anaconda3/envs/esmbind/lib/python3.12/site-packages/transformer_engine/__init__.py:59: RuntimeWarning: Detected a Jax installation but could not find the shared object file for the Transformer Engine Jax extension library. If this is not intentional, please reinstall Transformer Engine with `pip install transformer_engine[jax]` or build from source with `NVTE_FRAMEWORK=jax`.
+  warnings.warn(
+┌───────────────────────────────────────────────────────────────────────────────┐
+│                                  PyRosetta-4                                  │
+│               Created in JHU by Sergey Lyskov and PyRosetta Team              │
+│               (C) Copyright Rosetta Commons Member Institutions               │
+│                                                                               │
+│ NOTE: USE OF PyRosetta FOR COMMERCIAL PURPOSES REQUIRES PURCHASE OF A LICENSE │
+│          See LICENSE.PyRosetta.md or email license@uw.edu for details         │
+└───────────────────────────────────────────────────────────────────────────────┘
+PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serialization 2026.29+releasequarterly.80a0635615099e1b918474a63acba7b1de6fd107 2026-07-14T16:24:11] retrieved from: http://www.pyrosetta.org
+🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 80.92it/s]
+`torch_dtype` is deprecated! Use `dtype` instead!
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 78.40it/s]
+[sched3] 模型加载 9s; 臂 ii 三阶段调度, hotspots=['B:S30', 'A:S100']
+2026-10-14 12:09:53,827 INFO: inter_loss_mode='hotspot_neighborhood': 23/233 target residues selected for the inter loss domain (hotspots ['B:S30', 'A:S100']).
+2026-10-14 12:09:58,483 INFO:   step   0  |  intra_contact_loss=4.5687  inter_contact_loss=4.9478  glob_loss=1.4101  epitope_loss=2.1437  total_loss=9.1747  plm_loss=3.0625  time=4.6534  peak_allocated_gib=20.8216  peak_reserved_gib=21.6406  T=0.9999
+2026-10-14 12:10:16,911 INFO:   step   5  |  intra_contact_loss=4.0393  inter_contact_loss=4.4480  glob_loss=2.1051  epitope_loss=1.5187  total_loss=8.8303  plm_loss=3.4062  time=3.6853  peak_allocated_gib=20.8539  peak_reserved_gib=21.7871  T=0.9961
+2026-10-14 12:10:35,399 INFO:   step  10  |  intra_contact_loss=4.7989  inter_contact_loss=3.8807  glob_loss=2.0776  epitope_loss=0.8703  total_loss=9.3155  plm_loss=4.1250  time=3.7019  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.9869
+2026-10-14 12:10:53,949 INFO:   step  15  |  intra_contact_loss=4.8132  inter_contact_loss=3.7530  glob_loss=2.1865  epitope_loss=0.6313  total_loss=9.3172  plm_loss=4.2812  time=3.7129  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.9725
+2026-10-14 12:11:12,652 INFO:   step  20  |  intra_contact_loss=4.7886  inter_contact_loss=3.5878  glob_loss=2.1639  epitope_loss=0.5352  total_loss=9.1698  plm_loss=4.2812  time=3.7161  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.9529
+Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
+[sched3] 步 25 P1检查点: intra_last5=4.463 (阈值 3.8)
+[sched3] 步 25: → Phase 2 (intra plateau 4.46) weights={'inter_contact': 0.2, 'epitope': 0.25}
+2026-10-14 12:11:31,255 INFO:   step  25  |  intra_contact_loss=4.1883  inter_contact_loss=2.8851  glob_loss=2.1519  epitope_loss=0.1938  total_loss=8.5639  plm_loss=4.5000  time=3.7209  peak_allocated_gib=20.8532  peak_reserved_gib=21.7871  T=0.9284
+2026-10-14 12:11:49,877 INFO:   step  30  |  intra_contact_loss=4.2384  inter_contact_loss=3.3242  glob_loss=2.1144  epitope_loss=0.3836  total_loss=7.9278  plm_loss=4.6250  time=3.7232  peak_allocated_gib=20.8532  peak_reserved_gib=21.7871  T=0.8993
+2026-10-14 12:12:08,782 INFO:   step  35  |  intra_contact_loss=4.3339  inter_contact_loss=2.1501  glob_loss=2.1576  epitope_loss=0.1379  total_loss=7.5317  plm_loss=4.4688  time=4.0054  peak_allocated_gib=20.8532  peak_reserved_gib=21.7871  T=0.8658
+2026-10-14 12:12:27,415 INFO:   step  40  |  intra_contact_loss=4.0894  inter_contact_loss=2.7714  glob_loss=2.0655  epitope_loss=0.1545  total_loss=7.5507  plm_loss=4.5000  time=3.7278  peak_allocated_gib=20.8532  peak_reserved_gib=21.7871  T=0.8284
+2026-10-14 12:12:46,050 INFO:   step  45  |  intra_contact_loss=4.0240  inter_contact_loss=2.1836  glob_loss=2.0562  epitope_loss=0.1574  total_loss=7.3681  plm_loss=4.4688  time=3.7261  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.7875
+[sched3] 步 50 P2检查点: intra_last10=4.353 (阈值 3.0)
+2026-10-14 12:13:04,694 INFO:   step  50  |  intra_contact_loss=3.9106  inter_contact_loss=2.3505  glob_loss=2.0762  epitope_loss=0.1564  total_loss=7.5360  plm_loss=4.6562  time=3.7270  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.7435
+[sched3] 步 55 P2检查点: intra_last10=4.463 (阈值 3.0)
+2026-10-14 12:13:23,458 INFO:   step  55  |  intra_contact_loss=4.7180  inter_contact_loss=3.8960  glob_loss=2.0674  epitope_loss=0.9281  total_loss=8.2524  plm_loss=4.4688  time=3.8416  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.6968
+[sched3] 步 60 P2检查点: intra_last10=4.580 (阈值 3.0)
+2026-10-14 12:13:42,107 INFO:   step  60  |  intra_contact_loss=3.9036  inter_contact_loss=4.7502  glob_loss=2.1193  epitope_loss=3.0687  total_loss=8.6554  plm_loss=4.5625  time=3.7277  peak_allocated_gib=20.8533  peak_reserved_gib=21.7871  T=0.6481
+[sched3] 步 65 P2检查点: intra_last10=4.327 (阈值 3.0)
+2026-10-14 12:14:00,756 INFO:   step  65  |  intra_contact_loss=3.8205  inter_contact_loss=2.1363  glob_loss=2.0831  epitope_loss=0.1360  total_loss=7.0381  plm_loss=4.2500  time=3.7294  peak_allocated_gib=20.8539  peak_reserved_gib=21.7871  T=0.5978
+[sched3] 步 70 P2检查点: intra_last10=4.302 (阈值 3.0)
+2026-10-14 12:14:19,410 INFO:   step  70  |  intra_contact_loss=4.6560  inter_contact_loss=3.7314  glob_loss=2.1600  epitope_loss=0.8000  total_loss=8.1750  plm_loss=4.4688  time=3.7293  peak_allocated_gib=20.8539  peak_reserved_gib=21.7871  T=0.5464
+[sched3] 步 75 P2检查点: intra_last10=4.310 (阈值 3.0)
+2026-10-14 12:14:38,175 INFO:   step  75  |  intra_contact_loss=3.5662  inter_contact_loss=2.0084  glob_loss=2.1516  epitope_loss=0.0656  total_loss=7.0065  plm_loss=4.3750  time=3.7246  peak_allocated_gib=20.8540  peak_reserved_gib=21.7871  T=0.4946
+[sched3] 步 80 P2检查点: intra_last10=4.016 (阈值 3.0)
+2026-10-14 12:14:56,825 INFO:   step  80  |  intra_contact_loss=3.1573  inter_contact_loss=1.9919  glob_loss=2.1883  epitope_loss=0.0648  total_loss=7.0559  plm_loss=4.6250  time=3.7281  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.4430
+[sched3] 步 85 P2检查点: intra_last10=4.009 (阈值 3.0)
+2026-10-14 12:15:15,478 INFO:   step  85  |  intra_contact_loss=4.6908  inter_contact_loss=4.1776  glob_loss=2.2875  epitope_loss=1.3000  total_loss=8.4322  plm_loss=4.4688  time=3.7275  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.3920
+[sched3] 步 90 P2检查点: intra_last10=4.283 (阈值 3.0)
+2026-10-14 12:15:34,139 INFO:   step  90  |  intra_contact_loss=4.7647  inter_contact_loss=2.3623  glob_loss=2.5427  epitope_loss=0.1966  total_loss=7.6312  plm_loss=4.2188  time=3.7315  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.3422
+[sched3] 步 95 P2检查点: intra_last10=4.348 (阈值 3.0)
+2026-10-14 12:15:52,909 INFO:   step  95  |  intra_contact_loss=4.7513  inter_contact_loss=3.2101  glob_loss=2.4973  epitope_loss=0.3406  total_loss=7.6335  plm_loss=4.0312  time=3.8445  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.2942
+[sched3] 步 100 P2检查点: intra_last10=4.129 (阈值 3.0)
+2026-10-14 12:16:11,566 INFO:   step 100  |  intra_contact_loss=4.6775  inter_contact_loss=2.2412  glob_loss=2.5564  epitope_loss=0.1856  total_loss=7.3290  plm_loss=3.9844  time=3.7294  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.2486
+[sched3] 步 105 P2检查点: intra_last10=4.154 (阈值 3.0)
+2026-10-14 12:16:30,221 INFO:   step 105  |  intra_contact_loss=3.7296  inter_contact_loss=2.0931  glob_loss=2.2560  epitope_loss=0.1137  total_loss=6.0130  plm_loss=3.2500  time=3.7282  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.2057
+[sched3] 步 110 P2检查点: intra_last10=4.146 (阈值 3.0)
+2026-10-14 12:16:48,876 INFO:   step 110  |  intra_contact_loss=3.5030  inter_contact_loss=2.0470  glob_loss=2.2368  epitope_loss=0.0559  total_loss=5.5597  plm_loss=2.9375  time=3.7289  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.1661
+[sched3] 步 115 P2检查点: intra_last10=4.086 (阈值 3.0)
+2026-10-14 12:17:07,646 INFO:   step 115  |  intra_contact_loss=3.6579  inter_contact_loss=2.3428  glob_loss=2.2542  epitope_loss=0.0921  total_loss=4.5058  plm_loss=1.7344  time=3.7256  peak_allocated_gib=20.8541  peak_reserved_gib=21.7871  T=0.1303
+[sched3] 步 120 P2检查点: intra_last10=4.066 (阈值 3.0)
+2026-10-14 12:17:26,302 INFO:   step 120  |  intra_contact_loss=4.2239  inter_contact_loss=3.0302  glob_loss=2.5238  epitope_loss=0.1906  total_loss=5.0126  plm_loss=1.7422  time=3.7318  peak_allocated_gib=20.8542  peak_reserved_gib=21.7871  T=0.0985
+[sched3] 步 125 P2检查点: intra_last10=3.928 (阈值 3.0)
+2026-10-14 12:17:44,961 INFO:   step 125  |  intra_contact_loss=3.6860  inter_contact_loss=3.2357  glob_loss=2.4919  epitope_loss=0.4312  total_loss=4.2760  plm_loss=1.1797  time=3.7297  peak_allocated_gib=20.8542  peak_reserved_gib=21.7871  T=0.0712
+[sched3] 步 130 P2检查点: intra_last10=3.648 (阈值 3.0)
+2026-10-14 12:18:04,674 INFO:   step 130  |  intra_contact_loss=3.1643  inter_contact_loss=3.8750  glob_loss=2.1681  epitope_loss=0.8469  total_loss=4.0259  plm_loss=1.0234  time=4.7876  peak_allocated_gib=20.8542  peak_reserved_gib=21.7871  T=0.0487
+[sched3] 步 135 P2检查点: intra_last10=3.332 (阈值 3.0)
+2026-10-14 12:18:28,906 INFO:   step 135  |  intra_contact_loss=3.1688  inter_contact_loss=2.3880  glob_loss=2.2493  epitope_loss=0.1022  total_loss=3.7171  plm_loss=1.1797  time=4.7830  peak_allocated_gib=20.8542  peak_reserved_gib=21.7871  T=0.0311
+[sched3] 步 140 P2检查点: intra_last10=3.380 (阈值 3.0)
+2026-10-14 12:18:52,820 INFO:   step 140  |  intra_contact_loss=3.5683  inter_contact_loss=2.7461  glob_loss=2.5571  epitope_loss=0.1766  total_loss=3.7639  plm_loss=0.8750  time=4.7817  peak_allocated_gib=20.8542  peak_reserved_gib=21.7871  T=0.0188
+[sched3] 步 145 P2检查点: intra_last10=3.452 (阈值 3.0)
+2026-10-14 12:19:16,722 INFO:   step 145  |  intra_contact_loss=3.2539  inter_contact_loss=2.2689  glob_loss=2.3038  epitope_loss=0.1140  total_loss=3.6325  plm_loss=1.0625  time=4.7787  peak_allocated_gib=20.8542  peak_reserved_gib=21.7871  T=0.0117
+[Quality] 0/1 Hero Critic PDBs passed quality gate (iPTM≥0.7 [2 target chain(s)], binder=C, pLDDT≥0.7, proxy≥0.5)
+
+[sched3] 门=FAIL iPTM=0.784656822681427 pTM=0.6640037894248962 proxy=0.7238083268592042
+[sched3] 调度事件: [{'step': 25, 'event': 'p1_checkpoint', 'intra_last5_mean': 4.463}, {'step': 25, 'event': 'phase2 (intra plateau 4.46)', 'weights': {'intra_contact': 0.5, 'inter_contact': 0.2, 'glob': 0.2, 'epitope': 0.25}}, {'step': 50, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.353}, {'step': 55, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.463}, {'step': 60, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.58}, {'step': 65, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.327}, {'step': 70, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.302}, {'step': 75, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.31}, {'step': 80, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.016}, {'step': 85, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.009}, {'step': 90, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.283}, {'step': 95, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.348}, {'step': 100, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.129}, {'step': 105, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.154}, {'step': 110, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.146}, {'step': 115, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.086}, {'step': 120, 'event': 'p2_checkpoint', 'intra_last10_mean': 4.066}, {'step': 125, 'event': 'p2_checkpoint', 'intra_last10_mean': 3.928}, {'step': 130, 'event': 'p2_checkpoint', 'intra_last10_mean': 3.648}, {'step': 135, 'event': 'p2_checkpoint', 'intra_last10_mean': 3.332}, {'step': 140, 'event': 'p2_checkpoint', 'intra_last10_mean': 3.38}, {'step': 145, 'event': 'p2_checkpoint', 'intra_last10_mean': 3.452}]
+[sched3] 健康={'entropy': 2.0, 'max_homopolymer': 29, 'top2_aa_frac': 0.77} pLDDT={'A': {'n': 115, 'mean': 95.3, 'min': 85.1}, 'B': {'n': 118, 'mean': 92.2, 'min': 55.1}, 'C': {'n': 158, 'mean': 63.8, 'min': 43.0}}
+[sched3] 热点接触={'B:S30': {'found': True, 'min_cb': 4.9, 'n12': 12, 'n8': 4}, 'A:S100': {'found': True, 'min_cb': 8.2, 'n12': 5, 'n8': 0}}
+[sched3] 轨迹={'intra_contact_loss': {'first5': 4.269, 'last5': 3.429, 'min': 2.955}, 'inter_contact_loss': {'first5': 4.78, 'last5': 3.166, 'min': 1.943}, 'epitope_loss': {'first5': 2.325, 'last5': 0.597, 'min': 0.037}, 'glob_loss': {'first5': 1.594, 'last5': 2.42, 'min': 1.084}, 'plm_loss': {'first5': 3.178, 'last5': 0.987, 'min': 0.723}, 'corr_epitope_vs_inter': 0.851}
+[sched3] 产物 → /home/taoyr/projects/pipeline/test/module_results/diag_inter_schedule3d_junction

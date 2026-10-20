@@ -1,0 +1,165 @@
+{
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.2586214542388916,
+  "ptm": 0.49214091897010803,
+  "proxy": 0.5052393768916678,
+  "binder_sequence": "GGGGGGGLLGLLGLGGGGNNLNNLNNLLNNLLNLLLNNNNNNGKMSWQALLLLQQLRLLMRRLKNNNNNNNNNNNKKLKKQIQSLLQQLLKVLQ",
+  "scheduler": {
+    "final_phase": 3,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.554
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.55 [FORCED])",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.1
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.995
+      },
+      {
+        "step": 55,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.854
+      },
+      {
+        "step": 60,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.678
+      },
+      {
+        "step": 65,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.467
+      },
+      {
+        "step": 70,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.395
+      },
+      {
+        "step": 75,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.316
+      },
+      {
+        "step": 80,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.15
+      },
+      {
+        "step": 85,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 2.965
+      },
+      {
+        "step": 85,
+        "event": "phase3 (folded intra 2.96)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.5,
+          "glob": 0.2,
+          "epitope": 0.5
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 407.5,
+  "seq_health": {
+    "entropy": 2.7,
+    "max_homopolymer": 11,
+    "top2_aa_frac": 0.57
+  },
+  "plddt_profile": {
+    "A": {
+      "n": 115,
+      "mean": 90.0,
+      "min": 67.5
+    },
+    "B": {
+      "n": 118,
+      "mean": 82.2,
+      "min": 44.0
+    },
+    "C": {
+      "n": 94,
+      "mean": 58.3,
+      "min": 15.3
+    }
+  },
+  "hotspot_contacts": {
+    "B:S30": {
+      "found": true,
+      "min_cb": 6.0,
+      "n12": 12,
+      "n8": 2
+    },
+    "A:S100": {
+      "found": true,
+      "min_cb": 4.2,
+      "n12": 13,
+      "n8": 4
+    }
+  },
+  "traj": {
+    "intra_contact_loss": {
+      "first5": 4.591,
+      "last5": 2.449,
+      "min": 2.173
+    },
+    "inter_contact_loss": {
+      "first5": 4.268,
+      "last5": 3.178,
+      "min": 2.643
+    },
+    "epitope_loss": {
+      "first5": 1.421,
+      "last5": 0.409,
+      "min": 0.091
+    },
+    "glob_loss": {
+      "first5": 3.755,
+      "last5": 0.792,
+      "min": 0.669
+    },
+    "plm_loss": {
+      "first5": 3.234,
+      "last5": 1.322,
+      "min": 1.141
+    },
+    "corr_epitope_vs_inter": 0.817
+  },
+  "baselines": {
+    "no_schedule_ii": {
+      "iptm": 0.4434,
+      "binder_plddt": 33.4,
+      "entropy": 2.34,
+      "gate": "FAIL"
+    },
+    "two_phase_ii": {
+      "iptm": 0.4809,
+      "binder_plddt": 48.8,
+      "entropy": 3.02,
+      "gate": "FAIL"
+    },
+    "full_coverage_ii": {
+      "iptm": 0.713,
+      "gate": "PASS"
+    }
+  }
+}

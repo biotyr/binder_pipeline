@@ -15,6 +15,7 @@ pipeline/
 │   ├── PipelineConfig / PipelineResult
 │   ├── compute_selection_score / apply_filters / select_top_n
 │   ├── IntegratedPipeline (6 阶段 run())
+│   ├── _hotspot_contact_check (热点几何核验门, 热点任务 Stage-2 附加闸)
 │   └── _collect_results / _save_outputs
 │
 ├── run_modal.py                           ← Modal 远程部署适配器
@@ -28,6 +29,9 @@ pipeline/
 │   │                                        - pdb_with_quality_remarks() 将 iPTM/pTM
 │   │                                          嵌入 PDB REMARK 250 记录
 │   │                                        - critic_results["annotated_pdb"] 直接可用
+│   │                                        - inter loss 双分支 (full_coverage /
+│   │                                          hotspot_neighborhood) + fold-rescue
+│   │                                          三阶段调度 (见「热点引导设计」)
 │   └── binder_design.ipynb                ← 上游 Modal 教程 notebook (sweep → 收集
 │                                            → 选序参考实现)
 │
@@ -71,7 +75,10 @@ Stage 1: ESMFold2Design.load()
   ├─ inversion_models (×2)  → 仅用于 150 步 SGD 设计
   ├─ hf_critic_models (×4)  → Hero Critic 评分 + 后续 Stage 4 复用
   ├─ esmc_model              → 仅用于 pseudoperplexity 正则化
-  └─ scaling_critics (×15)  → 逐个加载/评分/删除, 不常驻
+  └─ scaling_critics (×15)  → pipeline 默认关闭 (core.py 传
+                              use_scaling_critics=False: base6B 组各自整载
+                              6B 主干, 瞬态峰 ~+25GB/critic, 4090 不可容),
+                              仅 H100 诊断路径; 启用时逐个加载/评分/删除
 
 Stage 1 完成后:
   → del inversion_models, del esmc_model   ← 回收 ~30GB
@@ -107,9 +114,10 @@ Stage 4: RefoldScreen
 Stage 1: ESMFold2 梯度设计 (esmcp)
 ═══════════════════════════════════════════════════════════════
   target sequence + minibinder(#*N)
-    → Inversion Models (150步 SGD, distogram熵 + ESMC正则)
+    → Inversion Models (150步 SGD, distogram熵 + ESMC正则; 热点任务 inter
+      loss 默认走热点邻域分支, 可选 fold-rescue 调度, 见「热点引导设计」)
     → 余弦温度退火 (T: 1.0 → 1e-2)
-    → Scaling Critics (1步扩散, distogram_iptm_proxy 粗筛)
+    → Scaling Critics (1步扩散, distogram_iptm_proxy 粗筛; pipeline 默认关闭)
     → Hero Critics (200步扩散, iPTM + 全原子坐标)
     → 输出: critic_results + esm_design 实例 (模型引用保留)
     → 释放 inversion_models + esmc_model (~30GB)
@@ -119,11 +127,14 @@ Stage 2: 质量预过滤 (inverse_optimize/quality_filter.py)
 ═══════════════════════════════════════════════════════════════
   Hero Critic PDB (REMARK 250 含 iPTM/pTM/distogram binding confidence,
                    B-factor 含 pLDDT)
-    → 解析 REMARK → iPTM 阈值按 target 链数选择 (单链 0.50 / 多链 0.70)
+    → 解析 REMARK → 界面置信度阈值按 target 链数选择
+      (pair_chains_iptm: 单链 0.50 / 多链 0.40, 2026/10/19 定标)
     → 界面级闸门: distogram binding confidence ≥ 0.50
       (纯 binder×target 界面熵, 无 target-target 稀释)
     → B-factor 均值 (binder 链 CA, 链名从 designed_sequence 推导) → pLDDT ≥ 0.70?
     → cKDTree CA clash → clash == 0?
+    → 热点任务追加几何核验: 每热点 min binder Cβ ≤10Å ∧ 12Å 内 binder
+      残基 ≥3 (质量门不度量热点 honoring, 2026/10/14 新增)
     → 输出: quality_passed (list[dict])
               │
               ▼
@@ -171,7 +182,8 @@ Stage 5: Rosetta 物理评分 (bindcraft_filter/), 可选
 Stage 6: 过滤 & 排序 (core.py)
 ═══════════════════════════════════════════════════════════════
   汇总所有 PipelineResult
-    → compute_selection_score()         ← 0.5×norm(iPTM) + 0.5×norm(proxy)
+    → compute_selection_score()         ← 0.5×norm(界面置信度) + 0.5×norm(proxy)
+                                          (界面置信度 = pair_chains_iptm, 默认)
     → check_filters()                   ← BindCraft 二元阈值 (PASSED/FAILED)
     → pI < 6.0                          ← minibinder 等电点筛选
     → select_top_n(N=84)                ← 每 (target, binder) 组择优
@@ -182,7 +194,7 @@ Stage 6: 过滤 & 排序 (core.py)
 
 | 维度 | ESMFold2 原生 | MPNN 逆折叠 | BindCraft 物理 |
 |------|:-----------:|:---------:|:------------:|
-| 界面置信度 | iPTM | — | — |
+| 界面置信度 | pair_chains_iptm (默认; 全局 iPTM 备选) | — | — |
 | 全局折叠置信度 | pTM | — | — |
 | 局部置信度 | pLDDT (B-factor) | — | — |
 | Distogram 结合 | distogram_iptm_proxy | — | — |
@@ -223,6 +235,87 @@ Pipeline 本体不解析 FASTA: `run()` 接受 `|` 拼接的序列串, 原始链
 对齐由调用方保证: 原始链名 → 重置链名的映射 = 传入时链的排列顺序。`test/e2e/run_e2e.py` 按 FASTA header 的 Chain 字母经 `chain_order` **显式排序**后拼接, 因此两个测试靶 (3RRQ 单链 A; 4ZQK 双链 A=PD-L1, B=PD-1) 重置前后链名一致, 4/4 热点残基字母核对通过。注意 4ZQK FASTA 中 B 链记录排在 A 链之前 —— 若按文件顺序拼接会使 B→A 错位, `chain_order` 显式排序即为规避。
 
 两个校验护栏: ① hotspot 残基字母必须与该位置序列字母一致, 错位时立即暴露; ② 残基编号是去 X 后序列的链内 1-indexed 位置。
+
+## 热点引导设计 (2026-10 源码化)
+
+背景: 双链靶上 inter contact loss 的"全覆盖"语义 (对全部 target 残基平均)
+与 epitope loss 的"局域钉扎"存在结构性冲突 (4ZQK 实证: 交界边缘热点 w0.5 →
+退化解; 非界面热点 → 弃热点保界面; 单链靶 3RRQ 无此冲突)。2026-10-12/14
+以下三项入正式源码; **不指定热点时默认行为逐位不变**。
+
+### 1. inter loss 双分支 — `inter_loss_mode: str | None = None` (run/design 参数)
+
+- `None` (默认 auto): 指定热点 → `"hotspot_neighborhood"`, 无热点 →
+  `"full_coverage"`。**语义变更 (2026-10-14 拍板): 热点任务自此默认走邻域
+  分支** (无论入口是否显式传参)。
+- `"hotspot_neighborhood"`: inter loss 的平均域从全部 target 残基收窄为
+  热点邻域可及残基。mask 在优化前由一次**纯 target 折叠** (无占位 binder,
+  mask 是 target 的纯函数, 不随 binder 长度/组成波动) 的 distogram 计算:
+  近热点 (到任一热点的期望距离 < 15Å) ∧ 可及 (10Å 接触数 burial proxy
+  低于 target 内 q0.5 分位, |i-j|<2 的配对不计), 强制含热点; 存活 < 10
+  残基时回退全覆盖并告警。loss 引擎与 cutoffs 与全覆盖一致 (k=1, 22Å)。
+  晶体校准 (4ZQK): mask vs 晶体接触数 Spearman 0.932 / vs DSSP RSA
+  −0.836; R=10-12Å 与晶体真值一致性最高。
+- `"full_coverage"`: 原路径, 对热点任务显式回退旧行为。
+
+阈值常量 `INTER_*` (esmcp/binder_design.py) 为 provisional defaults。
+
+### 2. fold-rescue 三阶段权重调度 — `fold_rescue_schedule: bool = False`
+
+仅限热点设计模式 (无热点时 ValueError)。P1 原生权重起步; 步 25/35 检查点
+发现 intra last5 均值 > 3.8 (折叠横盘) → P2 折叠挽救 (inter/epitope 降至
+0.1/0.1); 步 ≥50 起每 5 步检查, intra last10 均值 < 3.0 → P3 界面精修
+(恢复 0.5/0.5)。相位转移只改损失权重, 其余一切不动; 事件流写入
+`critic_results["fold_rescue_events"]`。参数常量 `FOLD_RESCUE_*`。
+
+### 3. 热点几何核验门 — `IntegratedPipeline._hotspot_contact_check`
+
+质量门 (iPTM/pLDDT/proxy) 不度量热点 honoring —— iPTM 0.78 的设计可对热点
+28-30Å 零接触而全线过门 (多 seed 实证)。指定热点且 `run()` 传入
+`target_sequence` 时自动启用: hero 结构中**每个**热点要求最近 binder Cβ
+(gly 用 CA) ≤10Å 且 12Å 内 binder 残基 ≥3; 核验失败进 `quality_failed`,
+条目携带 `hotspot_check` detail。PDB 为复合体顺序编号, 热点按链内序号 +
+前序靶链长度换算定位, 残基字母不符时 ±2 容差找回。注意: preset target 名
+(不传序列) 时该门不生效。
+
+### 入口
+
+| 入口 | 新参数 |
+|------|--------|
+| Python API | `IntegratedPipeline.run(..., inter_loss_mode=..., fold_rescue_schedule=...)` |
+| e2e runner | `test/e2e/run_e2e.py --inter-loss-mode {auto,full_coverage,hotspot_neighborhood}` (默认 auto) + `--fold-rescue-schedule` |
+| `run_local.py` / `run_modal.py` | 未暴露新参数; 热点任务自动走 ①③ 默认, 需显式控制时用 Python API |
+
+## 置信度指标: binder-target pair ipTM (2026-10-19 切换默认)
+
+Stage-2 质量门与 Stage-6 过滤/排序的界面置信度槽位已从全局 ipTM 切换为
+**pair_chains_iptm** —— ESMFold2 confidence head 的链对子块 TM 均值
+(`pair_chains_iptm[target][binder]`), 多链 target 按**残基加权合并**:
+
+```
+merged = Σᵢ Lᵢ·pair[tᵢ][binder] / Σᵢ Lᵢ   ≡  binder×(全部 target) 子块均值
+```
+
+- **方向 t2b**: PAE 语义为"行=对齐参考、列=误差对象", `[target][binder]`
+  即**固定 target 正确、评估 binder 的位置置信度** —— binder 质量的定义。
+  反方向 b2t 仅写入 REMARK/结果 dict 作诊断, 不进任何消费路径。
+- **修复的缺陷**: 全局 ipTM 混入 target-target 链间置信度 (native 界面
+  预测极好 → 虚高)。实证: 退化"包裹型"设计全局 iPTM 0.888 (全场第二),
+  pair 值仅 0.255 —— 膨胀被精确剥离。
+- **语义边界**: 这是**组装置信度** (复合体是否良定), 不是接触度量 ——
+  未结合链经 target 内部界面传递置信度仍中高, 属合法贡献。接触意图
+  (热点 honoring) 由热点几何核验门另行承担, 两门各司其职。
+- **定标** (diag_pair_iptm_replay, 8 真实产物 hero 200 步重折):
+  真解多链 0.487-0.684 / 真解单链 0.563-0.586 / 退化样本 ≤0.255 →
+  阈值 `quality_min_iptm_multi` 0.70→**0.40** (分离区间 (0.26, 0.49)
+  取中), `quality_min_iptm_single` 0.50 (沿用, 真解留 0.06 边际),
+  `Average_i_pTM` 槽 0.5→**0.4**。块均值系统性低于旧全局值 (-0.2~-0.3),
+  新旧数值不可混比。
+- **开关**: `PipelineConfig.iptm_metric` (`"pair_chains"` 默认 /
+  `"global"` 旧行为, 过渡诊断用); e2e/run_local 经
+  `--iptm-metric {pair_chains,global}`。REMARK 250 键:
+  `pair_chains_iptm` (被门消费) / `pair_chains_iptm_b2t` (诊断) /
+  `pair_chains_iptm_chains` (逐链人类可读)。
 
 ## 快速使用
 
@@ -285,6 +378,15 @@ result = pipeline.run(target_name="pd-l1", binder_name="minibinder", seed=42)
 
 for r in result["selected"][:5]:
     print(f"{r.selection_score:.4f}  {r.binder_sequence[:30]}...")
+
+# 热点引导: 热点任务自动走邻域 inter 分支 + Stage-2 热点几何门 (需传序列)
+result = pipeline.run(
+    target_name="my_complex", binder_name="minibinder", seed=42,
+    target_sequence="SEQ1|SEQ2",
+    target_hotspot_ids=["A:K32", "B:D45"],
+    # inter_loss_mode="full_coverage",   # 显式回退全覆盖旧行为
+    # fold_rescue_schedule=True,        # 三阶段折叠挽救调度 (热点模式专用)
+)
 ```
 
 ```python
@@ -405,3 +507,7 @@ hero_results, _ = screen.run([d["sequence"] for d in designs])
 ### 7. Scaling Critic 模型选择可配置化
 
 当前 Stage 4 使用硬编码的 `ESMFold2-Experimental-Fast-base300M-step1500k` 作为 scaling critic。不同靶点/场景可能受益于不同规模（300M/600M/6B）或不同训练步数（250k/500k/.../1500k）的 checkpoint。可将其暴露为 `PipelineConfig.scaling_critic_name` 选项（Hero Critic 已通过 `PipelineConfig.hero_critic_names` 支持多模型选择）。
+
+### 8. 热点分支阈值校准与多 seed 复核
+
+`INTER_*` 邻域阈值与 `FOLD_RESCUE_*` 调度参数按 4ZQK 校准 (provisional defaults), 换靶需复核。Stage-1 单轮对比受运行彩票支配 (同配置同 seed 两次运行 iPTM 相差可达 ±0.09, inductor autotune 按计时选 kernel → bf16 数值微差被大步长 SGD 放大), 热点任务结论应多 seed 验证; 过程量 (proxy loss 轨迹) 与真实质量可脱钩, 以 hero 事后判别 (iPTM/pLDDT/热点几何) 为准。

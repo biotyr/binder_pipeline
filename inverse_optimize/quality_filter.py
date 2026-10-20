@@ -46,6 +46,11 @@ class QualityFilterConfig:
         最低 iPTM (interface TM-score), 默认 0.50。
     min_ptm : float | None
         最低 pTM (global TM-score), None 表示不检查。
+    min_pair_chains_iptm : float | None
+        最低 binder-target pair ipTM (REMARK 键 ``pair_chains_iptm``,
+        t2b 方向残基加权合并值, 2026/10/19 新增), None 表示不检查。
+        与 ``min_iptm`` 互为指标源开关的两翼 —— core.py 按
+        ``PipelineConfig.iptm_metric`` 只给其中之一喂阈值。
     min_binder_plddt : float | None
         Binder 链 CA 原子平均 pLDDT 下限, None 表示不检查。
     min_distogram_binding_confidence : float | None
@@ -61,6 +66,9 @@ class QualityFilterConfig:
 
     min_iptm: float = 0.50
     min_ptm: float | None = None
+    ##### claude 2026/10/19 start #####
+    min_pair_chains_iptm: float | None = None
+    ##### claude 2026/10/19 end #####
     min_binder_plddt: float | None = 0.70
     min_distogram_binding_confidence: float | None = None
     max_ca_clashes: int = 0
@@ -84,23 +92,34 @@ def _parse_remarks(pdb_path: str) -> dict[str, float | None]:
         REMARK 250  iPTM=0.7532
         REMARK 250  pTM=0.8210
         REMARK 250  distogram_binding_confidence=0.6815
+        REMARK 250  pair_chains_iptm=0.6123
+        REMARK 250  pair_chains_iptm_b2t=0.5891
 
     Returns
     -------
     dict
         {"iptm": float|None, "ptm": float|None,
-         "distogram_binding_confidence": float|None}
+         "distogram_binding_confidence": float|None,
+         "pair_chains_iptm": float|None, "pair_chains_iptm_b2t": float|None}
     """
     metrics: dict[str, float | None] = {
         "iptm": None,
         "ptm": None,
         "distogram_binding_confidence": None,
+        ##### claude 2026/10/19 start #####
+        "pair_chains_iptm": None,
+        "pair_chains_iptm_b2t": None,
+        ##### claude 2026/10/19 end #####
     }
     # Map REMARK key to dict key
     key_map = {
         "iPTM": "iptm",
         "pTM": "ptm",
         "distogram_binding_confidence": "distogram_binding_confidence",
+        ##### claude 2026/10/19 start #####
+        "pair_chains_iptm": "pair_chains_iptm",
+        "pair_chains_iptm_b2t": "pair_chains_iptm_b2t",
+        ##### claude 2026/10/19 end #####
     }
 
     with open(pdb_path, "r") as fh:
@@ -265,6 +284,8 @@ def filter_pdb_by_quality(
         - "ptm": float|None — 解析到的 pTM
         - "binder_plddt": float — binder 链 CA 平均 pLDDT
         - "distogram_binding_confidence": float|None
+        - "pair_chains_iptm": float|None — binder-target pair ipTM (t2b 合并)
+        - "pair_chains_iptm_b2t": float|None — 反方向合并值 (仅诊断)
         - "ca_clashes": int — CA 冲突数
         - "reasons": list[str] — 未通过的原因 (pass 时为空)
     """
@@ -287,6 +308,10 @@ def filter_pdb_by_quality(
             "ptm": None,
             "binder_plddt": 0.0,
             "distogram_binding_confidence": None,
+            ##### claude 2026/10/19 start #####
+            "pair_chains_iptm": None,
+            "pair_chains_iptm_b2t": None,
+            ##### claude 2026/10/19 end #####
             "ca_clashes": -1,
             "reasons": [f"PDB file not found: {pdb_path}"],
         }
@@ -296,6 +321,9 @@ def filter_pdb_by_quality(
     iptm = remarks["iptm"]
     ptm = remarks["ptm"]
     dist_binding_conf = remarks["distogram_binding_confidence"]
+    ##### claude 2026/10/19 start #####
+    pair_iptm = remarks["pair_chains_iptm"]
+    ##### claude 2026/10/19 end #####
 
     # 2. Check iPTM
     if config.min_iptm is not None:
@@ -307,6 +335,22 @@ def filter_pdb_by_quality(
             reasons.append(
                 f"iPTM={iptm:.4f} < {config.min_iptm:.2f}"
             )
+
+    ##### claude 2026/10/19 start #####
+    # 2b. Binder-target pair ipTM (t2b 残基加权合并值; 与 min_iptm 互为
+    # 指标源开关, core.py 按 PipelineConfig.iptm_metric 二选一喂阈值)。
+    if config.min_pair_chains_iptm is not None:
+        if pair_iptm is None:
+            reasons.append(
+                "pair_chains_iptm not found in REMARK records "
+                f"(need {config.min_pair_chains_iptm:.2f})"
+            )
+        elif pair_iptm < config.min_pair_chains_iptm:
+            reasons.append(
+                f"pair_chains_iptm={pair_iptm:.4f} "
+                f"< {config.min_pair_chains_iptm:.2f}"
+            )
+    ##### claude 2026/10/19 end #####
 
     # 3. Check pTM
     if config.min_ptm is not None:
@@ -364,6 +408,10 @@ def filter_pdb_by_quality(
         "ptm": ptm,
         "binder_plddt": binder_plddt,
         "distogram_binding_confidence": dist_binding_conf,
+        ##### claude 2026/10/19 start #####
+        "pair_chains_iptm": pair_iptm,
+        "pair_chains_iptm_b2t": remarks["pair_chains_iptm_b2t"],
+        ##### claude 2026/10/19 end #####
         "ca_clashes": ca_clashes,
         "reasons": reasons,
     }

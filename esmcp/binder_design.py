@@ -106,6 +106,22 @@ INTER_BURIAL_CONTACT_DISTANCE = 10.0  # Å: distogram cutoff of the contact-numb
 INTER_BURIAL_QUANTILE = 0.5           # burial quantile below which a residue counts as accessible
 INTER_BURIAL_MIN_SEP = 2              # sequence pairs closer than this are excluded from burial
 INTER_NEIGHBORHOOD_MIN_SIZE = 10      # fewer selected residues: fall back to full coverage
+# Fold-rescue phase schedule (hotspot designs only; opt-in via
+# ``fold_rescue_schedule=True``). Phase 1 runs the native LOSS_WEIGHTS; if
+# binder folding stalls (intra contact-loss plateau at the checkpoint steps),
+# phase 2 hands the optimization to folding with residual hotspot anchoring;
+# once folding completes (intra mean below the phase-3 threshold), phase 3
+# restores full hotspot weights for rigid-body interface refinement. Phase
+# transitions only shift loss weights — everything else is untouched.
+# Calibrated on 4ZQK junction pairs (2026-10): P2 rescue 3/3, low P2
+# anchoring avoids the drift fuel of higher anchor weights.
+FOLD_RESCUE_CHECKPOINT_STEPS = (25, 35)   # 0-indexed steps of the P1 plateau check
+FOLD_RESCUE_INTRA_TRIGGER = 3.8           # last-5 mean above this = folding plateau
+FOLD_RESCUE_P2_WEIGHTS = {"inter_contact": 0.1, "epitope": 0.1}
+FOLD_RESCUE_P3_MIN_STEP = 50              # earliest phase-3 evaluation step
+FOLD_RESCUE_P3_WINDOW = 10                # last-N steps averaged for the phase-3 test
+FOLD_RESCUE_P3_INTRA = 3.0                # last-N mean below this = folding complete
+FOLD_RESCUE_P3_WEIGHTS = {"inter_contact": 0.5, "epitope": 0.5}
 LOG_INTERVAL = 5
 LEARNING_RATE = 0.1
 TEMPERATURE_MIN = 1e-2
@@ -644,32 +660,36 @@ def precompute_inter_neighborhood_mask(
 
     Parallel-mode companion to ``inter_loss_mode="hotspot_neighborhood"``:
     wraps :func:`derive_hotspot_neighborhood_mask` (the mask semantics) with
-    the model I/O — a single no-grad fold of ``target + poly-A placeholder``
-    and chain-qualified hotspot resolution. The target sequence does not
-    change during optimization, so this runs ONCE before the design loop and
-    the mask is a constant thereafter.
+    the model I/O — a single no-grad TARGET-ONLY fold and chain-qualified
+    hotspot resolution. 2026-10-14: the placeholder-binder fold was replaced
+    by a target-only fold — the mask must be a pure function of the target;
+    a placeholder binder perturbed the target self-block and made the mask
+    vary with the unknown binder's length/composition (observed 23-28
+    residues for the same target across binder lengths). The target
+    sequence does not change during optimization, so the mask is a constant
+    thereafter.
+
+    ``binder_length`` is only used for hotspot-position bookkeeping (the
+    mask layout mirrors the complex) — the fold itself is binder-free.
 
     Returns a boolean ``(1, T)`` mask over the target residues, or ``None``
     when the neighborhood is degenerately small (caller falls back to the
     full-coverage inter loss).
     """
 
-    # Poly-A placeholder: only the target self-block of the distogram is
-    # consumed, the binder part is irrelevant.
-    dummy_design = torch.zeros(batch_size, binder_length, AA_DIMS, device=device)
-    dummy_design[..., 0] = 1.0
     with torch.no_grad():
         pre_fold = fold_and_get_distogram(
             inversion_model,
             target_sequence,
             target_one_hot,
-            dummy_design,
+            None,
             num_loops=1,
             num_sampling_steps=1,
             calculate_confidence=False,
             seed=seed,
+            include_binder=False,
         )
-    total_target = pre_fold["distogram_logits"].shape[1] - binder_length
+    total_target = pre_fold["distogram_logits"].shape[1]
     assert sum(len(c) for c in target_sequence.split("|")) == total_target
     hotspot_positions = get_epitope_mask(
         target_chains=target_sequence.split("|"),
@@ -691,6 +711,64 @@ def precompute_inter_neighborhood_mask(
     )
 
 
+def update_fold_rescue_schedule(
+    state: dict, weights: dict, step: int, intra_mean: float
+) -> None:
+    """Advance the fold-rescue phase schedule by one optimization step.
+
+    ``state`` is a per-run dict (``call``/``phase``/``intra``/``events``),
+    updated in place together with ``weights`` — the per-run loss-weight
+    overlay consumed by :func:`compute_structure_losses`. Phase semantics:
+    1 = native weights, 2 = fold rescue (FOLD_RESCUE_P2_WEIGHTS), 3 =
+    interface refinement (FOLD_RESCUE_P3_WEIGHTS).
+
+    Call AFTER computing the step's losses, so a phase transition takes
+    effect on the following step (same ordering as the calibrated test
+    scripts). No-op when the schedule already reached phase 3.
+    """
+    state["call"] += 1
+    state["intra"].append(intra_mean)
+    step_idx = state["call"] - 1
+    if state["phase"] == 1 and step_idx in FOLD_RESCUE_CHECKPOINT_STEPS:
+        last5 = state["intra"][-5:]
+        mean5 = sum(last5) / len(last5)
+        state["events"].append({"step": step_idx, "event": "p1_checkpoint",
+                                "intra_last5_mean": round(mean5, 3)})
+        if mean5 > FOLD_RESCUE_INTRA_TRIGGER:
+            state["phase"] = 2
+            weights.update(FOLD_RESCUE_P2_WEIGHTS)
+            state["events"].append({"step": step_idx, "event": "phase2",
+                                    "weights": dict(weights)})
+            logger.info(
+                "fold_rescue: step %d plateau (intra_last5=%.2f>%.1f) -> "
+                "phase 2 weights %s.",
+                step_idx, mean5, FOLD_RESCUE_INTRA_TRIGGER, FOLD_RESCUE_P2_WEIGHTS,
+            )
+        elif step_idx == FOLD_RESCUE_CHECKPOINT_STEPS[-1]:
+            state["events"].append({"step": step_idx, "event": "stay_phase1"})
+            logger.info(
+                "fold_rescue: step %d folding progressing, staying in "
+                "phase 1 for the remaining steps.", step_idx,
+            )
+    elif state["phase"] == 2 and step_idx >= FOLD_RESCUE_P3_MIN_STEP \
+            and step_idx % 5 == 0:
+        last_n = state["intra"][-FOLD_RESCUE_P3_WINDOW:]
+        mean_n = sum(last_n) / len(last_n)
+        state["events"].append({"step": step_idx, "event": "p2_checkpoint",
+                                "intra_last10_mean": round(mean_n, 3)})
+        if mean_n < FOLD_RESCUE_P3_INTRA:
+            state["phase"] = 3
+            weights.update(FOLD_RESCUE_P3_WEIGHTS)
+            state["events"].append({"step": step_idx, "event": "phase3",
+                                    "weights": dict(weights)})
+            logger.info(
+                "fold_rescue: step %d folding complete (intra_last%d=%.2f<%.1f)"
+                " -> phase 3 weights %s.",
+                step_idx, FOLD_RESCUE_P3_WINDOW, mean_n, FOLD_RESCUE_P3_INTRA,
+                FOLD_RESCUE_P3_WEIGHTS,
+            )
+
+
 def compute_structure_losses(
     distogram_logits: torch.Tensor,
     binder_length: int,
@@ -698,6 +776,7 @@ def compute_structure_losses(
     target_hotspot_ids: list[str] | None = None,
     epitope_contact_distance: float = 12.0,
     inter_neighborhood_mask: torch.Tensor | None = None,
+    loss_weights: dict | None = None,
 ) -> dict[str, torch.Tensor]:
     """Compute structural losses and a weighted total.
 
@@ -705,8 +784,13 @@ def compute_structure_losses(
     hotspot-neighborhood parallel mode (see
     :func:`compute_inter_contact_loss_neighborhood`); ``None`` keeps the
     default full-coverage inter loss.
+
+    ``loss_weights`` is an optional per-run overlay for the loss weights
+    (fold-rescue phase schedule); ``None`` uses the module-level
+    ``LOSS_WEIGHTS``.
     """
 
+    weights = loss_weights if loss_weights is not None else LOSS_WEIGHTS
     bin_distance = get_mid_points().to(distogram_logits.device)
     losses: dict[str, torch.Tensor] = {}
     losses["intra_contact_loss"] = compute_intra_contact_loss(
@@ -725,9 +809,9 @@ def compute_structure_losses(
     )
     B = distogram_logits.size(0)
     total = torch.tensor([0.0] * B, device=distogram_logits.device, requires_grad=True)
-    total = total + LOSS_WEIGHTS["intra_contact"] * losses["intra_contact_loss"]
-    total = total + LOSS_WEIGHTS["inter_contact"] * losses["inter_contact_loss"]
-    total = total + LOSS_WEIGHTS["glob"] * losses["glob_loss"]
+    total = total + weights["intra_contact"] * losses["intra_contact_loss"]
+    total = total + weights["inter_contact"] * losses["inter_contact_loss"]
+    total = total + weights["glob"] * losses["glob_loss"]
     if target_hotspot_ids is not None:
         assert (
             target_sequence is not None
@@ -763,7 +847,7 @@ def compute_structure_losses(
             bin_distance=bin_distance,
             epitope_contact_distance=epitope_contact_distance,
         )
-        total = total + LOSS_WEIGHTS["epitope"] * losses["epitope_loss"]
+        total = total + weights["epitope"] * losses["epitope_loss"]
     losses["total_loss"] = total
     return losses
 
@@ -933,23 +1017,35 @@ def fold_and_get_distogram(
     model: ESMFold2ExperimentalModel,
     target_seq: str,
     target_one_hot: torch.Tensor,
-    design: torch.Tensor,
+    design: torch.Tensor | None,
     num_loops: int = 0,
     num_sampling_steps: int = 1,
     calculate_confidence: bool = False,
     seed: int | None = None,
+    include_binder: bool = True,
 ) -> dict:
-    """Prepare inputs, run model forward, return distogram_logits + raw output."""
-    padding = (2, 11)
-    padded_design = F.pad(design, padding, mode="constant", value=0)
+    """Prepare inputs, run model forward, return distogram_logits + raw output.
 
-    # Argmax to get the designed sequence string.
-    token_lists = torch.argmax(padded_design, dim=-1)
-    designed_seq = [
-        [PROTEIN_3TO1[TOKENS[int(tkn.item())]] for tkn in token_list]
-        for token_list in token_lists
-    ]
-    seq_list = [target_seq + "|" + "".join(seq) for seq in designed_seq]
+    ``include_binder=False`` folds the target chains only (``design`` must be
+    ``None``): used by the neighborhood-mask precompute, where the mask must
+    be a pure function of the target — a placeholder binder would perturb the
+    target self-block and make the mask vary with the unknown binder's
+    length/composition.
+    """
+    if include_binder:
+        assert design is not None, "design is required when include_binder=True"
+        padding = (2, 11)
+        padded_design = F.pad(design, padding, mode="constant", value=0)
+
+        # Argmax to get the designed sequence string.
+        token_lists = torch.argmax(padded_design, dim=-1)
+        designed_seq = [
+            [PROTEIN_3TO1[TOKENS[int(tkn.item())]] for tkn in token_list]
+            for token_list in token_lists
+        ]
+        seq_list = [target_seq + "|" + "".join(seq) for seq in designed_seq]
+    else:
+        seq_list = [target_seq]
     max_atoms = None if len(seq_list) == 1 else ((len(seq_list[0]) - 1) * 14) // 32 * 32
 
     inputs_list = []
@@ -972,9 +1068,10 @@ def fold_and_get_distogram(
         key: torch.stack([inp[key] for inp in inputs_list], dim=0).cuda()
         for key in inputs_list[0]
     }
-    inputs["res_type_soft"] = torch.cat(
-        (target_one_hot.repeat(design.size(0), 1, 1), padded_design), dim=1
-    )
+    if include_binder:
+        inputs["res_type_soft"] = torch.cat(
+            (target_one_hot.repeat(design.size(0), 1, 1), padded_design), dim=1
+        )
 
     with seed_context(seed):
         output = model(
@@ -1090,11 +1187,80 @@ def build_complex(
     )
 
 
+##### claude 2026/10/19 start #####
+def merge_pair_chains_iptm(
+    pair_chains_iptm: torch.Tensor,
+    target_chain_lengths: list[int],
+) -> dict:
+    """Merge per-chain-pair ipTM into a binder-quality score (t2b direction).
+
+    ``pair_chains_iptm`` is the ConfidenceHead output (fork
+    ``modeling_esmfold2_experimental.py``), shape ``[B, n_chains, n_chains]``:
+    entry ``[c1, c2]`` is the mean of ``tm_expected`` over the c1×c2 block —
+    "placement confidence of c2 residues given c1 is the alignment reference"
+    (PAE rows = reference, cols = error subject). The consumed direction is
+    therefore **[target][binder] (t2b)**: fix the target, evaluate the binder
+    placement. ``[binder][target]`` (b2t) is returned for diagnostics only.
+
+    Multi-chain targets merge by residue count, which is algebraically the
+    plain mean over the binder×(all targets) block — i.e. the global ipTM
+    block mean restricted to binder-target pairs, removing the target-target
+    pairs that inflate multi-chain iPTM. Weights are the fixed target chain
+    lengths (non-circular: independent of what the binder actually engages).
+
+    Parameters
+    ----------
+    pair_chains_iptm
+        ``[n_chains, n_chains]`` or ``[B, n_chains, n_chains]`` tensor (the
+        first batch element is used in the latter case).
+    target_chain_lengths
+        Residue count per target chain, in ``split("|")`` order.
+
+    Returns
+    -------
+    dict
+        ``{"merged_t2b": float, "merged_b2t": float,
+        "chains": {chain_label: {"t2b": float, "b2t": float}}}``.
+    """
+    n_target = len(target_chain_lengths)
+    binder_idx = n_target  # asym_id convention: targets 0..n-1, binder = n
+    matrix = pair_chains_iptm[0] if pair_chains_iptm.ndim == 3 else pair_chains_iptm
+    assert matrix.shape[0] > binder_idx, (
+        f"pair_chains_iptm has {matrix.shape[0]} chains, expected more than "
+        f"{binder_idx} (target chains + binder)."
+    )
+    chain_labels = [_asym_id_to_chain_label(i) for i in range(matrix.shape[0])]
+    lengths = [float(n) for n in target_chain_lengths]
+    total = float(sum(lengths))
+    merged_t2b = sum(
+        length * float(matrix[t, binder_idx]) for t, length in enumerate(lengths)
+    ) / total
+    merged_b2t = sum(
+        length * float(matrix[binder_idx, t]) for t, length in enumerate(lengths)
+    ) / total
+    chains = {
+        chain_labels[t]: {
+            "t2b": float(matrix[t, binder_idx]),
+            "b2t": float(matrix[binder_idx, t]),
+        }
+        for t in range(n_target)
+    }
+    return {
+        "merged_t2b": merged_t2b,
+        "merged_b2t": merged_b2t,
+        "chains": chains,
+    }
+##### claude 2026/10/19 end #####
+
+
 def pdb_with_quality_remarks(
     pdb_string: str,
     iptm: float | None = None,
     ptm: float | None = None,
     distogram_binding_confidence: float | None = None,
+    pair_chains_iptm: float | None = None,
+    pair_chains_iptm_b2t: float | None = None,
+    pair_chains_iptm_chains: str | None = None,
 ) -> str:
     """Insert REMARK records with predicted quality metrics into a PDB string.
 
@@ -1111,6 +1277,16 @@ def pdb_with_quality_remarks(
         Global predicted TM-score.
     distogram_binding_confidence : float | None
         Distogram-based binding confidence proxy (all Critics).
+    pair_chains_iptm : float | None
+        Binder-target pair ipTM, residue-weighted merge of
+        ``pair_chains_iptm[target][binder]`` (t2b: target as alignment
+        reference, binder placement confidence). Consumed by quality gates.
+    pair_chains_iptm_b2t : float | None
+        Reverse-direction merge (``[binder][target]``) — diagnostics only,
+        never consumed by gates.
+    pair_chains_iptm_chains : str | None
+        Human-readable per-target-chain t2b values, e.g. ``"A:0.5512,B:0.6734"``.
+        Informational; not parsed by ``quality_filter``.
 
     Returns
     -------
@@ -1130,6 +1306,25 @@ def pdb_with_quality_remarks(
             f"REMARK {PDB_QUALITY_REMARK_NUM}  "
             f"distogram_binding_confidence={distogram_binding_confidence:.4f}"
         )
+    ##### claude 2026/10/19 start #####
+    # Binder-target pair ipTM (ConfidenceHead pair_chains_iptm): t2b 合并值
+    # 是 Stage-2/6 置信度门的消费对象; b2t 与逐链值仅诊断记录。
+    if pair_chains_iptm is not None:
+        remarks.append(
+            f"REMARK {PDB_QUALITY_REMARK_NUM}  "
+            f"pair_chains_iptm={pair_chains_iptm:.4f}"
+        )
+    if pair_chains_iptm_b2t is not None:
+        remarks.append(
+            f"REMARK {PDB_QUALITY_REMARK_NUM}  "
+            f"pair_chains_iptm_b2t={pair_chains_iptm_b2t:.4f}"
+        )
+    if pair_chains_iptm_chains is not None:
+        remarks.append(
+            f"REMARK {PDB_QUALITY_REMARK_NUM}  "
+            f"pair_chains_iptm_chains={pair_chains_iptm_chains}"
+        )
+    ##### claude 2026/10/19 end #####
 
     remark_block = "\n".join(remarks) + "\n"
 
@@ -1308,7 +1503,8 @@ def design_binder(
     batch_size: int = 1,
     target_hotspot_ids: list[str] | None = None,
     epitope_contact_distance: float = 12.0,
-    inter_loss_mode: str = "full_coverage",
+    inter_loss_mode: str | None = None,
+    fold_rescue_schedule: bool = False,
 ) -> tuple[list[str], Trajectory, list[dict]]:
     """
     Algorithm 11 Gradient-Guided Binder Sequence Optimization.
@@ -1326,10 +1522,15 @@ def design_binder(
     positions within the named target chain.
 
     ``inter_loss_mode`` selects the inter contact loss implementation:
-    ``"full_coverage"`` (default) averages over every target residue;
-    ``"hotspot_neighborhood"`` precomputes — once, from a distogram of the
-    fixed target — the surface-accessible hotspot neighborhood and averages
-    over that only (parallel mode; requires ``target_hotspot_ids``).
+    ``None`` (default) auto-resolves — hotspot designs
+    (``target_hotspot_ids`` given) use ``"hotspot_neighborhood"`` (a
+    distogram-precomputed surface-accessible hotspot neighborhood),
+    no-hotspot designs use ``"full_coverage"``; an explicit
+    ``"full_coverage"`` overrides the auto default for hotspot designs.
+    ``fold_rescue_schedule`` enables the three-phase fold-rescue weight
+    schedule (hotspot designs only): native weights unless folding stalls,
+    then rescue weights, then full hotspot weights for interface refinement
+    once folding completes (see ``update_fold_rescue_schedule``).
     """
     # Setup
     device = "cuda"
@@ -1384,9 +1585,29 @@ def design_binder(
     # hotspot neighborhood from a distogram of the fixed target and restrict
     # the inter contact loss averaging domain to it. The target sequence does
     # not change during optimization, so the mask is a constant thereafter.
-    # The default "full_coverage" path is byte-for-byte unchanged; see
-    # precompute_inter_neighborhood_mask / derive_hotspot_neighborhood_mask.
     # (Placed after binder_sequence resolution: needs binder_length.)
+    # 2026-10-14: ``inter_loss_mode=None`` auto-resolves — hotspot designs
+    # default to the neighborhood mask, no-hotspot designs to full coverage;
+    # an explicit "full_coverage" keeps the legacy hotspot behavior.
+    if inter_loss_mode is None:
+        inter_loss_mode = (
+            "hotspot_neighborhood" if target_hotspot_ids else "full_coverage"
+        )
+    # Fold-rescue phase schedule: hotspot design mode only (user spec
+    # 2026-10-14). Per-run state + weight overlay consumed by run_step;
+    # transitions shift loss weights only.
+    if fold_rescue_schedule and target_hotspot_ids is None:
+        raise ValueError(
+            "fold_rescue_schedule requires target_hotspot_ids "
+            "(hotspot design mode only)."
+        )
+    if fold_rescue_schedule:
+        fold_rescue_state: dict = {"call": 0, "phase": 1, "intra": [],
+                                   "events": []}
+        fold_rescue_weights: dict = dict(LOSS_WEIGHTS)
+    else:
+        fold_rescue_state = None
+        fold_rescue_weights = None
     inter_neighborhood_mask: torch.Tensor | None = None
     if inter_loss_mode == "full_coverage":
         pass
@@ -1471,7 +1692,15 @@ def design_binder(
             target_hotspot_ids=target_hotspot_ids,
             epitope_contact_distance=epitope_contact_distance,
             inter_neighborhood_mask=inter_neighborhood_mask,
+            loss_weights=fold_rescue_weights,
         )
+        if fold_rescue_state is not None:
+            update_fold_rescue_schedule(
+                fold_rescue_state,
+                fold_rescue_weights,
+                global_step,
+                float(losses["intra_contact_loss"].mean()),
+            )
         structure_loss = losses["total_loss"]
         structure_grad = torch.autograd.grad(structure_loss.mean(), logits)[0]
 
@@ -1578,6 +1807,22 @@ def design_binder(
         ptm_tensor = final_fold.get("ptm")
         ptm = ptm_tensor.item() if ptm_tensor is not None else None
 
+        ##### claude 2026/10/19 start #####
+        # Binder-target pair ipTM (ConfidenceHead pair_chains_iptm)。消费方向
+        # = [target][binder] (t2b: 固定 target 正确, 评估 binder 位置置信度),
+        # 多链 target 按残基加权合并 (binder×target 子块均值)。scaling critic
+        # 无 confidence head → output 里无此键 → 条目自然缺失该指标 (向后
+        # 兼容, Stage-2 门按 None 跳过)。
+        pair_detail: dict | None = None
+        if not is_scaling_critic:
+            pair_matrix = final_fold["output"].get("pair_chains_iptm")
+            if pair_matrix is not None:
+                pair_detail = merge_pair_chains_iptm(
+                    pair_matrix[batch_idx],
+                    [len(c) for c in target_sequence.split("|")],
+                )
+        ##### claude 2026/10/19 end #####
+
         # Build annotated PDB with quality metrics embedded as REMARK records.
         annotated_pdb: str | None = None
         if pred_complex is not None:
@@ -1592,6 +1837,22 @@ def design_binder(
                 distogram_binding_confidence=iptm_proxy_scores.get(
                     "distogram_iptm_proxy"
                 ),
+                ##### claude 2026/10/19 start #####
+                pair_chains_iptm=(
+                    pair_detail["merged_t2b"] if pair_detail else None
+                ),
+                pair_chains_iptm_b2t=(
+                    pair_detail["merged_b2t"] if pair_detail else None
+                ),
+                pair_chains_iptm_chains=(
+                    ",".join(
+                        f"{label}:{vals['t2b']:.4f}"
+                        for label, vals in pair_detail["chains"].items()
+                    )
+                    if pair_detail
+                    else None
+                ),
+                ##### claude 2026/10/19 end #####
             )
             ##### claude 2026/8/13 end #####
 
@@ -1607,7 +1868,19 @@ def design_binder(
                 "final_loss": final_total_loss[batch_idx].item(),
                 "iptm": iptm,
                 "ptm": ptm,
+                ##### claude 2026/10/19 start #####
+                # merged t2b 标量 (Stage-2/6 消费) + 完整明细 (b2t/逐链, 仅诊断)
+                "pair_chains_iptm": (
+                    pair_detail["merged_t2b"] if pair_detail else None
+                ),
+                "pair_chains_iptm_detail": pair_detail,
+                ##### claude 2026/10/19 end #####
                 "logits": logits[batch_idx].detach().cpu(),
+                "fold_rescue_events": (
+                    list(fold_rescue_state["events"])
+                    if fold_rescue_state is not None
+                    else None
+                ),
                 **iptm_proxy_scores,
             }
         )
@@ -1750,7 +2023,8 @@ class ESMFold2Design:
         batch_size: int = 1,
         target_hotspot_ids: list[str] | None = None,
         epitope_contact_distance: float = 12.0,
-        inter_loss_mode: str = "full_coverage",
+        inter_loss_mode: str | None = None,
+        fold_rescue_schedule: bool = False,
     ) -> tuple[list[str], Trajectory, list[dict]]:
         return design_binder(
             self.inversion_models,
@@ -1767,6 +2041,7 @@ class ESMFold2Design:
             target_hotspot_ids=target_hotspot_ids,
             epitope_contact_distance=epitope_contact_distance,
             inter_loss_mode=inter_loss_mode,
+            fold_rescue_schedule=fold_rescue_schedule,
         )
 
 

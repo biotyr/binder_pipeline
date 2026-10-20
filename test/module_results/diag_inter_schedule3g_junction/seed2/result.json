@@ -1,0 +1,143 @@
+{
+  "seed": 2,
+  "hotspots": [
+    "B:S30",
+    "A:S100"
+  ],
+  "gate": "FAIL",
+  "iptm": 0.5962015986442566,
+  "ptm": 0.7261881232261658,
+  "proxy": 0.3403191691888904,
+  "binder_sequence": "GGGGGGLALLLALLLALLALLLSGRMTQAQLIAILRQIMQRQQQQQGGGGGGGGGGLAALLAALLRAFLAFFAQ",
+  "scheduler": {
+    "final_phase": 3,
+    "events": [
+      {
+        "step": 25,
+        "event": "p1_checkpoint",
+        "intra_last5_mean": 4.436
+      },
+      {
+        "step": 25,
+        "event": "phase2 (intra plateau 4.44)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.1,
+          "glob": 0.2,
+          "epitope": 0.1
+        }
+      },
+      {
+        "step": 50,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.881
+      },
+      {
+        "step": 55,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.649
+      },
+      {
+        "step": 60,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.479
+      },
+      {
+        "step": 65,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.33
+      },
+      {
+        "step": 70,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.16
+      },
+      {
+        "step": 75,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 3.118
+      },
+      {
+        "step": 80,
+        "event": "p2_checkpoint",
+        "intra_last10_mean": 2.999
+      },
+      {
+        "step": 80,
+        "event": "phase3 (folded intra 3.00)",
+        "weights": {
+          "intra_contact": 0.5,
+          "inter_contact": 0.5,
+          "glob": 0.2,
+          "epitope": 0.5
+        }
+      }
+    ],
+    "n_calls": 150
+  },
+  "elapsed_s": 369.2,
+  "seq_health": {
+    "entropy": 2.74,
+    "max_homopolymer": 10,
+    "top2_aa_frac": 0.5
+  },
+  "plddt_profile": {
+    "A": {
+      "n": 115,
+      "mean": 94.4,
+      "min": 83.2
+    },
+    "B": {
+      "n": 118,
+      "mean": 90.5,
+      "min": 33.1
+    },
+    "C": {
+      "n": 74,
+      "mean": 61.7,
+      "min": 37.6
+    }
+  },
+  "hotspot_contacts": {
+    "B:S30": {
+      "found": true,
+      "min_cb": 4.6,
+      "n12": 15,
+      "n8": 4
+    },
+    "A:S100": {
+      "found": true,
+      "min_cb": 7.6,
+      "n12": 6,
+      "n8": 1
+    }
+  },
+  "traj": {
+    "intra_contact_loss": {
+      "first5": 4.698,
+      "last5": 2.65,
+      "min": 2.019
+    },
+    "inter_contact_loss": {
+      "first5": 4.276,
+      "last5": 3.388,
+      "min": 2.098
+    },
+    "epitope_loss": {
+      "first5": 1.636,
+      "last5": 0.694,
+      "min": 0.01
+    },
+    "glob_loss": {
+      "first5": 4.475,
+      "last5": 1.252,
+      "min": 1.146
+    },
+    "plm_loss": {
+      "first5": 3.15,
+      "last5": 1.302,
+      "min": 1.031
+    },
+    "corr_epitope_vs_inter": 0.911
+  }
+}

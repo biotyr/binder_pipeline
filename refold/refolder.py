@@ -26,6 +26,7 @@ from esmcp.binder_design import (
     build_target_one_hot,
     compute_distogram_iptm_proxy,
     fold_and_get_distogram,
+    merge_pair_chains_iptm,
     pdb_with_quality_remarks,
     sequence_to_one_hot,
 )
@@ -153,6 +154,8 @@ def refold_full(
         - "annotated_pdb": str | None   (含 REMARK 质量标注)
         - "iptm": float | None
         - "ptm": float | None
+        - "pair_chains_iptm": float | None   (binder-target t2b 残基加权合并值)
+        - "pair_chains_iptm_detail": dict | None   (b2t/逐链, 仅诊断)
         - "distogram_iptm_proxy": float
         - "cdr_distogram_iptm_proxy": float
         - "distogram_logits": Tensor
@@ -199,6 +202,18 @@ def refold_full(
         is_antibody,
     )
 
+    ##### claude 2026/10/19 start #####
+    # Binder-target pair ipTM (ConfidenceHead pair_chains_iptm), 与 Stage-1
+    # score_critic 同源同式: 消费方向 [target][binder] (t2b), 多链 target 按
+    # 残基加权合并; b2t/逐链仅诊断。
+    pair_detail: dict | None = None
+    pair_matrix = fold["output"].get("pair_chains_iptm")
+    if pair_matrix is not None:
+        pair_detail = merge_pair_chains_iptm(
+            pair_matrix, [len(c) for c in target_seq.split("|")]
+        )
+    ##### claude 2026/10/19 end #####
+
     # Annotate PDB with quality remarks
     annotated_pdb: str | None = None
     if pred_complex is not None:
@@ -209,6 +224,22 @@ def refold_full(
             distogram_binding_confidence=iptm_proxy.get(
                 "distogram_iptm_proxy"
             ),
+            ##### claude 2026/10/19 start #####
+            pair_chains_iptm=(
+                pair_detail["merged_t2b"] if pair_detail else None
+            ),
+            pair_chains_iptm_b2t=(
+                pair_detail["merged_b2t"] if pair_detail else None
+            ),
+            pair_chains_iptm_chains=(
+                ",".join(
+                    f"{label}:{vals['t2b']:.4f}"
+                    for label, vals in pair_detail["chains"].items()
+                )
+                if pair_detail
+                else None
+            ),
+            ##### claude 2026/10/19 end #####
         )
 
     return {
@@ -220,6 +251,12 @@ def refold_full(
         "annotated_pdb": annotated_pdb,
         "iptm": iptm,
         "ptm": ptm,
+        ##### claude 2026/10/19 start #####
+        "pair_chains_iptm": (
+            pair_detail["merged_t2b"] if pair_detail else None
+        ),
+        "pair_chains_iptm_detail": pair_detail,
+        ##### claude 2026/10/19 end #####
         "plddt": plddt,
         "distogram_iptm_proxy": iptm_proxy.get("distogram_iptm_proxy"),
         "cdr_distogram_iptm_proxy": iptm_proxy.get("cdr_distogram_iptm_proxy"),

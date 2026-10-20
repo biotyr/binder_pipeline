@@ -73,6 +73,18 @@ def main() -> None:
     parser.add_argument("--enable-rosetta", type=bool, default=False)
     parser.add_argument("--mpnn-num-seqs", type=int, default=20)
     parser.add_argument("--mpnn-sampling-temp", type=float, default=0.1)
+    ##### claude 2026/10/19 start #####
+    parser.add_argument(
+        "--iptm-metric", choices=["global", "pair_chains"],
+        default="pair_chains",
+        help=(
+            "Confidence metric source for Stage-2 gate and Stage-6 "
+            "filter/ranking (calibrated 2026-10-19, default pair_chains): "
+            "global = legacy full-complex iPTM (diagnostic); "
+            "pair_chains = binder-target pair_chains_iptm (t2b merged)."
+        ),
+    )
+    ##### claude 2026/10/19 end #####
     ##### claude 2026/8/13 start #####
     parser.add_argument("--quality-min-iptm-single", type=float, default=0.50)
     parser.add_argument("--quality-min-iptm-multi", type=float, default=0.70)
@@ -109,6 +121,9 @@ def main() -> None:
         ),
         ##### claude 2026/8/13 end #####
         scaling_threshold=args.scaling_threshold,
+        ##### claude 2026/10/19 start #####
+        iptm_metric=args.iptm_metric,
+        ##### claude 2026/10/19 end #####
         hero_critic_names=(
             args.hero_critics
             if args.hero_critics is not None
