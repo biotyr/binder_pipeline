@@ -6,10 +6,11 @@ pair_chains_iptm 全链路冒烟 (30 步缩短设计, 单卡 ~5min):
   Stage-2 质量门 (iptm_metric="pair_chains") → Stage-6 排序/过滤
 
 检查点:
-  1. critic_results (hero 条目) 携带 pair_chains_iptm / detail, REMARK 行在;
+  1. critic_results (hero 条目) 携带 pair_chains_iptm / ipsae / detail,
+     REMARK 行在 (pair + ipsae);
   2. Stage-2 打印行显示 pair_chains_iptm 槽位;
-  3. PipelineResult / selection.parquet 携带 pair_chains_iptm 列;
-  4. run_summary 无异常 (设计质量本身不作断言 — 30 步仅冒烟)。
+  3. PipelineResult / selection.parquet 携带 pair_chains_iptm 与 ipsae 列;
+  4. 全链路无异常 (设计质量本身不作断言 — 30 步仅冒烟)。
 
 用法: CUDA_VISIBLE_DEVICES=<GPU-UUID> python smoke_pair_iptm.py
 """
@@ -65,17 +66,23 @@ def main() -> None:
         pair = r.get("pair_chains_iptm")
         assert pair is not None, f"critic_results 未携带 pair 值: {r.keys()}"
         assert r.get("pair_chains_iptm_detail") is not None
+        ipsae = r.get("ipsae")
+        assert ipsae is not None, f"critic_results 未携带 ipsae: {r.keys()}"
+        assert r.get("ipsae_detail") is not None
         pdb = r.get("annotated_pdb") or ""
         assert "pair_chains_iptm=" in pdb, "REMARK 250 缺 pair 行"
         assert "pair_chains_iptm_chains=" in pdb, "REMARK 250 缺逐链行"
+        assert "ipsae=" in pdb, "REMARK 250 缺 ipsae 行"
+        assert "ipsae_anchor=" in pdb, "REMARK 250 缺 ipsae_anchor 行"
         print(f"[smoke] 1. critic {r['critic_name']}: iptm={r.get('iptm'):.4f} "
-              f"pair={pair:.4f}  REMARK ✓")
+              f"pair={pair:.4f} ipsae={ipsae:.4f}  REMARK ✓")
 
     # Stage-2 打印行 (verbose 输出已在上方日志) + 条目结构
     for r in result["quality_passed"] + result["quality_failed"]:
         qc = r.get("quality_check", {})
         assert "pair_chains_iptm" in qc, f"quality_check 缺 pair 键: {qc.keys()}"
-    print(f"[smoke] 2. quality_check 携带 pair 键 ✓ "
+        assert "ipsae" in qc, f"quality_check 缺 ipsae 键: {qc.keys()}"
+    print(f"[smoke] 2. quality_check 携带 pair/ipsae 键 ✓ "
           f"(passed={len(result['quality_passed'])} "
           f"failed={len(result['quality_failed'])})")
 
@@ -83,12 +90,16 @@ def main() -> None:
     assert fr and all(r.pair_chains_iptm is not None for r in fr), (
         "PipelineResult 缺 pair_chains_iptm"
     )
+    assert fr and all(r.ipsae is not None for r in fr), (
+        "PipelineResult 缺 ipsae"
+    )
     sel_parquet = OUT_DIR / "selection.parquet"
     if sel_parquet.exists():
         import pandas as pd
         cols = pd.read_parquet(sel_parquet).columns
         assert "pair_chains_iptm" in cols, f"parquet 缺 pair 列: {list(cols)}"
-        print("[smoke] 3. PipelineResult + selection.parquet pair 列 ✓")
+        assert "ipsae" in cols, f"parquet 缺 ipsae 列: {list(cols)}"
+        print("[smoke] 3. PipelineResult + selection.parquet pair/ipsae 列 ✓")
     print(f"[smoke] 4. 全链路冒烟通过 ✓  (全局/逐结果数值见上方日志)")
 
 

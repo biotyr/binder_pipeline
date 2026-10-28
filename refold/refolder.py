@@ -156,6 +156,8 @@ def refold_full(
         - "ptm": float | None
         - "pair_chains_iptm": float | None   (binder-target t2b 残基加权合并值)
         - "pair_chains_iptm_detail": dict | None   (b2t/逐链, 仅诊断)
+        - "ipsae": float | None   (ipSAE d0res 主分数, t2b; 补充信号)
+        - "ipsae_detail": dict | None   (锚残基/b2t/逐链, 仅诊断)
         - "distogram_iptm_proxy": float
         - "cdr_distogram_iptm_proxy": float
         - "distogram_logits": Tensor
@@ -212,6 +214,16 @@ def refold_full(
         pair_detail = merge_pair_chains_iptm(
             pair_matrix, [len(c) for c in target_seq.split("|")]
         )
+    # ipSAE (补充信号): 同一 output["pae"] 直接计算 (ipsae.py 为 pipeline
+    # 根目录共享度量模块, 根目录已在 sys.path — 本文件 esmcp import 同前提)。
+    from ipsae import compute_ipsae
+
+    ipsae_detail: dict | None = None
+    pae_matrix = fold["output"].get("pae")
+    if pae_matrix is not None:
+        ipsae_detail = compute_ipsae(
+            pae_matrix, [len(c) for c in target_seq.split("|")]
+        )
     ##### claude 2026/10/19 end #####
 
     # Annotate PDB with quality remarks
@@ -240,6 +252,13 @@ def refold_full(
                 else None
             ),
             ##### claude 2026/10/19 end #####
+            ##### claude 2026/10/19 start #####
+            ipsae=ipsae_detail["ipsae_t2b"] if ipsae_detail else None,
+            ipsae_b2t=ipsae_detail["ipsae_b2t"] if ipsae_detail else None,
+            ipsae_anchor=(
+                ipsae_detail["anchor_t2b"] if ipsae_detail else None
+            ),
+            ##### claude 2026/10/19 end #####
         )
 
     return {
@@ -256,6 +275,8 @@ def refold_full(
             pair_detail["merged_t2b"] if pair_detail else None
         ),
         "pair_chains_iptm_detail": pair_detail,
+        "ipsae": ipsae_detail["ipsae_t2b"] if ipsae_detail else None,
+        "ipsae_detail": ipsae_detail,
         ##### claude 2026/10/19 end #####
         "plddt": plddt,
         "distogram_iptm_proxy": iptm_proxy.get("distogram_iptm_proxy"),

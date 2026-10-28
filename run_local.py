@@ -75,13 +75,15 @@ def main() -> None:
     parser.add_argument("--mpnn-sampling-temp", type=float, default=0.1)
     ##### claude 2026/10/19 start #####
     parser.add_argument(
-        "--iptm-metric", choices=["global", "pair_chains"],
-        default="pair_chains",
+        "--iptm-metric", choices=["global", "pair_chains", "ipsae"],
+        default="ipsae",
         help=(
-            "Confidence metric source for Stage-2 gate and Stage-6 "
-            "filter/ranking (calibrated 2026-10-19, default pair_chains): "
+            "ipTM term source for Stage-6 selection score (2026-10-19 "
+            "finalized, default ipsae; ranking only - Stage-2 gates are "
+            "fixed at pair 0.50/0.40 + ipsae 0.5): "
             "global = legacy full-complex iPTM (diagnostic); "
-            "pair_chains = binder-target pair_chains_iptm (t2b merged)."
+            "pair_chains = binder-target pair_chains_iptm (t2b merged); "
+            "ipsae = ipSAE (d0res main score, t2b)."
         ),
     )
     ##### claude 2026/10/19 end #####

@@ -12,31 +12,35 @@ PyRosetta-4 2026 [Rosetta PyRosetta4.Release.python312.ubuntu.cxx11thread.serial
 🚨 No checkpoint found for ESMCForSequenceClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
 🚨 No checkpoint found for ESMCForTokenClassification.forward. Please add a `checkpoint` arg to `auto_docstring` or add one in ESMCConfig's docstring
 [replay] 8 条待重折: ['founder', 'groov_3r', 'nohot_3r', 'nohot_4z', 'seed2', 'seed3', 'seed4', 'wrapper']
-Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 81.82it/s]
-[replay] founder: 已有结果, 跳过
-[replay] nohot_4z: 已有结果, 跳过
-[replay] nohot_3r: 已有结果, 跳过
-[replay] groov_3r: 已有结果, 跳过
-[replay] seed2: 已有结果, 跳过
-[replay] seed3: 已有结果, 跳过
-[replay] seed4: 已有结果, 跳过
+Loading checkpoint shards:   0%|          | 0/6 [00:00<?, ?it/s]Loading checkpoint shards: 100%|██████████| 6/6 [00:00<00:00, 82.89it/s]
 Loading CCD dictionary from /home/taoyr/.cache/huggingface/hub/models--biohub--ESMFold2/snapshots/8fc3ff471022fdce52c77030685eb775de0c00a3/ccd.pkl
-[replay] wrapper: global=0.8883 t2b=0.2550 b2t=0.1921 (degraded_multi, 18.5s)
+[replay] founder: global=0.7864 t2b=0.4939 b2t=0.3831 ipsae=0.1520 ipsae10=0.1395 (good_multi, 16.1s)
+[replay] nohot_4z: global=0.9085 t2b=0.6838 b2t=0.7020 ipsae=0.8039 ipsae10=0.8152 (good_multi, 10.7s)
+[replay] nohot_3r: global=0.8594 t2b=0.5849 b2t=0.6245 ipsae=0.8125 ipsae10=0.8201 (good_single, 7.1s)
+[replay] groov_3r: global=0.8467 t2b=0.5628 b2t=0.6153 ipsae=0.7972 ipsae10=0.8215 (good_single, 7.1s)
+[replay] seed2: global=0.5985 t2b=0.0599 b2t=0.0514 ipsae=0.0000 ipsae10=0.0000 (quality_ok_multi, 7.6s)
+[replay] seed3: global=0.7846 t2b=0.4927 b2t=0.3564 ipsae=0.2541 ipsae10=0.2497 (quality_ok_multi, 9.1s)
+[replay] seed4: global=0.5682 t2b=0.1984 b2t=0.1471 ipsae=0.0185 ipsae10=0.0124 (quality_ok_multi, 9.1s)
+[replay] wrapper: global=0.8909 t2b=0.2556 b2t=0.1928 ipsae=0.3787 ipsae10=0.3960 (degraded_multi, 10.7s)
 
 [replay] 汇总 (按 replay t2b 降序):
-label      class                 t2b     b2t  global    orig
-nohot_4z   good_multi         0.6837  0.7007  0.9084  0.9077
-nohot_3r   good_single        0.5858  0.6252  0.8597  0.8597
-groov_3r   good_single        0.5626  0.6148  0.8467  0.8465
-seed3      quality_ok_multi   0.4961  0.3601  0.7873  0.7792
-founder    good_multi         0.4871  0.3739  0.7823  0.8245
-wrapper    degraded_multi     0.2550  0.1921  0.8883  0.9003
-seed4      quality_ok_multi   0.2026  0.1503  0.5708  0.6849
-seed2      quality_ok_multi   0.0591  0.0525  0.5975  0.5962
+label      class                 t2b     b2t   ipsae   ips10  global    orig
+nohot_4z   good_multi         0.6838  0.7020  0.8039  0.8152  0.9085  0.9077
+nohot_3r   good_single        0.5849  0.6245  0.8125  0.8201  0.8594  0.8597
+groov_3r   good_single        0.5628  0.6153  0.7972  0.8215  0.8467  0.8465
+founder    good_multi         0.4939  0.3831  0.1520  0.1395  0.7864  0.8245
+seed3      quality_ok_multi   0.4927  0.3564  0.2541  0.2497  0.7846  0.7792
+wrapper    degraded_multi     0.2556  0.1928  0.3787  0.3960  0.8909  0.9003
+seed4      quality_ok_multi   0.1984  0.1471  0.0185  0.0124  0.5682  0.6849
+seed2      quality_ok_multi   0.0599  0.0514  0.0000  0.0000  0.5985  0.5962
+
+[replay] ipSAE 补充门阈值建议 (cutoff=15):
+  多链 good min ipsae=0.1520; 退化 max=0.3787
+  单链 good min ipsae=0.7972
 
 [replay] 阈值建议 (真解全过 + 退化拦截):
-  多链 quality_min_iptm_multi → ≤0.4871 (good_multi 最小 t2b); 退化样本 t2b=0.2550 → 取区间 (0.25, 0.49) 内
-  单链 quality_min_iptm_single → ≤0.5626 (good_single 最小 t2b)
+  多链 quality_min_iptm_multi → ≤0.4939 (good_multi 最小 t2b); 退化样本 t2b=0.2556 → 取区间 (0.26, 0.49) 内
+  单链 quality_min_iptm_single → ≤0.5628 (good_single 最小 t2b)
   Average_i_pTM 槽 (default_filters.json) 与多链门同理下移; 最终取值由用户拍板
 
 [replay] 结果已写 /home/taoyr/projects/pipeline/test/module_results/diag_pair_iptm_replay/result.json

@@ -190,26 +190,53 @@ def test_stage6_metric_switch() -> None:
     ranked_g = compute_selection_score(
         [pair_bad, pair_good], iptm_metric="global")
     assert ranked_g[0] is pair_bad, [r.binder_sequence for r in ranked_g]
+
+    # ipsae 分支: ipsae 值决定排序, 缺失回退 pair 值
+    ipsae_hi = PipelineResult(
+        binder_sequence="D" * 11, pair_chains_iptm=0.30, ipsae=0.70,
+        iptm=0.5, distogram_iptm_proxy=0.9,
+        target_name="t", binder_name="test_binder",
+    )
+    ipsae_lo = PipelineResult(
+        binder_sequence="E" * 11, pair_chains_iptm=0.60, ipsae=0.20,
+        iptm=0.5, distogram_iptm_proxy=0.9,
+        target_name="t", binder_name="test_binder",
+    )
+    ranked_i = compute_selection_score(
+        [ipsae_lo, ipsae_hi], iptm_metric="ipsae")
+    assert ranked_i[0] is ipsae_hi, [r.binder_sequence for r in ranked_i]
+    # 回退链: 无 ipsae 的行走 pair 值
+    fallback = compute_selection_score(
+        [pair_bad, pair_good], iptm_metric="ipsae")
+    assert fallback[0] is pair_good, [r.binder_sequence for r in fallback]
+    print("  Stage-6 ipsae 排序分支 + 回退链 ✓")
     # legacy 旧行 (无 pair 值): pair 模式回退全局, 不崩溃且得分有限
     ranked_mixed = compute_selection_score(
         [legacy_only], iptm_metric="pair_chains")
     assert 0.0 <= ranked_mixed[0].selection_score <= 1.0
 
-    # 过滤槽位: Average_i_pTM 喂 pair 值; 旧行回退全局
-    d = _build_data_dict(pair_good, iptm_metric="pair_chains")
+    # 过滤槽位: Average_i_pTM 固定 pair 值优先 (与排序开关解耦); 旧行回退
+    d = _build_data_dict(pair_good)
     assert d["Average_i_pTM"] == 0.55, d
-    d = _build_data_dict(pair_good, iptm_metric="global")
-    assert d["Average_i_pTM"] == 0.80, d
-    d = _build_data_dict(legacy_only, iptm_metric="pair_chains")
+    d = _build_data_dict(legacy_only)
     assert d["Average_i_pTM"] == 0.70, d
 
-    # apply_filters 透传 (default_filters.json Average_i_pTM 闸)
-    passed, _ = apply_filters(
-        [pair_good, pair_bad], iptm_metric="pair_chains")
+    # apply_filters (default_filters.json Average_i_pTM 闸, 固定 pair 值)
+    passed, _ = apply_filters([pair_good, pair_bad])
     names = {r.binder_sequence[0] for r in passed}
     assert "A" in names and "B" not in names, (
-        f"pair 模式下低 pair 值应被 Average_i_pTM 闸拦截: {names}")
+        f"低 pair 值应被 Average_i_pTM 闸拦截: {names}")
     print("  Stage-6 排序/过滤指标开关 ✓")
+
+    # 新默认: selection score ipTM 项 = ipsae; pair 门统一 0.3 粗筛
+    from core import PipelineConfig
+    assert PipelineConfig().iptm_metric == "ipsae"
+    assert PipelineConfig().min_ipsae == 0.5
+    assert PipelineConfig().quality_min_iptm_single == 0.30
+    assert PipelineConfig().quality_min_iptm_multi == 0.30
+    ranked_def = compute_selection_score([ipsae_lo, ipsae_hi])
+    assert ranked_def[0] is ipsae_hi, [r.binder_sequence for r in ranked_def]
+    print("  默认排序源=ipsae / min_ipsae=0.5 ✓")
 
 
 def main() -> None:

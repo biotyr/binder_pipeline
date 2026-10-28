@@ -1261,6 +1261,9 @@ def pdb_with_quality_remarks(
     pair_chains_iptm: float | None = None,
     pair_chains_iptm_b2t: float | None = None,
     pair_chains_iptm_chains: str | None = None,
+    ipsae: float | None = None,
+    ipsae_b2t: float | None = None,
+    ipsae_anchor: int | None = None,
 ) -> str:
     """Insert REMARK records with predicted quality metrics into a PDB string.
 
@@ -1287,6 +1290,14 @@ def pdb_with_quality_remarks(
     pair_chains_iptm_chains : str | None
         Human-readable per-target-chain t2b values, e.g. ``"A:0.5512,B:0.6734"``.
         Informational; not parsed by ``quality_filter``.
+    ipsae : float | None
+        ipSAE (d0res 主分数, t2b 方向; ``ipsae.py`` 自实现)。可解析、
+        被 Stage-2 ``min_ipsae`` 补充门消费。
+    ipsae_b2t : float | None
+        反方向 ipSAE — 诊断 only, 不进消费路径。
+    ipsae_anchor : int | None
+        t2b 方向锚残基 flat 0-idx (结合 target 链长换算链内序号可定位
+        界面锚点)。诊断 only。
 
     Returns
     -------
@@ -1323,6 +1334,22 @@ def pdb_with_quality_remarks(
         remarks.append(
             f"REMARK {PDB_QUALITY_REMARK_NUM}  "
             f"pair_chains_iptm_chains={pair_chains_iptm_chains}"
+        )
+    ##### claude 2026/10/19 end #####
+    ##### claude 2026/10/19 start #####
+    # ipSAE (d0res 主分数, ipsae.py 自实现): t2b 可解析、被补充门消费;
+    # b2t 与锚残基 (flat 0-idx, 结合 target 链长可换算链内序号) 仅诊断。
+    if ipsae is not None:
+        remarks.append(
+            f"REMARK {PDB_QUALITY_REMARK_NUM}  ipsae={ipsae:.4f}"
+        )
+    if ipsae_b2t is not None:
+        remarks.append(
+            f"REMARK {PDB_QUALITY_REMARK_NUM}  ipsae_b2t={ipsae_b2t:.4f}"
+        )
+    if ipsae_anchor is not None:
+        remarks.append(
+            f"REMARK {PDB_QUALITY_REMARK_NUM}  ipsae_anchor={int(ipsae_anchor)}"
         )
     ##### claude 2026/10/19 end #####
 
@@ -1504,7 +1531,7 @@ def design_binder(
     target_hotspot_ids: list[str] | None = None,
     epitope_contact_distance: float = 12.0,
     inter_loss_mode: str | None = None,
-    fold_rescue_schedule: bool = False,
+    fold_rescue_schedule: bool | None = None,
 ) -> tuple[list[str], Trajectory, list[dict]]:
     """
     Algorithm 11 Gradient-Guided Binder Sequence Optimization.
@@ -1528,9 +1555,13 @@ def design_binder(
     no-hotspot designs use ``"full_coverage"``; an explicit
     ``"full_coverage"`` overrides the auto default for hotspot designs.
     ``fold_rescue_schedule`` enables the three-phase fold-rescue weight
-    schedule (hotspot designs only): native weights unless folding stalls,
-    then rescue weights, then full hotspot weights for interface refinement
-    once folding completes (see ``update_fold_rescue_schedule``).
+    schedule: native weights unless folding stalls, then rescue weights,
+    then full hotspot weights for interface refinement once folding
+    completes (see ``update_fold_rescue_schedule``). ``None`` (default)
+    auto-resolves — hotspot designs enable the schedule, no-hotspot
+    designs keep it off (2026-10-21 semantics, mirroring
+    ``inter_loss_mode``); an explicit ``False`` opts out for hotspot
+    designs, an explicit ``True`` without hotspots raises ValueError.
     """
     # Setup
     device = "cuda"
@@ -1596,6 +1627,14 @@ def design_binder(
     # Fold-rescue phase schedule: hotspot design mode only (user spec
     # 2026-10-14). Per-run state + weight overlay consumed by run_step;
     # transitions shift loss weights only.
+    ##### claude 2026/10/21 start #####
+    # None = auto (mirrors inter_loss_mode): hotspot designs enable the
+    # schedule by default (semantic change 2026-10-21), no-hotspot designs
+    # keep it off. Explicit False opts out; explicit True without hotspots
+    # still hits the ValueError below.
+    if fold_rescue_schedule is None:
+        fold_rescue_schedule = target_hotspot_ids is not None
+    ##### claude 2026/10/21 end #####
     if fold_rescue_schedule and target_hotspot_ids is None:
         raise ValueError(
             "fold_rescue_schedule requires target_hotspot_ids "
@@ -1821,6 +1860,20 @@ def design_binder(
                     pair_matrix[batch_idx],
                     [len(c) for c in target_sequence.split("|")],
                 )
+        # ipSAE (d0res 主分数, 与 pair_chains_iptm 同级的补充信号): 同一
+        # output["pae"] 直接计算, 与 annotated_pdb 同源同折。局部 import —
+        # ipsae.py 在 pipeline 根目录 (共享度量模块), 保持本文件可被 Modal
+        # 镜像独立加载 (根目录入 sys.path 后方可解析)。
+        ipsae_detail: dict | None = None
+        if not is_scaling_critic:
+            from ipsae import compute_ipsae
+
+            pae_matrix = final_fold["output"].get("pae")
+            if pae_matrix is not None:
+                ipsae_detail = compute_ipsae(
+                    pae_matrix[batch_idx],
+                    [len(c) for c in target_sequence.split("|")],
+                )
         ##### claude 2026/10/19 end #####
 
         # Build annotated PDB with quality metrics embedded as REMARK records.
@@ -1853,6 +1906,13 @@ def design_binder(
                     else None
                 ),
                 ##### claude 2026/10/19 end #####
+                ##### claude 2026/10/19 start #####
+                ipsae=ipsae_detail["ipsae_t2b"] if ipsae_detail else None,
+                ipsae_b2t=ipsae_detail["ipsae_b2t"] if ipsae_detail else None,
+                ipsae_anchor=(
+                    ipsae_detail["anchor_t2b"] if ipsae_detail else None
+                ),
+                ##### claude 2026/10/19 end #####
             )
             ##### claude 2026/8/13 end #####
 
@@ -1874,6 +1934,9 @@ def design_binder(
                     pair_detail["merged_t2b"] if pair_detail else None
                 ),
                 "pair_chains_iptm_detail": pair_detail,
+                # ipSAE (补充信号): t2b 标量 + 明细 (锚残基/逐链, 诊断)
+                "ipsae": ipsae_detail["ipsae_t2b"] if ipsae_detail else None,
+                "ipsae_detail": ipsae_detail,
                 ##### claude 2026/10/19 end #####
                 "logits": logits[batch_idx].detach().cpu(),
                 "fold_rescue_events": (
@@ -2024,7 +2087,11 @@ class ESMFold2Design:
         target_hotspot_ids: list[str] | None = None,
         epitope_contact_distance: float = 12.0,
         inter_loss_mode: str | None = None,
-        fold_rescue_schedule: bool = False,
+        ##### claude 2026/10/21 start #####
+        # None = auto: 热点任务默认启用三阶段调度 (语义变更 2026-10-21),
+        # 显式 False 可退出; 解析在 design_binder 内 (与 inter_loss_mode 同址)。
+        fold_rescue_schedule: bool | None = None,
+        ##### claude 2026/10/21 end #####
     ) -> tuple[list[str], Trajectory, list[dict]]:
         return design_binder(
             self.inversion_models,

@@ -119,16 +119,22 @@ def main() -> None:
                     default="auto",
                     help="inter contact loss 分支 (2026-10-14, 已入源码): "
                          "auto = 指定热点→邻域可及mask, 无热点→全覆盖")
-    ap.add_argument("--fold-rescue-schedule", action="store_true",
+    ap.add_argument("--fold-rescue-schedule", choices=["auto", "on", "off"],
+                    default="auto",
                     help="热点设计三阶段调度 (P1原生→P2折叠挽救→P3界面精修, "
-                         "intra 横盘检测自动转移; 仅限指定热点)")
-    ap.add_argument("--iptm-metric", choices=["global", "pair_chains"],
-                    default="pair_chains",
-                    help="置信度指标源 (Stage-2 门 + Stage-6 过滤/排序, "
-                         "2026-10-19 定标后默认 pair_chains): "
-                         "global=全局 iPTM (旧行为, 过渡诊断用); "
+                         "intra 横盘检测自动转移): auto=热点任务默认开启 "
+                         "(2026-10-21 语义变更, 无热点任务仍为关); "
+                         "on/off=显式覆盖")
+    ap.add_argument("--iptm-metric",
+                    choices=["global", "pair_chains", "ipsae"],
+                    default="ipsae",
+                    help="Stage-6 selection score 的 ipTM 项指标源 "
+                         "(2026-10-19 定稿默认 ipsae; 仅控制排序, "
+                         "Stage-2 门固定 pair 0.50/0.40 + ipsae 0.5 双门): "
+                         "global=全局 iPTM (诊断); "
                          "pair_chains=binder-target pair_chains_iptm "
-                         "(t2b 方向残基加权合并, 阈值 0.50/0.40 定标)")
+                         "(t2b 方向残基加权合并); "
+                         "ipsae=ipSAE (d0res 主分数 t2b)")
     args = ap.parse_args()
 
     task_dir = RESULTS_ROOT / args.task / f"{args.hotspot}_hotspot"
@@ -151,7 +157,9 @@ def main() -> None:
         bd.STEPS = args.steps
 
     print(f"[e2e] task={args.task} hotspot={args.hotspot} seed={args.seed} "
-          f"batch_size={args.batch_size}")
+          f"batch_size={args.batch_size} "
+          f"inter_loss_mode={args.inter_loss_mode} "
+          f"fold_rescue_schedule={args.fold_rescue_schedule}")
     print(f"[e2e] target chains: {[(c, len(s)) for c, s in zip(chain_order, target_sequence.split('|'))]}")
     print(f"[e2e] hotspots: {hotspots}")
     print(f"[e2e] GPU: {torch.cuda.get_device_name(0)}, "
@@ -184,7 +192,13 @@ def main() -> None:
         epitope_contact_distance=12.0,
         inter_loss_mode=(None if args.inter_loss_mode == "auto"
                          else args.inter_loss_mode),
-        fold_rescue_schedule=args.fold_rescue_schedule,
+        ##### claude 2026/10/21 start #####
+        # auto → None (引擎内解析: 热点任务默认启用调度); on/off 显式覆盖
+        fold_rescue_schedule=(
+            None if args.fold_rescue_schedule == "auto"
+            else args.fold_rescue_schedule == "on"
+        ),
+        ##### claude 2026/10/21 end #####
     )
     elapsed = time.time() - t0
 
@@ -202,6 +216,7 @@ def main() -> None:
             "binder_len": len(r.binder_sequence),
             "iptm": r.iptm, "ptm": r.ptm,
             "pair_chains_iptm": r.pair_chains_iptm,
+            "ipsae": r.ipsae,
             "distogram_iptm_proxy": r.distogram_iptm_proxy,
             "final_loss": r.final_loss,
             "isoelectric_point": r.isoelectric_point,
@@ -279,6 +294,12 @@ def main() -> None:
                    "epitope_weight": args.epitope_weight if args.epitope_weight is not None else 0.5,
                    "steps": args.steps if args.steps is not None else 150,
                    "iptm_metric": args.iptm_metric,
+                   ##### claude 2026/10/21 start #####
+                   # 记录 CLI 档位 (auto 由引擎解析: 热点→邻域 inter /
+                   # fold-rescue 开), 供跨 run 基准对比
+                   "inter_loss_mode": args.inter_loss_mode,
+                   "fold_rescue_schedule": args.fold_rescue_schedule,
+                   ##### claude 2026/10/21 end #####
                    "dtype": "trunk bf16 (native) + heads fp32"},
         "elapsed_s": round(elapsed, 1),
         "n_stage1_candidates": len(s1_rows),

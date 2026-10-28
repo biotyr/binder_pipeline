@@ -50,10 +50,11 @@ class RefoldScreenConfig:
     is_antibody : bool
         Binder 是否为抗体 (影响 CDR distogram 计算)。
     iptm_metric : str
-        置信度指标源 (2026/10/19): "global" = 全局 ipTM (默认, 旧行为);
-        "pair_chains" = binder-target pair_chains_iptm (t2b 方向残基加权
-        合并值, 缺失时回退全局 ipTM) — 用于多 hero 的 winner-takes-all
-        比较与结果排序。
+        hero winner-takes-all 比较/排序的置信度指标源 (2026/10/19 定稿
+        默认 "ipsae"): "ipsae" = ipSAE (d0res 主分数 t2b); "pair_chains"
+        = binder-target pair_chains_iptm (t2b 合并); "global" = 全局
+        ipTM (诊断)。三者缺失时均回退全局 ipTM。仅控制比较/排序,
+        与 Stage-2 门无关。
     verbose : bool
         是否打印进度。
     """
@@ -63,7 +64,7 @@ class RefoldScreenConfig:
     hero_steps: int = 200
     hero_loops: int = 3
     is_antibody: bool = False
-    iptm_metric: str = "global"
+    iptm_metric: str = "ipsae"
     verbose: bool = True
 
 
@@ -280,12 +281,17 @@ class RefoldScreen:
 
                     ##### claude 2026/10/19 start #####
                     # winner-takes-all 比较键跟随指标开关: pair_chains 模式
-                    # 用 binder-target t2b 合并值 (缺失回退全局 ipTM)。
-                    if self.config.iptm_metric == "pair_chains":
-                        cmp_val = full.get("pair_chains_iptm") or iptm_val
+                    # 用 binder-target t2b 合并值, ipsae 模式用 ipSAE (均缺
+                    # 失回退全局 ipTM)。
+                    metric = self.config.iptm_metric
+                    if metric in ("pair_chains", "ipsae"):
+                        cmp_key = (
+                            "pair_chains_iptm" if metric == "pair_chains"
+                            else "ipsae"
+                        )
+                        cmp_val = full.get(cmp_key) or iptm_val
                         prev_cmp = (
-                            best_per_idx.get(idx, {}).get("pair_chains_iptm")
-                            or prev_iptm
+                            best_per_idx.get(idx, {}).get(cmp_key) or prev_iptm
                         )
                     else:
                         cmp_val, prev_cmp = iptm_val, prev_iptm
@@ -304,6 +310,8 @@ class RefoldScreen:
                             "pair_chains_iptm_detail": full.get(
                                 "pair_chains_iptm_detail"
                             ),
+                            "ipsae": full.get("ipsae"),
+                            "ipsae_detail": full.get("ipsae_detail"),
                             ##### claude 2026/10/19 end #####
                             "plddt": full["plddt"],
                             "distogram_iptm_proxy": full["distogram_iptm_proxy"],
@@ -337,6 +345,8 @@ class RefoldScreen:
                             ##### claude 2026/10/19 start #####
                             "pair_chains_iptm": None,
                             "pair_chains_iptm_detail": None,
+                            "ipsae": None,
+                            "ipsae_detail": None,
                             ##### claude 2026/10/19 end #####
                             "plddt": None,
                             "distogram_iptm_proxy": float("nan"),
@@ -356,9 +366,11 @@ class RefoldScreen:
         results = [best_per_idx[i] for i in sorted(best_per_idx)]
 
         ##### claude 2026/10/19 start #####
-        if self.config.iptm_metric == "pair_chains":
+        metric = self.config.iptm_metric
+        if metric in ("pair_chains", "ipsae"):
+            key_field = "pair_chains_iptm" if metric == "pair_chains" else "ipsae"
             results.sort(
-                key=lambda r: r.get("pair_chains_iptm")
+                key=lambda r: r.get(key_field)
                 or (r["iptm"] if r["iptm"] is not None else -1.0),
                 reverse=True,
             )

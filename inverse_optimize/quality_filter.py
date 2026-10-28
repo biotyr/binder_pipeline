@@ -43,14 +43,21 @@ class QualityFilterConfig:
     Attributes
     ----------
     min_iptm : float
-        最低 iPTM (interface TM-score), 默认 0.50。
+        最低全局 iPTM, 默认 0.50 (库默认; pipeline 路径 core.py 已置 None
+        不设门 —— 全局值仅解析记录, 门固定走 pair_chains_iptm)。
     min_ptm : float | None
         最低 pTM (global TM-score), None 表示不检查。
     min_pair_chains_iptm : float | None
         最低 binder-target pair ipTM (REMARK 键 ``pair_chains_iptm``,
         t2b 方向残基加权合并值, 2026/10/19 新增), None 表示不检查。
-        与 ``min_iptm`` 互为指标源开关的两翼 —— core.py 按
-        ``PipelineConfig.iptm_metric`` 只给其中之一喂阈值。
+        pipeline 路径 core.py 恒以此门为粗筛门 (单链/多链统一 0.3,
+        2026/10/19 用户定稿), 与排序开关 iptm_metric 解耦; 精细鉴别
+        由 ``min_ipsae`` 补充门承担。
+    min_ipsae : float | None
+        最低 ipSAE (REMARK 键 ``ipsae``, d0res 主分数 t2b 方向,
+        2026/10/19 新增), None 表示不检查。**补充门** —— 与排序开关
+        iptm_metric 无关, core.py 恒按 ``PipelineConfig.min_ipsae``
+        (0.5) 透传。
     min_binder_plddt : float | None
         Binder 链 CA 原子平均 pLDDT 下限, None 表示不检查。
     min_distogram_binding_confidence : float | None
@@ -68,6 +75,7 @@ class QualityFilterConfig:
     min_ptm: float | None = None
     ##### claude 2026/10/19 start #####
     min_pair_chains_iptm: float | None = None
+    min_ipsae: float | None = None
     ##### claude 2026/10/19 end #####
     min_binder_plddt: float | None = 0.70
     min_distogram_binding_confidence: float | None = None
@@ -94,13 +102,15 @@ def _parse_remarks(pdb_path: str) -> dict[str, float | None]:
         REMARK 250  distogram_binding_confidence=0.6815
         REMARK 250  pair_chains_iptm=0.6123
         REMARK 250  pair_chains_iptm_b2t=0.5891
+        REMARK 250  ipsae=0.4521
 
     Returns
     -------
     dict
         {"iptm": float|None, "ptm": float|None,
          "distogram_binding_confidence": float|None,
-         "pair_chains_iptm": float|None, "pair_chains_iptm_b2t": float|None}
+         "pair_chains_iptm": float|None, "pair_chains_iptm_b2t": float|None,
+         "ipsae": float|None, "ipsae_b2t": float|None}
     """
     metrics: dict[str, float | None] = {
         "iptm": None,
@@ -109,6 +119,8 @@ def _parse_remarks(pdb_path: str) -> dict[str, float | None]:
         ##### claude 2026/10/19 start #####
         "pair_chains_iptm": None,
         "pair_chains_iptm_b2t": None,
+        "ipsae": None,
+        "ipsae_b2t": None,
         ##### claude 2026/10/19 end #####
     }
     # Map REMARK key to dict key
@@ -119,6 +131,8 @@ def _parse_remarks(pdb_path: str) -> dict[str, float | None]:
         ##### claude 2026/10/19 start #####
         "pair_chains_iptm": "pair_chains_iptm",
         "pair_chains_iptm_b2t": "pair_chains_iptm_b2t",
+        "ipsae": "ipsae",
+        "ipsae_b2t": "ipsae_b2t",
         ##### claude 2026/10/19 end #####
     }
 
@@ -261,8 +275,8 @@ def filter_pdb_by_quality(
 ) -> dict[str, Any]:
     """基于 PDB 内嵌质量指标对单个设计进行预过滤。
 
-    按顺序检查: PDB 存在性 → iPTM → pTM → binder pLDDT →
-    distogram_binding_confidence → CA clashes。
+    按顺序检查: PDB 存在性 → pair_chains_iptm → ipSAE (补充门) → iPTM →
+    pTM → binder pLDDT → distogram_binding_confidence → CA clashes。
     任一条件不满足即标记为 failed 并记录原因。
 
     Parameters
@@ -311,6 +325,8 @@ def filter_pdb_by_quality(
             ##### claude 2026/10/19 start #####
             "pair_chains_iptm": None,
             "pair_chains_iptm_b2t": None,
+            "ipsae": None,
+            "ipsae_b2t": None,
             ##### claude 2026/10/19 end #####
             "ca_clashes": -1,
             "reasons": [f"PDB file not found: {pdb_path}"],
@@ -323,6 +339,7 @@ def filter_pdb_by_quality(
     dist_binding_conf = remarks["distogram_binding_confidence"]
     ##### claude 2026/10/19 start #####
     pair_iptm = remarks["pair_chains_iptm"]
+    ipsae = remarks["ipsae"]
     ##### claude 2026/10/19 end #####
 
     # 2. Check iPTM
@@ -337,8 +354,8 @@ def filter_pdb_by_quality(
             )
 
     ##### claude 2026/10/19 start #####
-    # 2b. Binder-target pair ipTM (t2b 残基加权合并值; 与 min_iptm 互为
-    # 指标源开关, core.py 按 PipelineConfig.iptm_metric 二选一喂阈值)。
+    # 2b. Binder-target pair ipTM (t2b 残基加权合并值; pipeline 主门 ——
+    # core.py 恒以此喂阈值 0.50/0.40, 与排序开关 iptm_metric 解耦)。
     if config.min_pair_chains_iptm is not None:
         if pair_iptm is None:
             reasons.append(
@@ -349,6 +366,18 @@ def filter_pdb_by_quality(
             reasons.append(
                 f"pair_chains_iptm={pair_iptm:.4f} "
                 f"< {config.min_pair_chains_iptm:.2f}"
+            )
+
+    # 2c. ipSAE (d0res 主分数 t2b; **补充门** — 与指标源开关无关)。
+    if config.min_ipsae is not None:
+        if ipsae is None:
+            reasons.append(
+                "ipsae not found in REMARK records "
+                f"(need {config.min_ipsae:.2f})"
+            )
+        elif ipsae < config.min_ipsae:
+            reasons.append(
+                f"ipsae={ipsae:.4f} < {config.min_ipsae:.2f}"
             )
     ##### claude 2026/10/19 end #####
 
@@ -411,6 +440,8 @@ def filter_pdb_by_quality(
         ##### claude 2026/10/19 start #####
         "pair_chains_iptm": pair_iptm,
         "pair_chains_iptm_b2t": remarks["pair_chains_iptm_b2t"],
+        "ipsae": ipsae,
+        "ipsae_b2t": remarks["ipsae_b2t"],
         ##### claude 2026/10/19 end #####
         "ca_clashes": ca_clashes,
         "reasons": reasons,

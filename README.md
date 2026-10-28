@@ -127,8 +127,8 @@ Stage 2: 质量预过滤 (inverse_optimize/quality_filter.py)
 ═══════════════════════════════════════════════════════════════
   Hero Critic PDB (REMARK 250 含 iPTM/pTM/distogram binding confidence,
                    B-factor 含 pLDDT)
-    → 解析 REMARK → 界面置信度阈值按 target 链数选择
-      (pair_chains_iptm: 单链 0.50 / 多链 0.40, 2026/10/19 定标)
+    → 解析 REMARK → 界面置信度双门: pair_chains_iptm 统一 0.3 (粗筛)
+      + ipsae 0.5 (补充门, 2026/10/19 定标)
     → 界面级闸门: distogram binding confidence ≥ 0.50
       (纯 binder×target 界面熵, 无 target-target 稀释)
     → B-factor 均值 (binder 链 CA, 链名从 designed_sequence 推导) → pLDDT ≥ 0.70?
@@ -183,7 +183,8 @@ Stage 6: 过滤 & 排序 (core.py)
 ═══════════════════════════════════════════════════════════════
   汇总所有 PipelineResult
     → compute_selection_score()         ← 0.5×norm(界面置信度) + 0.5×norm(proxy)
-                                          (界面置信度 = pair_chains_iptm, 默认)
+                                          (ipTM 项默认 ipSAE; Average_i_pTM
+                                          过滤槽固定 pair_chains_iptm 值)
     → check_filters()                   ← BindCraft 二元阈值 (PASSED/FAILED)
     → pI < 6.0                          ← minibinder 等电点筛选
     → select_top_n(N=84)                ← 每 (target, binder) 组择优
@@ -260,13 +261,16 @@ Pipeline 本体不解析 FASTA: `run()` 接受 `|` 拼接的序列串, 原始链
 
 阈值常量 `INTER_*` (esmcp/binder_design.py) 为 provisional defaults。
 
-### 2. fold-rescue 三阶段权重调度 — `fold_rescue_schedule: bool = False`
+### 2. fold-rescue 三阶段权重调度 — `fold_rescue_schedule: bool | None = None`
 
-仅限热点设计模式 (无热点时 ValueError)。P1 原生权重起步; 步 25/35 检查点
-发现 intra last5 均值 > 3.8 (折叠横盘) → P2 折叠挽救 (inter/epitope 降至
-0.1/0.1); 步 ≥50 起每 5 步检查, intra last10 均值 < 3.0 → P3 界面精修
-(恢复 0.5/0.5)。相位转移只改损失权重, 其余一切不动; 事件流写入
-`critic_results["fold_rescue_events"]`。参数常量 `FOLD_RESCUE_*`。
+**语义变更 (2026-10-21 拍板, 与 ① 的 inter_loss_mode 同款 auto 约定)**:
+`None` (默认) 自动解析 — **热点任务默认启用三阶段调度**, 无热点任务保持
+关闭; 显式 `False` 可退出 (旧行为), 无热点时显式 `True` 仍 ValueError。
+调度内容: P1 原生权重起步; 步 25/35 检查点发现 intra last5 均值 > 3.8
+(折叠横盘) → P2 折叠挽救 (inter/epitope 降至 0.1/0.1); 步 ≥50 起每 5 步
+检查, intra last10 均值 < 3.0 → P3 界面精修 (恢复 0.5/0.5)。相位转移只改
+损失权重, 其余一切不动; 事件流写入 `critic_results["fold_rescue_events"]`。
+参数常量 `FOLD_RESCUE_*`。
 
 ### 3. 热点几何核验门 — `IntegratedPipeline._hotspot_contact_check`
 
@@ -282,9 +286,9 @@ Pipeline 本体不解析 FASTA: `run()` 接受 `|` 拼接的序列串, 原始链
 
 | 入口 | 新参数 |
 |------|--------|
-| Python API | `IntegratedPipeline.run(..., inter_loss_mode=..., fold_rescue_schedule=...)` |
-| e2e runner | `test/e2e/run_e2e.py --inter-loss-mode {auto,full_coverage,hotspot_neighborhood}` (默认 auto) + `--fold-rescue-schedule` |
-| `run_local.py` / `run_modal.py` | 未暴露新参数; 热点任务自动走 ①③ 默认, 需显式控制时用 Python API |
+| Python API | `IntegratedPipeline.run(..., inter_loss_mode=..., fold_rescue_schedule=...)` (均 `None`=auto) |
+| e2e runner | `test/e2e/run_e2e.py --inter-loss-mode {auto,full_coverage,hotspot_neighborhood}` (默认 auto) + `--fold-rescue-schedule {auto,on,off}` (默认 auto = 热点任务启用) |
+| `run_local.py` / `run_modal.py` | 未暴露新参数; 热点任务自动走 ①② 默认, 需显式控制时用 Python API |
 
 ## 置信度指标: binder-target pair ipTM (2026-10-19 切换默认)
 
@@ -311,11 +315,42 @@ merged = Σᵢ Lᵢ·pair[tᵢ][binder] / Σᵢ Lᵢ   ≡  binder×(全部 targ
   取中), `quality_min_iptm_single` 0.50 (沿用, 真解留 0.06 边际),
   `Average_i_pTM` 槽 0.5→**0.4**。块均值系统性低于旧全局值 (-0.2~-0.3),
   新旧数值不可混比。
-- **开关**: `PipelineConfig.iptm_metric` (`"pair_chains"` 默认 /
-  `"global"` 旧行为, 过渡诊断用); e2e/run_local 经
-  `--iptm-metric {pair_chains,global}`。REMARK 250 键:
-  `pair_chains_iptm` (被门消费) / `pair_chains_iptm_b2t` (诊断) /
-  `pair_chains_iptm_chains` (逐链人类可读)。
+- **门与排序解耦 (2026-10-19 定稿)**: Stage-2 质量门固定 pair 门
+  (统一 0.3 粗筛 —— pair 值的 d0 耦合全复合体长度, 跨设计尺度不稳,
+  精细鉴别交给 ipSAE 门) + ipSAE 补充门 (0.5) 双门, 与排序开关无关;
+  `Average_i_pTM` 过滤槽固定 pair 值。`PipelineConfig.iptm_metric` 仅
+  控制 Stage-6 selection score 的 ipTM 项与 hero 比较 (默认 "ipsae",
+  见下节); e2e/run_local 经 `--iptm-metric {ipsae,pair_chains,global}`。
+  REMARK 250 键: `pair_chains_iptm` (被门消费) / `pair_chains_iptm_b2t`
+  (诊断) / `pair_chains_iptm_chains` (逐链人类可读)。
+
+### ipSAE 补充信号 (2026-10-19)
+
+`ipsae.py` (pipeline 根目录, 与 core.py 同级 —— 所有 hero 精确折叠处共用):
+参考 Dunbrack lab ipsae.py v4 的**设 cutoff 主分数 (d0res)** 自实现, 纯
+numpy; 等价性测试对参考脚本 Example 数据 6 链对全部 <1e-6
+(`test_ipsae.py`)。方向 t2b, 与 pair_chains_iptm 同位提取 (hero fold
+`output["pae"]` → 同源同折), REMARK 键 `ipsae` (可解析) / `ipsae_b2t` /
+`ipsae_anchor` (锚残基 flat idx —— 界面定位诊断)。
+**算术域 = 仅 binder↔target 对**: 列掩码严格限定 binder, target 内部
+链对不进 n0res 也不进均值 (不变性单测钉死) —— 多链 target 的
+target-target 置信度不会混入, 与 pair_chains_iptm 同语义。
+
+- **补充角色**: Stage-2 `min_ipsae` 补充门 (默认 **0.5**, 与排序开关无关
+  常透传) + Stage-6 selection score ipTM 项**默认源**
+  (`iptm_metric="ipsae"`, 2026-10-19 定稿)。
+- **定标 (8 产物, cutoff15)**: 全流程验证真解 (3 个 selected 设计)
+  **0.797-0.813**; 未验证/带缺陷产物 0.15-0.38 (founder 0.152 —— pair 值
+  0.494 过粗筛门但 Stage-6 pLDDT FAIL + 序列组成单调, 从非验证成功;
+  seed3 0.254 热点假阳性; wrapper 0.379 低复杂度); 灾难失败 0.00-0.02。
+  **ipSAE 排序与验证状态一致**, 恰好补充 pair 门盲区: 拦截 founder 型
+  "pair 值过门但整体质量缺陷" 设计 (门 0.5 位于分离带 (0.38, 0.80),
+  真解留 ~0.3 边际; n=3 真解样本, 待更多 e2e 复核)。
+- **注意事项**: d0res 的 d0 由锚残基低 PAE 伙伴数决定, 对界面大小敏感
+  (窄界面分数系统性偏低) —— 阈值语义是"已验证设计 ≈0.8"的经验锚定,
+  换 binder 类型/长度需重新校核; cutoff 15 与 10 排序一致。
+- **与 pair 值数值不同族** (点值 PAE + 配对专属 d0 vs soft-bin 期望 +
+  全复合体 d0), 两者是同级补充信号, 各走各的定标, 不可互换。
 
 ## 快速使用
 
@@ -379,13 +414,14 @@ result = pipeline.run(target_name="pd-l1", binder_name="minibinder", seed=42)
 for r in result["selected"][:5]:
     print(f"{r.selection_score:.4f}  {r.binder_sequence[:30]}...")
 
-# 热点引导: 热点任务自动走邻域 inter 分支 + Stage-2 热点几何门 (需传序列)
+# 热点引导: 热点任务自动走邻域 inter 分支 + fold-rescue 三阶段调度 +
+# Stage-2 热点几何门 (需传序列)
 result = pipeline.run(
     target_name="my_complex", binder_name="minibinder", seed=42,
     target_sequence="SEQ1|SEQ2",
     target_hotspot_ids=["A:K32", "B:D45"],
     # inter_loss_mode="full_coverage",   # 显式回退全覆盖旧行为
-    # fold_rescue_schedule=True,        # 三阶段折叠挽救调度 (热点模式专用)
+    # fold_rescue_schedule=False,       # 显式关闭三阶段调度 (热点任务默认开)
 )
 ```
 

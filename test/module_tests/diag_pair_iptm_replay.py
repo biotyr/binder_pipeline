@@ -46,6 +46,7 @@ import pandas as pd  # noqa: E402
 import run_e2e  # noqa: E402,F401  (Patch A + pyrosetta.init + hero 限 1)
 import esmcp.binder_design as bd  # noqa: E402
 from esmcp.binder_design import merge_pair_chains_iptm  # noqa: E402
+from ipsae import compute_ipsae  # noqa: E402
 
 OUT_DIR = _pipeline_dir / "test" / "module_results" / "diag_pair_iptm_replay"
 HERO = "ESMFold2-Experimental-Cutoff2025"
@@ -116,8 +117,8 @@ def main() -> None:
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     out_path = OUT_DIR / "result.json"
     rows: dict[str, dict] = {}
-    if out_path.exists():  # 断点续跑
-        rows = json.load(open(out_path))
+    if out_path.exists() and not os.environ.get("REPLAY_FORCE"):
+        rows = json.load(open(out_path))  # 断点续跑 (REPLAY_FORCE=1 全量重跑)
 
     print(f"[replay] {len(manifest)} 条待重折: {sorted(manifest)}")
     model = bd._load_hf_model(HERO, lm_dropout=0.25, cache_esmc=True,
@@ -146,6 +147,15 @@ def main() -> None:
             pair_matrix = fold["output"].get("pair_chains_iptm")
             detail = merge_pair_chains_iptm(pair_matrix, chain_lens) \
                 if pair_matrix is not None else None
+            # ipSAE (补充信号定标列): 同一 output["pae"], cutoff 15/10 双档
+            ipsae_detail = None
+            pae_matrix = fold["output"].get("pae")
+            if pae_matrix is not None:
+                ipsae_detail = compute_ipsae(pae_matrix, chain_lens,
+                                             cutoff=15.0)
+                ipsae10 = compute_ipsae(pae_matrix, chain_lens, cutoff=10.0)
+            else:
+                ipsae10 = None
             rows[label] = {
                 "class": item["class"], "note": item["note"],
                 "src": item["src"], "orig_iptm": item["orig_iptm"],
@@ -155,12 +165,21 @@ def main() -> None:
                 "merged_t2b": detail["merged_t2b"] if detail else None,
                 "merged_b2t": detail["merged_b2t"] if detail else None,
                 "chains": detail["chains"] if detail else None,
+                "ipsae_t2b": ipsae_detail["ipsae_t2b"] if ipsae_detail else None,
+                "ipsae_b2t": ipsae_detail["ipsae_b2t"] if ipsae_detail else None,
+                "ipsae_anchor": (ipsae_detail["anchor_t2b"]
+                                 if ipsae_detail else None),
+                "ipsae_chains": (ipsae_detail["chains"]
+                                 if ipsae_detail else None),
+                "ipsae10_t2b": ipsae10["ipsae_t2b"] if ipsae10 else None,
                 "elapsed_s": round(time.time() - t0, 1),
             }
             json.dump(rows, open(out_path, "w"), indent=2, ensure_ascii=False)
             print(f"[replay] {label}: global={iptm:.4f} "
                   f"t2b={detail['merged_t2b']:.4f} "
                   f"b2t={detail['merged_b2t']:.4f} "
+                  f"ipsae={ipsae_detail['ipsae_t2b']:.4f} "
+                  f"ipsae10={ipsae10['ipsae_t2b']:.4f} "
                   f"({item['class']}, {rows[label]['elapsed_s']}s)")
             del fold
     finally:
@@ -171,14 +190,32 @@ def main() -> None:
     # ---- 汇总表 + 阈值建议 ----
     print("\n[replay] 汇总 (按 replay t2b 降序):")
     header = (f"{'label':<10} {'class':<17} {'t2b':>7} {'b2t':>7} "
-              f"{'global':>7} {'orig':>7}")
+              f"{'ipsae':>7} {'ips10':>7} {'global':>7} {'orig':>7}")
     print(header)
     ordered = sorted(rows.items(),
                      key=lambda kv: kv[1]["merged_t2b"] or 0.0, reverse=True)
     for label, r in ordered:
         print(f"{label:<10} {r['class']:<17} "
               f"{r['merged_t2b']:>7.4f} {r['merged_b2t']:>7.4f} "
+              f"{r.get('ipsae_t2b') or 0.0:>7.4f} "
+              f"{r.get('ipsae10_t2b') or 0.0:>7.4f} "
               f"{r['global_iptm_replay']:>7.4f} {r['orig_iptm']:>7.4f}")
+
+    def _min_in_ipsae(class_key: str) -> float | None:
+        vals = [r.get("ipsae_t2b") for r in rows.values()
+                if r["class"] == class_key and r.get("ipsae_t2b") is not None]
+        return min(vals) if vals else None
+
+    g_multi = _min_in_ipsae("good_multi")
+    g_single = _min_in_ipsae("good_single")
+    g_degraded = _min_in_ipsae("degraded_multi")
+    print("\n[replay] ipSAE 补充门阈值建议 (cutoff=15):")
+    if g_multi is not None:
+        print(f"  多链 good min ipsae={g_multi:.4f}"
+              + (f"; 退化 max={max(v.get('ipsae_t2b') or 0 for v in rows.values() if v['class']=='degraded_multi'):.4f}"
+                 if g_degraded is not None else ""))
+    if g_single is not None:
+        print(f"  单链 good min ipsae={g_single:.4f}")
 
     def _min_in(class_key: str) -> float | None:
         vals = [r["merged_t2b"] for r in rows.values()

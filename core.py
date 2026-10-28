@@ -79,16 +79,19 @@ class PipelineConfig:
     scaling_threshold : float
         Scaling 快筛的 distogram_iptm_proxy 最低阈值。
     quality_min_iptm_single : float
-        PDB 质量闸门的最低 iPTM (单链 target), 默认 0.50。
+        Stage-2 pair 门下限 (binder-target pair_chains_iptm, 单链 target),
+        默认 0.30 (统一粗筛线, 2026/10/19)。
     quality_min_iptm_multi : float
-        PDB 质量闸门的最低 iPTM (多链 target), 默认 0.70。
+        Stage-2 pair 门下限 (多链 target), 默认 0.30 (与单链统一;
+        精细鉴别由 min_ipsae=0.5 补充门承担)。
     quality_min_distogram_binding_confidence : float
         PDB 质量闸门的最低界面 distogram 置信度 (纯 binder×target
         界面, 无 target-target 稀释), 默认 0.50。
     quality_min_binder_plddt : float
         PDB 质量闸门的最低 binder pLDDT。
     iptm_metric : str
-        置信度指标源 ("global" | "pair_chains"), 见字段注释。
+        Stage-6 排序的 ipTM 项指标源 ("ipsae" | "pair_chains" | "global"),
+        见字段注释; 不控制 Stage-2 质量门。
     top_n : int
         最终输出的 Top-N 设计数。
     output_dir : str
@@ -106,17 +109,24 @@ class PipelineConfig:
 
     # Quality gate
     ##### claude 2026/10/19 start #####
-    # ipTM 阈值: 按 target 链数选择, 喂给 iptm_metric 选中的指标。
-    # pair_chains 模式 (默认) 下为 binder-target pair_chains_iptm 的定标值
-    # (2026-10-19 回放, diag_pair_iptm_replay, 8 真实产物):
-    #   多链: 真解 founder 0.487 / nohot_4z 0.684 vs 退化 wrapper 0.255 /
-    #   seed2 0.059 / seed4 0.203 → 分离区间 (0.26, 0.49) 取 0.40;
-    #   单链: 真解 0.563-0.586, 无退化样本, 沿用 0.50 (留 0.06 边际)。
-    #   块均值系统性低于旧全局 max-over-rows 值 (典型 -0.2~-0.3), 勿与旧
-    #   0.50/0.70 数值混比。
-    # global 模式 (过渡诊断用): 阈值同为上述数值, 未按全局值重标定。
-    quality_min_iptm_single: float = 0.50
-    quality_min_iptm_multi: float = 0.40
+    # pair 门阈值 (Stage-2 粗筛门, 与 iptm_metric 排序开关解耦; 2026-10-19
+    # 用户定稿: 单链/多链统一 0.3)。角色为粗底线 —— pair_chains_iptm 的
+    # d0 耦合全复合体长度 (跨 binder 长度/复杂度尺度不稳), 且精细鉴别
+    # 职责已由 ipSAE 补充门 (0.5) 承担。回放参照 (diag_pair_iptm_replay,
+    # 8 产物): 验证真解 pair 0.49-0.68 (过门), 退化 wrapper 0.256 /
+    # seed4 0.198 / seed2 0.060 (拦下), founder 型缺陷设计 pair 0.494
+    # 过本门而由 ipSAE 门拦截 —— 两门互补。块均值系统性低于旧全局
+    # max-over-rows 值 (-0.2~-0.3), 勿与旧数值混比。
+    quality_min_iptm_single: float = 0.30
+    quality_min_iptm_multi: float = 0.30
+    # ipSAE 补充门 (Stage-2, 与 iptm_metric 开关无关常透传; REMARK 键
+    # "ipsae")。定标 (2026-10-19, diag_pair_iptm_replay, 8 产物 cutoff15):
+    # 全流程验证真解 (3 个 selected) 0.797-0.813; 未验证/带缺陷产物
+    # (founder: pair 值过门但 Stage-6 pLDDT FAIL + 序列单调; seed3 热点
+    # 假阳性; wrapper 低复杂度) 0.15-0.38; 灾难失败 0.00-0.02 → 阈值 0.5
+    # (分离带 (0.38, 0.80) 内偏宽松, 真解留 ~0.3 边际; n=3 待更多 e2e 复核)。
+    # 与 pair 门互补: 拦截 founder 型 "pair 值过门但整体质量缺陷" 设计。
+    min_ipsae: float | None = 0.5
     ##### claude 2026/10/19 end #####
     # 界面级质量闸门: distogram binding confidence (纯 binder×target
     # 界面熵, 无 target-target 稀释), 与 Stage 4 scaling 阈值惯例一致。
@@ -125,16 +135,17 @@ class PipelineConfig:
     quality_min_binder_plddt: float = 0.70
 
     ##### claude 2026/10/19 start #####
-    # 置信度指标源 (Stage-2 质量门 + Stage-6 过滤/排序的 ipTM 槽位):
-    # "pair_chains" (默认) = binder-target pair_chains_iptm (ConfidenceHead
-    #            链对子块均值的 [target][binder] 方向残基加权合并 — 固定
-    #            target 评估 binder 位置置信度; 多链 target 剔除 target-
-    #            target 对的膨胀。组装置信度语义, 非接触度量 — 接触意图由
-    #            热点几何门另行核验)。2026-10-19 定标后切为默认:
-    #            wrapper 全局 0.888 / pair 0.255 的膨胀实证;
-    # "global" = 全局 ipTM (旧行为, 过渡诊断用; 多链被 target-target 对
-    #            稀释虚高, 阈值未按全局值重标定)。
-    iptm_metric: str = "pair_chains"
+    # Stage-6 selection score 的 ipTM 项指标源 + Stage-4 hero 比较/排序源
+    # (2026-10-19 定稿默认 "ipsae"; **仅控制排序, 不控制 Stage-2 门** ——
+    # 质量门固定 pair (0.50/0.40) + min_ipsae (0.5) 双门, Average_i_pTM
+    # 过滤槽固定 pair 值, 均与本开关解耦):
+    # "ipsae" = ipSAE (d0res 主分数 t2b; 8 产物回放实证排序与验证状态
+    #           一致: 验证真解 0.80+ > 未验证/带缺陷 0.15-0.38 > 灾难
+    #           ≤0.02; 缺失回退 pair → 全局);
+    # "pair_chains" = binder-target pair_chains_iptm (t2b 残基加权合并,
+    #           组装置信度语义);
+    # "global" = 全局 ipTM (诊断; 多链被 target-target 对稀释虚高)。
+    iptm_metric: str = "ipsae"
     ##### claude 2026/10/19 end #####
 
     # Refold screening
@@ -188,6 +199,10 @@ class PipelineResult:
     # "pair_chains" 时为 Stage-2/6 置信度槽位的指标源)。b2t/逐链明细
     # 不进 dataclass, 留在源结果 dict。
     pair_chains_iptm: float | None = None
+    # ipSAE (d0res 主分数 t2b, 补充信号): Stage-2 补充门 + Stage-6
+    # iptm_metric="ipsae" 排序源; anchor 为消费方向锚残基 flat 0-idx。
+    ipsae: float | None = None
+    ipsae_anchor: int | None = None
     ##### claude 2026/10/19 end #####
 
     # 重折叠后指标
@@ -223,7 +238,7 @@ class PipelineResult:
 def compute_selection_score(
     results: list[PipelineResult],
     rosetta_weight: float = 0.0,
-    iptm_metric: str = "global",
+    iptm_metric: str = "ipsae",
 ) -> list[PipelineResult]:
     """计算每条设计的综合选择评分。
 
@@ -245,9 +260,9 @@ def compute_selection_score(
     rosetta_weight : float
         Rosetta 物理评分在综合评分中的权重 (0-1), 默认 0。
     iptm_metric : str
-        ipTM 槽位指标源 (2026/10/19): "global" 用 refold/全局 ipTM;
-        "pair_chains" 优先取 binder-target pair_chains_iptm (t2b 合并值),
-        缺失时回退全局 (过渡兼容旧行)。
+        selection score 的 ipTM 项指标源 (仅排序; Stage-2 门不随此项):
+        "ipsae" 用 ipSAE (缺失回退 pair → 全局); "pair_chains" 用 pair
+        值 (缺失回退全局); "global" 用 refold/全局 ipTM。
 
     Returns
     -------
@@ -262,6 +277,12 @@ def compute_selection_score(
     if iptm_metric == "pair_chains":
         iptm_vals = np.array([
             (r.pair_chains_iptm or r.refold_iptm or r.iptm or 0.0)
+            for r in results
+        ])
+    elif iptm_metric == "ipsae":
+        # ipSAE 排序源; 旧行缺失回退 pair 值再回退全局 (过渡兼容)
+        iptm_vals = np.array([
+            (r.ipsae or r.pair_chains_iptm or r.refold_iptm or r.iptm or 0.0)
             for r in results
         ])
     else:
@@ -334,7 +355,6 @@ def apply_filters(
     results: list[PipelineResult],
     filters_json: str | None = None,
     pI_max: float = 6.0,
-    iptm_metric: str = "global",
 ) -> tuple[list[PipelineResult], list[PipelineResult]]:
     """执行 BindCraft 风格的阈值过滤 + 等电点筛选。
 
@@ -370,7 +390,7 @@ def apply_filters(
 
     for r in results:
         # 构建 data_dict
-        data_dict = _build_data_dict(r, iptm_metric=iptm_metric)
+        data_dict = _build_data_dict(r)
 
         # BindCraft 阈值检查
         filter_result = check_filters(data_dict, filters)
@@ -401,19 +421,18 @@ def apply_filters(
 
 def _build_data_dict(
     result: PipelineResult,
-    iptm_metric: str = "global",
 ) -> dict[str, Any]:
     """从 PipelineResult 构建 check_filters 所需的 data_dict。
 
     仅使用有实际测量值的指标, 缺失的用 None (check_filters 会跳过)。
-    ``iptm_metric="pair_chains"`` 时 Average_i_pTM 槽位优先取
-    binder-target pair_chains_iptm (t2b 合并值), 缺失回退全局 ipTM。
+    Average_i_pTM 槽**固定 pair 值优先** (Stage-6 过滤阈值 0.4 按 pair 值
+    定标, 不随 iptm_metric 排序开关切换; 旧行缺失回退 refold/全局)。
     """
     d: dict[str, Any] = {}
 
     # 置信度指标 (前缀 Average_, 模拟 BindCraft 的多模型平均)
     ##### claude 2026/10/19 start #####
-    if iptm_metric == "pair_chains" and result.pair_chains_iptm is not None:
+    if result.pair_chains_iptm is not None:
         d["Average_i_pTM"] = result.pair_chains_iptm
     elif result.refold_iptm is not None:
         d["Average_i_pTM"] = result.refold_iptm
@@ -517,7 +536,12 @@ class IntegratedPipeline:
         target_hotspot_ids: list[str] | None,
         epitope_contact_distance: float,
         inter_loss_mode: str | None = None,
-        fold_rescue_schedule: bool = False,
+        ##### claude 2026/10/21 start #####
+        # None = auto: 热点任务默认启用 fold-rescue 三阶段调度
+        # (2026-10-21 语义变更, 与 inter_loss_mode 同款 auto 约定);
+        # 解析在 design_binder 内, 显式 False 可退出。
+        fold_rescue_schedule: bool | None = None,
+        ##### claude 2026/10/21 end #####
     ) -> tuple[list[str], Any, list[dict], Any]:
         """执行原始 ESMFold2 binder design。
 
@@ -651,9 +675,12 @@ class IntegratedPipeline:
     ) -> tuple[list[dict], list[dict]]:
         """对 Hero Critic 输出的 PDB 做质量预过滤。
 
+        固定门组 (2026/10/19 定稿): pair_chains_iptm (统一 0.3 粗筛)
+        + ipSAE 补充门 (min_ipsae=0.5) + binder pLDDT (0.70) +
+        distogram proxy (0.50) + CA clash (=0); 全局 iPTM 仅记录不设门。
         ``target_hotspot_ids`` 非空时 (热点设计模式) 追加热点几何核验门
-        (见 :meth:`_hotspot_contact_check`), 作为现有 iPTM/pLDDT/proxy 门
-        的额外补充; 核验失败的条目进入 failed 并记录原因。
+        (见 :meth:`_hotspot_contact_check`); 核验失败的条目进入 failed
+        并记录原因。
         """
         from inverse_optimize.quality_filter import (
             QualityFilterConfig,
@@ -671,7 +698,8 @@ class IntegratedPipeline:
         ##### claude 2026/8/13 start #####
         # 多链 target: binder 链名 = 复合物最后一条链的标签 (不再是固定的
         # "B")。所有 hero critic 共享同一 designed_sequence, 循环外推导一次。
-        # 同时按 target 链数选择 iPTM 阈值 (单链 0.50 / 多链 0.70)。
+        # pair 门阈值按 target 链数选择 (当前单链/多链统一 0.3, 字段保留
+        # 以便日后分开调)。
         binder_label = ""
         target_chains: list[str] = []
         if hero_results:
@@ -687,14 +715,16 @@ class IntegratedPipeline:
         )
 
         ##### claude 2026/10/19 start #####
-        # ipTM 指标源开关: pair_chains 模式把同一阈值喂给 pair 门 (REMARK 键
-        # pair_chains_iptm, t2b 合并值), global 模式保持原 iPTM 门。
-        use_pair = self.config.iptm_metric == "pair_chains"
-        ##### claude 2026/10/19 end #####
+        # Stage-2 置信度门固定双门 (2026-10-19 定稿): pair 门 (0.50/0.40,
+        # REMARK 键 pair_chains_iptm) + ipSAE 补充门 (min_ipsae=0.5)。
+        # 全局 iPTM 仅记录不设门; iptm_metric 只控制 Stage-6 排序源,
+        # 与本门完全解耦。
         cfg = QualityFilterConfig(
+            ##### claude 2026/10/19 end #####
             ##### claude 2026/10/19 start #####
-            min_iptm=None if use_pair else min_iptm,
-            min_pair_chains_iptm=min_iptm if use_pair else None,
+            min_iptm=None,
+            min_pair_chains_iptm=min_iptm,
+            min_ipsae=self.config.min_ipsae,
             ##### claude 2026/10/19 end #####
             min_binder_plddt=self.config.quality_min_binder_plddt,
             ##### claude 2026/8/13 start #####
@@ -749,11 +779,15 @@ class IntegratedPipeline:
             print(
                 f"[Quality] {len(passed)}/{len(hero_results)} Hero Critic PDBs "
                 f"passed quality gate "
-                f"({'pair_chains_iptm' if use_pair else 'iPTM'}≥{min_iptm} "
+                f"(pair_chains_iptm≥{min_iptm} "
                 f"[{len(target_chains)} target chain(s)], "
                 f"binder={binder_label}, "
                 f"pLDDT≥{self.config.quality_min_binder_plddt}, "
-                f"proxy≥{self.config.quality_min_distogram_binding_confidence})"
+                f"proxy≥{self.config.quality_min_distogram_binding_confidence}"
+                + (
+                    f", ipsae≥{self.config.min_ipsae}"
+                    if self.config.min_ipsae is not None else ""
+                ) + ")"
             )
             ##### claude 2026/8/13 end #####
 
@@ -972,7 +1006,11 @@ class IntegratedPipeline:
         target_hotspot_ids: list[str] | None = None,
         epitope_contact_distance: float = 12.0,
         inter_loss_mode: str | None = None,
-        fold_rescue_schedule: bool = False,
+        ##### claude 2026/10/21 start #####
+        # None = auto: 热点任务默认启用 fold-rescue 三阶段调度
+        # (2026-10-21 语义变更); 显式 False 可退出, 无热点时 True 报错。
+        fold_rescue_schedule: bool | None = None,
+        ##### claude 2026/10/21 end #####
     ) -> dict[str, Any]:
         """执行完整的集成 Pipeline。
 
@@ -994,8 +1032,8 @@ class IntegratedPipeline:
         cfg = self.config
 
         ##### claude 2026/10/19 start #####
-        assert cfg.iptm_metric in ("global", "pair_chains"), (
-            f"iptm_metric must be 'global' or 'pair_chains', "
+        assert cfg.iptm_metric in ("global", "pair_chains", "ipsae"), (
+            f"iptm_metric must be 'global', 'pair_chains' or 'ipsae', "
             f"got {cfg.iptm_metric!r}"
         )
         ##### claude 2026/10/19 end #####
@@ -1127,7 +1165,7 @@ class IntegratedPipeline:
             print(f"[Pipeline] Stage 6: Filter & Select")
             print(f"{'='*60}")
 
-        passed, failed = apply_filters(all_results, iptm_metric=cfg.iptm_metric)
+        passed, failed = apply_filters(all_results)
 
         # ── 选择 Top-N ───────────────────────────────────────────
         selected = select_top_n(passed, top_n=cfg.top_n)
@@ -1222,6 +1260,12 @@ def _collect_results(
             final_loss=r.get("final_loss"),
             ##### claude 2026/10/19 start #####
             pair_chains_iptm=r.get("pair_chains_iptm"),
+            ipsae=r.get("ipsae"),
+            ipsae_anchor=(
+                (r.get("ipsae_detail") or {}).get("anchor_t2b")
+                if r.get("ipsae_detail")
+                else None
+            ),
             ##### claude 2026/10/19 end #####
             annotated_pdb=r.get("annotated_pdb"),
             complex=r.get("complex"),
@@ -1265,6 +1309,12 @@ def _collect_results(
             distogram_iptm_proxy=mr.get("distogram_iptm_proxy"),
             ##### claude 2026/10/19 start #####
             pair_chains_iptm=mr.get("pair_chains_iptm"),
+            ipsae=mr.get("ipsae"),
+            ipsae_anchor=(
+                (mr.get("ipsae_detail") or {}).get("anchor_t2b")
+                if mr.get("ipsae_detail")
+                else None
+            ),
             ##### claude 2026/10/19 end #####
             annotated_pdb=mr.get("annotated_pdb"),
             complex=mr.get("complex"),
@@ -1333,6 +1383,7 @@ def _save_outputs(
             "selection_score": round(r.selection_score, 4),
             "iptm": r.refold_iptm or r.iptm,
             "pair_chains_iptm": r.pair_chains_iptm,
+            "ipsae": r.ipsae,
             "distogram_iptm_proxy": r.distogram_iptm_proxy,
             "rosetta_dG": r.rosetta_dG,
             "rosetta_sc": r.rosetta_sc,
