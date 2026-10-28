@@ -1,7 +1,11 @@
 {
   "permissions": {
     "allow": [
-      "Bash(cd *)"
+      "Bash(cd *)",
+      "WebSearch",
+      "Read(//home/taoyr/projects/benchmark/data/add/**)",
+      "Read(//home/taoyr/projects/benchmark/**)",
+      "Bash(/home/taoyr/anaconda3/envs/esmbind/bin/python -)"
     ]
   }
 }
