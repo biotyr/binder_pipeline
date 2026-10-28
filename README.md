@@ -290,6 +290,35 @@ Pipeline 本体不解析 FASTA: `run()` 接受 `|` 拼接的序列串, 原始链
 | e2e runner | `test/e2e/run_e2e.py --inter-loss-mode {auto,full_coverage,hotspot_neighborhood}` (默认 auto) + `--fold-rescue-schedule {auto,on,off}` (默认 auto = 热点任务启用) |
 | `run_local.py` / `run_modal.py` | 未暴露新参数; 热点任务自动走 ①② 默认, 需显式控制时用 Python API |
 
+### 4. 策略选择经验法则：inter 域随 binder/target 长度需求比（2026-10-27 双臂 benchmark 实证）
+
+2026-10-23/27 两轮双臂 benchmark（20 靶 × 2 策略 × 3 seed = 60 组有效配对，ipSAE
+口径；完整数据与报告见 `benchmark/results/report_ipsae_length.md`）发现：
+**① 邻域化与 ② fold-rescue 调度哪个占优，由需求比 = target 残基数 / binder 长度
+（全覆盖损失的"单位 binder 容量接触需求"）决定，临界线在需求比 ≈1**，而非靶长
+绝对值。三段经验法则：
+
+| 需求比 | 机制 | 实证（均值 ΔipSAE = current−native） | 建议 |
+|---|---|---|---|
+| **≥2**（binder ≪ target） | 全覆盖物理不可满足，inter 退化为稀释噪声并与 epitope 拔河 | **current 占优 4/4 靶**（GDF-8 +0.26 / BHRF1 +0.13 / IL-7Rα +0.12 / 15-PGDH +0.05） | **用 current（①② 默认即最优）** |
+| **1.0-1.8**（binder 略小于 target，全覆盖"临界可达"） | 稠密全覆盖梯度是有效塑形压力；邻域化撤压反而受损 | native 7/7 靶均 ≥ current（TrkA −0.25 最显著）；但有 Der-f7 型 native 三 seed 坍塌风险 | **倾向 native（显式 `inter_loss_mode="full_coverage"`），建议双跑** |
+| **<1**（binder ≥ target，全覆盖近乎免费） | 两种 inter 域趋同，epitope 被子集化，方差主导 | 两轮证据矛盾（长 binder 批 current +0.15，L120 同靶判决翻负） | **双跑取优** |
+
+**判决实验**（U 型模型的最强证据）：同靶唯一变量 binder 长度（181-196 → 120）
+跨过需求比 1.0 边界——IL-17A 的 Δ 从 +0.165 翻到 **−0.231**、Der-f21 从 +0.125
+翻到 **−0.244**（6 个 seed 配对 5 个负向），需求比 <1 时 current 占优、跨入
+1.0-1.8 后优势消失，方向与模型一致。
+
+**限制与注意**：
+- 样本 = 15 靶 / 3 seed，单指标（ipSAE）；长 binder（>180aa）区 seed 方差
+  ±0.4-0.6，单 seed 配对差异不可作结论。
+- 中带并非 native 稳赢：Der-f7 在需求比 1.63 下 native 三 seed 全坍塌
+  （ipSAE ≤0.1）——临界带存在 native 自身失效模式，故建议双跑。
+- 策略差异与热点 honoring 相互独立：高 ipSAE 不保证热点接触
+  （IL-17A 长 binder 例），热点任务的几何核验门在任何策略下都必须保留。
+- `inter_loss_mode` 默认（`None` → 邻域）在需求比 ≥2 区间最优；临界带任务
+  请按上表显式选边或双跑。
+
 ## 置信度指标: binder-target pair ipTM (2026-10-19 切换默认)
 
 Stage-2 质量门与 Stage-6 过滤/排序的界面置信度槽位已从全局 ipTM 切换为
